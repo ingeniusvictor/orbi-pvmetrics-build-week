@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { StateProvider, useAppState } from './StateContext';
 import { DashboardView } from '../components/DashboardView';
 import { PVMetricsLiveMonitoringDashboard } from '../components/live/PVMetricsLiveMonitoringDashboard';
@@ -27,14 +27,19 @@ import {
   Cpu,
   Database,
   GitCommit,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { PVMetricsDataSourceManagerView } from '../components/data-sources/PVMetricsDataSourceManagerView';
 import { PVMetricsSignalMappingView } from '../components/signal-mapping/PVMetricsSignalMappingView';
 import { PVMetricsSignalQualityRulesView } from '../components/signal-quality/PVMetricsSignalQualityRulesView';
 import { PVMetricsPlantProfileManagerView } from '../components/plant-profile/PVMetricsPlantProfileManagerView';
 
-type MainViewType = 'dashboard' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
+const IncidentCopilotView = lazy(
+  () => import('../../build-week/incident-copilot/IncidentCopilotView'),
+);
+
+type MainViewType = 'dashboard' | 'incident-copilot' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
 
 const OrbiPVMetricsStandaloneInner: React.FC = () => {
   const { 
@@ -52,6 +57,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
     { id: 'live', label: 'Monitoreo Live', icon: Activity },
     { id: 'diario', label: 'Diario', icon: Clock },
     { id: 'semanal', label: 'Semanal', icon: Calendar },
@@ -72,6 +78,18 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
     switch (activeView) {
       case 'dashboard':
         return <DashboardView />;
+      case 'incident-copilot':
+        return (
+          <Suspense
+            fallback={
+              <div className="rounded-xl border border-amber-500/20 bg-gray-900 p-8 text-center text-xs text-amber-300">
+                Loading Build Week Incident Copilot…
+              </div>
+            }
+          >
+            <IncidentCopilotView />
+          </Suspense>
+        );
       case 'live':
         return <PVMetricsLiveMonitoringDashboard />;
       case 'diario':
@@ -218,7 +236,20 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                     }`}
                   >
                     <Icon className="w-4 h-4 shrink-0" />
-                    {item.label}
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                      <span className="truncate">{item.label}</span>
+                      {'badge' in item && item.badge && (
+                        <span
+                          className={`shrink-0 rounded px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider ${
+                            isSelected
+                              ? 'bg-slate-950/15 text-slate-900'
+                              : 'border border-amber-500/30 bg-amber-500/10 text-amber-300'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </span>
                   </button>
                 );
               })}
