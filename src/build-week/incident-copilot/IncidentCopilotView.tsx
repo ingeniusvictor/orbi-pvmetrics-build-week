@@ -17,7 +17,14 @@ import {
   Sparkles,
   XCircle,
 } from 'lucide-react';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { requestGptAdvisory } from './advisoryClient';
+import {
+  clearIncidentAdvisory,
+  createIncidentAdvisoryState,
+  GPT_ADVISORY_TITLE,
+  recordIncidentAdvisory,
+} from './advisoryDomain';
 import {
   HumanReviewState,
   IncidentAssessment,
@@ -37,6 +44,7 @@ import {
 import {
   getSyntheticScenario,
   SYNTHETIC_INCIDENT_SCENARIOS,
+  type SyntheticIncidentScenarioId,
 } from './syntheticScenarios';
 
 const qualityStyle: Record<IncidentObservation['quality'], string> = {
@@ -159,6 +167,12 @@ export default function IncidentCopilotView() {
   const [reviewNote, setReviewNote] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
+  const [advisoryState, setAdvisoryState] = useState(
+    createIncidentAdvisoryState,
+  );
+  const [isGeneratingAdvisory, setIsGeneratingAdvisory] = useState(false);
+  const [advisoryError, setAdvisoryError] = useState('');
+  const advisoryRequestVersion = useRef(0);
   const scenario = getSyntheticScenario(session.selectedScenarioId);
 
   const qualityCounts = useMemo(
@@ -174,14 +188,22 @@ export default function IncidentCopilotView() {
   );
 
   const handleScenarioChange = (id: string) => {
+    advisoryRequestVersion.current += 1;
     setSession((current) => selectIncidentScenario(current, id));
     setReviewNote('');
     setError('');
+    setAdvisoryState(clearIncidentAdvisory());
+    setAdvisoryError('');
+    setIsGeneratingAdvisory(false);
   };
 
   const handleAnalyze = async () => {
+    advisoryRequestVersion.current += 1;
     setIsAnalyzing(true);
     setError('');
+    setAdvisoryState(clearIncidentAdvisory());
+    setAdvisoryError('');
+    setIsGeneratingAdvisory(false);
     try {
       const assessment = await deterministicIncidentAnalysisProvider.analyze({
         scenario,
@@ -196,6 +218,41 @@ export default function IncidentCopilotView() {
       );
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleGenerateAdvisory = async () => {
+    const assessment = session.assessment;
+    if (!assessment) return;
+    const requestVersion = advisoryRequestVersion.current + 1;
+    advisoryRequestVersion.current = requestVersion;
+    setIsGeneratingAdvisory(true);
+    setAdvisoryError('');
+    setAdvisoryState(clearIncidentAdvisory());
+    try {
+      const response = await requestGptAdvisory(
+        {
+          schemaVersion: '1.0',
+          scenarioId: scenario.id as SyntheticIncidentScenarioId,
+          assessmentId: assessment.assessmentId,
+        },
+        scenario,
+      );
+      if (advisoryRequestVersion.current === requestVersion) {
+        setAdvisoryState(recordIncidentAdvisory(response));
+      }
+    } catch (advisoryRequestError) {
+      if (advisoryRequestVersion.current === requestVersion) {
+        setAdvisoryError(
+          advisoryRequestError instanceof Error
+            ? advisoryRequestError.message
+            : 'The optional advisory failed safely. The deterministic assessment remains authoritative.',
+        );
+      }
+    } finally {
+      if (advisoryRequestVersion.current === requestVersion) {
+        setIsGeneratingAdvisory(false);
+      }
     }
   };
 
@@ -225,6 +282,7 @@ export default function IncidentCopilotView() {
           </div>
           <div className="shrink-0 rounded-xl border border-gray-800 bg-slate-950/70 p-3 text-[10px] leading-relaxed text-gray-400">
             <p><strong className="text-gray-200">Runtime analysis provider:</strong> {RUNTIME_ANALYSIS_PROVIDER}</p>
+            <p><strong className="text-gray-200">Optional supplemental runtime:</strong> Server-side GPT-5.6 Sol advisory interpretation</p>
             <p><strong className="text-gray-200">Development assistance:</strong> {DEVELOPMENT_ASSISTANCE}</p>
             <p className="mt-1 text-amber-300">Synthetic demonstration · read-only · no control</p>
           </div>
@@ -281,7 +339,7 @@ export default function IncidentCopilotView() {
           <FlaskConical className="mx-auto h-8 w-8 text-amber-400" />
           <h2 className="mt-3 text-sm font-bold text-white">Ready for deterministic analysis</h2>
           <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-gray-500">
-            Review the raw synthetic observations below, then run the local evidence engine. No external service or model inference is called.
+            Review the raw synthetic observations below, then run the local evidence engine. Deterministic analysis makes no external call; the optional GPT-5.6 advisory is separate and must be requested explicitly.
           </p>
         </section>
       ) : (
@@ -388,6 +446,101 @@ export default function IncidentCopilotView() {
               <span>Rules: {assessment.trace.ruleIds.join(', ')}</span>
             </div>
           </Section>
+
+          <section
+            aria-labelledby="gpt-advisory-title"
+            className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/10 via-gray-900 to-cyan-500/5 p-5 shadow-xl shadow-black/10"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-violet-200">
+                    Supplemental and non-authoritative
+                  </span>
+                  <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-amber-200">
+                    Human review required
+                  </span>
+                </div>
+                <h2 id="gpt-advisory-title" className="flex items-center gap-2 text-sm font-black text-white">
+                  <Sparkles className="h-4 w-4 text-violet-300" /> {GPT_ADVISORY_TITLE}
+                </h2>
+                <p id="gpt-advisory-boundary" className="mt-2 max-w-3xl text-xs leading-relaxed text-gray-400">
+                  The deterministic assessment remains authoritative. GPT-5.6 cannot modify facts, priority, risk, confidence, evidence, calculations, or review state. Only fixed synthetic data is sent; output is advisory and cannot approve an assessment or control equipment.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleGenerateAdvisory}
+                disabled={isGeneratingAdvisory}
+                aria-describedby="gpt-advisory-boundary"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-violet-400/40 bg-violet-500/15 px-5 py-3 text-xs font-black uppercase tracking-wider text-violet-100 transition hover:bg-violet-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:cursor-wait disabled:opacity-60"
+              >
+                <Sparkles className={`h-4 w-4 ${isGeneratingAdvisory ? 'animate-pulse' : ''}`} />
+                {isGeneratingAdvisory ? 'Generating advisory' : 'Generate GPT-5.6 advisory'}
+              </button>
+            </div>
+
+            {advisoryError && (
+              <p role="alert" className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-relaxed text-amber-200">
+                {advisoryError}
+              </p>
+            )}
+
+            {advisoryState.response && (
+              <div className="mt-5 space-y-4" data-testid="gpt-advisory-interpretation">
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <article className="rounded-xl border border-violet-500/20 bg-slate-950/55 p-4">
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-violet-200">Advisory summary</h3>
+                    <p className="mt-2 text-xs leading-6 text-gray-300">{advisoryState.response.advisory.advisorySummary}</p>
+                  </article>
+                  <article className="rounded-xl border border-cyan-500/20 bg-slate-950/55 p-4">
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-200">Uncertainty explanation</h3>
+                    <p className="mt-2 text-xs leading-6 text-gray-300">{advisoryState.response.advisory.uncertaintyExplanation}</p>
+                  </article>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  <div className="rounded-xl border border-gray-800 bg-slate-950/55 p-4">
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-200">Human-review questions</h3>
+                    <ol className="mt-3 space-y-3">
+                      {advisoryState.response.advisory.humanReviewQuestions.map((question) => (
+                        <li key={question.id} className="rounded-lg border border-gray-800 bg-black/20 p-3">
+                          <p className="text-xs font-semibold leading-relaxed text-gray-200">{question.question}</p>
+                          <p className="mt-1 text-[10px] leading-relaxed text-gray-500">{question.rationale}</p>
+                          <EvidenceLinks ids={question.evidenceIds} />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div className="rounded-xl border border-gray-800 bg-slate-950/55 p-4">
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-200">Investigation considerations</h3>
+                    <ol className="mt-3 space-y-3">
+                      {advisoryState.response.advisory.investigationConsiderations.map((consideration) => (
+                        <li key={consideration.id} className="rounded-lg border border-violet-500/15 bg-violet-500/5 p-3">
+                          <span className="text-[8px] font-bold uppercase text-amber-300">Human approval required</span>
+                          <p className="mt-1 text-xs font-semibold leading-relaxed text-gray-200">{consideration.consideration}</p>
+                          <p className="mt-1 text-[10px] leading-relaxed text-gray-500">{consideration.rationale}</p>
+                          <EvidenceLinks ids={consideration.evidenceIds} />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-gray-800 bg-slate-950/55 p-4">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-200">Limitations</h3>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-gray-400">
+                    {advisoryState.response.advisory.limitations.map((limitation) => (
+                      <li key={limitation}>{limitation}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 font-mono text-[9px] text-gray-500">
+                    Provider: {advisoryState.response.provider.id} · Model: {advisoryState.response.provider.model} · Role: {advisoryState.response.provider.role}
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
 
           <Section title="Human review state" icon={ShieldCheck} id="incident-human-review">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
