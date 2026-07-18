@@ -172,6 +172,18 @@ The Incident Copilot async chunk does not import Recharts or the legacy QA, rele
 
 These commits preserve the distinction between the product that existed before Build Week and the bounded competition feature built during the event.
 
+## Private evaluation delivery model
+
+The authorized Build Week delivery model is:
+
+- a private GitHub repository;
+- controlled evaluator access;
+- local execution using Node.js 22;
+- a public demonstration video without source-code exposure;
+- no public web deployment unless separately approved by the owner.
+
+Public source-code publication and public Vercel, Netlify, GitHub Pages, or other web deployment are not authorized by this repository.
+
 ## Build Week evidence
 
 Build Week evidence includes:
@@ -179,10 +191,23 @@ Build Week evidence includes:
 - a clear record of pre-existing versus Build Week work;
 - the immutable sanitized baseline and accepted implementation commits;
 - tests and reproducible setup instructions;
-- a public demo video under three minutes;
+- a public demo video under three minutes without source-code exposure;
 - the Codex `/feedback` Session ID for the principal development thread.
 
 See `BUILD_WEEK_CHANGELOG.md` for the focused implementation and verification record.
+
+## Intellectual Property and Evaluation Notice
+
+Copyright © 2026 Víctor Marcel León Pacheco / ORBI Ecosystem.
+All rights reserved.
+
+This repository and its contents are provided solely for evaluation in OpenAI Build Week.
+
+No permission is granted to copy, redistribute, sublicense, commercialize, sell, publish, create derivative commercial products from, or reuse the software, source code, prompts, architecture, interfaces, reasoning rules, documentation, or associated materials outside the authorized evaluation process.
+
+ORBI PVMetrics IA is proprietary software under active commercial development. This competition repository contains only a sanitized, synthetic, and bounded evaluation edition. It does not contain the complete commercial product, real customer data, production connectors, operational credentials, or future proprietary modules.
+
+Access to this private repository does not transfer ownership or grant an open-source license.
 
 ## Attribution
 
