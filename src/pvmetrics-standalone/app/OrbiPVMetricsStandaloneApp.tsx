@@ -210,26 +210,32 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             <div className="md:hidden p-4 flex justify-between items-center bg-gray-900/50 border-b border-gray-800">
               <span className="text-xs font-semibold text-gray-300">Navegación</span>
               <button 
+                type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1 text-gray-400 hover:text-white"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="primary-navigation"
+                className="rounded p-1 text-gray-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
 
             {/* Links */}
-            <nav className={`p-3 space-y-1 ${mobileMenuOpen ? 'block' : 'hidden md:block'}`}>
+            <nav id="primary-navigation" className={`p-3 space-y-1 ${mobileMenuOpen ? 'block' : 'hidden md:block'}`}>
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isSelected = activeView === item.id;
                 return (
                   <button
+                    type="button"
                     key={item.id}
+                    aria-current={isSelected ? 'page' : undefined}
                     onClick={() => {
                       setActiveView(item.id as MainViewType);
                       setMobileMenuOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                       isSelected 
                         ? 'bg-amber-500 text-slate-950 font-bold' 
                         : 'text-gray-400 hover:text-white hover:bg-gray-900/50'

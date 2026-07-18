@@ -66,7 +66,7 @@ const EvidenceLinks = ({ ids }: { ids: string[] }) => (
       <a
         key={id}
         href={`#evidence-${id}`}
-        className="inline-flex items-center gap-1 rounded border border-cyan-500/20 bg-cyan-500/5 px-2 py-1 font-mono text-[9px] text-cyan-300 hover:border-cyan-400 hover:bg-cyan-500/10"
+        className="inline-flex items-center gap-1 rounded border border-cyan-500/20 bg-cyan-500/5 px-2 py-1 font-mono text-[9px] text-cyan-300 hover:border-cyan-400 hover:bg-cyan-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
       >
         <Link2 className="h-3 w-3" />
         {id}
@@ -132,7 +132,14 @@ const SummaryCards = ({ assessment }: { assessment: IncidentAssessment }) => {
           <span className="text-4xl font-black text-white">{assessment.confidence.score}</span>
           <span className="pb-1 text-xs font-bold uppercase text-cyan-300">{assessment.confidence.level}</span>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-800">
+        <div
+          className="mt-3 h-2 overflow-hidden rounded-full bg-gray-800"
+          role="progressbar"
+          aria-label="Analysis confidence"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={assessment.confidence.score}
+        >
           <div
             className="h-full rounded-full bg-cyan-400"
             style={{ width: `${assessment.confidence.score}%` }}
@@ -234,7 +241,7 @@ export default function IncidentCopilotView() {
               id="incident-scenario"
               value={session.selectedScenarioId}
               onChange={(event) => handleScenarioChange(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none focus:border-amber-400"
+              className="mt-2 w-full rounded-xl border border-gray-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
               {SYNTHETIC_INCIDENT_SCENARIOS.map((item) => (
                 <option key={item.id} value={item.id}>{item.title}</option>
@@ -249,7 +256,7 @@ export default function IncidentCopilotView() {
             type="button"
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition hover:bg-amber-300 disabled:cursor-wait disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-xs font-black uppercase tracking-wider text-slate-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:cursor-wait disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
             {assessment ? 'Rerun analysis' : 'Analyze synthetic scenario'}
@@ -385,7 +392,7 @@ export default function IncidentCopilotView() {
           <Section title="Human review state" icon={ShieldCheck} id="incident-human-review">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               <div>
-                <span className={`inline-flex rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase ${reviewStyle[assessment.review.state]}`}>
+                <span role="status" aria-live="polite" className={`inline-flex rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase ${reviewStyle[assessment.review.state]}`}>
                   {reviewLabel[assessment.review.state]}
                 </span>
                 <p className="mt-2 text-xs leading-relaxed text-gray-500">
@@ -398,17 +405,17 @@ export default function IncidentCopilotView() {
                   onChange={(event) => setReviewNote(event.target.value)}
                   rows={3}
                   placeholder="Optional reviewer rationale"
-                  className="mt-2 w-full rounded-xl border border-gray-700 bg-slate-950 p-3 text-xs text-gray-200 outline-none focus:border-amber-400"
+                  className="mt-2 w-full rounded-xl border border-gray-700 bg-slate-950 p-3 text-xs text-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                 />
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                <button type="button" onClick={() => handleReview('approved')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-emerald-300 hover:bg-emerald-500/20">
+                <button type="button" onClick={() => handleReview('approved')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-emerald-300 hover:bg-emerald-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300">
                   <CheckCircle2 className="h-4 w-4" /> Approve
                 </button>
-                <button type="button" onClick={() => handleReview('changes-requested')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-orange-300 hover:bg-orange-500/20">
+                <button type="button" onClick={() => handleReview('changes-requested')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-orange-300 hover:bg-orange-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300">
                   <ChevronRight className="h-4 w-4" /> Request changes
                 </button>
-                <button type="button" onClick={() => handleReview('rejected')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-red-300 hover:bg-red-500/20">
+                <button type="button" onClick={() => handleReview('rejected')} className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-[10px] font-bold uppercase text-red-300 hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300">
                   <XCircle className="h-4 w-4" /> Reject
                 </button>
               </div>
@@ -423,7 +430,8 @@ export default function IncidentCopilotView() {
             <article
               key={item.id}
               id={`evidence-${item.id}`}
-              className="scroll-mt-6 rounded-xl border border-gray-800 bg-slate-950/60 p-3 focus-within:border-cyan-500/30 target:border-cyan-400 target:bg-cyan-500/5"
+              tabIndex={-1}
+              className="scroll-mt-6 rounded-xl border border-gray-800 bg-slate-950/60 p-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-within:border-cyan-500/30 target:border-cyan-400 target:bg-cyan-500/5"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-mono text-[9px] text-cyan-300">{item.id}</span>
