@@ -1,0 +1,5 @@
+{
+  "name": "ORBI PVMetrics IA — Build Week Baseline",
+  "description": "Sanitized local-first baseline for the OpenAI Build Week Incident Intelligence Copilot.",
+  "requestFramePermissions": []
+}

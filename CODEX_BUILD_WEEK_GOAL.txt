@@ -1,0 +1,60 @@
+OPENAI BUILD WEEK — CODEX PRINCIPAL SESSION
+ORBI PVMetrics IA — Incident Intelligence Copilot
+
+Read first: AGENTS.md, BUILD_WEEK_BASELINE.md, SANITIZATION_REPORT.md, README.md, package.json, src/App.tsx, src/pvmetrics-standalone/app/OrbiPVMetricsStandaloneApp.tsx, and src/pvmetrics-standalone/version/pvMetricsVersionRegistry.ts.
+
+This thread is intended to become the principal Build Week development session used for the final `/feedback` Session ID.
+
+GOAL
+
+Design, implement, test, and document a focused Incident Intelligence Copilot inside the existing sanitized ORBI PVMetrics IA demo.
+
+The feature must analyze synthetic photovoltaic and BESS incident scenarios and produce:
+
+1. Priority incident.
+2. Confirmed facts and evidence.
+3. Technical hypotheses.
+4. Missing information.
+5. Recommended field verification steps.
+6. Confidence and uncertainty.
+7. Recommended O&M actions.
+8. Energy/operational risk indication.
+9. Executive summary.
+10. Human approval/review state.
+
+FIRST PHASE — AUDIT AND PLAN ONLY
+
+Before editing:
+
+1. Audit the repository and run baseline checks.
+2. Identify the cleanest bounded integration point.
+3. Inventory reusable data, components, and types.
+4. Propose a Build Week architecture and user flow.
+5. Define synthetic scenario schema and validation.
+6. Define deterministic reasoning and an optional GPT-5.6 provider boundary without implementing secrets yet.
+7. Define tests and proof of completion.
+8. List files to add or modify.
+9. Identify risks, including bundle size and the large legacy history surface.
+10. Present the plan and wait for approval.
+
+LIMITS
+
+- No real data.
+- No API key or runtime OpenAI integration in the first phase.
+- No cloud deployment or telecontrol.
+- No rewrite of the whole app.
+- No removal of stable functionality.
+- No commit before approval.
+- No PASS claims without executed evidence.
+
+BASELINE CHECKS
+
+node --version
+npm --version
+npm ci
+npm run lint
+npm run build
+
+REPORT
+
+Return architecture, verified baseline, historical boundary, proposed feature architecture, user flow, synthetic scenarios, tests, files, risks, and approval gate.
