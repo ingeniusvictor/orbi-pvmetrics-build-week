@@ -10,6 +10,10 @@ const hasOverlap = (value: EvaluatedDemoCase) => value.assessment.doubleCounting
   (item) => ['possible-overlap', 'confirmed-overlap'].includes(item.status),
 );
 
+const hasConfirmedOverlap = (value: EvaluatedDemoCase) => value.assessment.doubleCounting.some(
+  (item) => item.status === 'confirmed-overlap',
+);
+
 const recoverableEnergy = (value: EvaluatedDemoCase) =>
   value.assessment.lossAssessments.reduce((sum, item) =>
     sum + (item.scenarios.find((scenario) => scenario.status === 'simulated')?.recoveredEnergy.valueKwh ?? 0),
@@ -33,6 +37,10 @@ export const createPortfolioSummary = (
   const excluded = evaluatedCases.filter((item) =>
     item.assessment.recoverability.status === 'non-recoverable'
     || item.assessment.dataSufficiency.status === 'insufficient'
+    || !item.assessment.lossAssessments.some((loss) =>
+      loss.scenarios.some((scenario) => scenario.status === 'simulated' && scenario.recoveredEnergy.valueKwh > 0),
+    )
+    || hasConfirmedOverlap(item)
     || (policy === 'exclude-overlap' && hasOverlap(item)),
   );
   const candidates = evaluatedCases.filter((item) => !excluded.includes(item));

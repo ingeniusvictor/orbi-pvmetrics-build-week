@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-03 presentation-ready application service
+Status: CR-04 synthetic Climate Recovery portfolio foundation
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -37,6 +37,14 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - The presentation layer preserves uncertainty, provenance, and human-review
   requirements.
 - Spanish and English presentation labels are supported for CR-03 content.
+- A five-asset synthetic Climate Recovery portfolio is implemented.
+- Fourteen deterministic synthetic cases can be evaluated locally.
+- Plant and portfolio summaries can be generated.
+- The portfolio supports explicit overlap aggregation policies.
+- A transparent internal Climate Opportunity Score can rank synthetic
+  opportunities.
+- Human-review queues and data-quality summaries can be generated.
+- All portfolio values are synthetic and presentation-oriented.
 
 ## Prohibited claims at this stage
 
@@ -72,6 +80,17 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Users can dispatch or approve maintenance through the system.
 - The application is production-deployed.
 - The bilingual experience is fully implemented in the UI.
+- The portfolio represents real plants.
+- The portfolio represents ORBI customers.
+- The portfolio totals are operational results.
+- Climate Opportunity Score is scientifically validated.
+- Climate Opportunity Score is a probability.
+- The ranking automatically dispatches maintenance.
+- The emission factors are official.
+- The portfolio has recovered real energy.
+- The portfolio has avoided verified emissions.
+- ORBI operates these assets.
+- The portfolio is production-connected.
 
 ## Usage rule
 

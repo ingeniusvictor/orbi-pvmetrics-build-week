@@ -1,0 +1,41 @@
+export const EXPECTED_SYNTHETIC_PORTFOLIO_RESULTS = Object.freeze({
+  plantCount: 5,
+  caseCount: 14,
+  plantCaseCounts: {
+    'CR04-PLANT-AURORA': 4,
+    'CR04-PLANT-HELIOS': 3,
+    'CR04-PLANT-VALLE': 2,
+    'CR04-PLANT-PATAGONIA': 3,
+    'CR04-PLANT-COSTA': 2,
+  },
+  recoverabilityCounts: {
+    recoverable: 5,
+    'partially-recoverable': 3,
+    'non-recoverable': 3,
+    indeterminate: 3,
+    'not-assessed': 0,
+  },
+  insufficientDataCount: 2,
+  overlapCaseIds: ['DEMO-CR-CASE-D'],
+  defaultExcludedCaseIds: [
+    'DEMO-CR-CASE-B',
+    'CR04-CASE-COMMUNICATIONS',
+    'CR04-CASE-CLIPPING',
+    'DEMO-CR-CASE-C',
+    'DEMO-CR-CASE-D',
+    'CR04-CASE-BESS-OPERATION',
+    'CR04-CASE-THERMAL-DERATING',
+  ],
+  expectedRanking: [
+    'Aurora Solar',
+    'Costa Sur Solar',
+    'Patagonia Storage',
+    'Valle Verde',
+    'Helios Norte',
+  ],
+  rationale: [
+    'Counts and ranking are fixed only after executing CR-02 through CR-03 at the canonical timestamp.',
+    'Exact energy and climate totals remain engine-derived and are asserted through invariants rather than oversized snapshots.',
+    'Unavailable and non-recoverable groups deliberately have no numeric zero fallback.',
+  ],
+});

@@ -20,6 +20,14 @@ explainability, operation descriptors, and explicitly governed synthetic
 portfolio summaries. English and Spanish CR-03 labels come from a small
 deterministic registry. No React component or visual change is included.
 
+CR-04 adds `createSyntheticClimateRecoveryPortfolioService`, a deterministic
+five-asset and fourteen-case portfolio foundation over CR-03. It returns plant
+summaries, an executive portfolio presentation, rankings, a relative human-review
+queue, data-quality and status distributions, explicit overlap aggregation, and
+an explainable internal Climate Opportunity Score. Two fictional configurable
+emission factors support sensitivity at the fixed CR-04 timestamp. All CR-04
+values remain synthetic, presentation-oriented, non-operational, and unverified.
+
 ## Safety boundary
 
 - Hypotheses remain separate from human-confirmed diagnoses.

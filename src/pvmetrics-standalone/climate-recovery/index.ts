@@ -82,3 +82,19 @@ export {
   resolveClimateRecoveryText,
   createClimateRecoveryApplicationService,
 } from './application';
+export type * from './portfolio/contracts/plantContracts';
+export type * from './portfolio/contracts/portfolioContracts';
+export type * from './portfolio/contracts/portfolioPresentationContracts';
+export type {
+  SyntheticClimateRecoveryPortfolioService,
+  SyntheticClimateRecoveryPortfolioServiceDependencies,
+  ClimateOpportunityScoreInput,
+} from './portfolio';
+export {
+  createSyntheticClimateRecoveryPortfolioService,
+  calculateClimateOpportunityScore,
+  CLIMATE_OPPORTUNITY_SCORE_CONFIGURATION,
+  SYNTHETIC_CLIMATE_RECOVERY_PORTFOLIO_METADATA,
+  SYNTHETIC_CLIMATE_RECOVERY_PORTFOLIO_VERSION,
+  getSyntheticPortfolioConfiguration,
+} from './portfolio';
