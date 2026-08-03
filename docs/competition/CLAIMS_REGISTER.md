@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-01 domain foundation
+Status: CR-02 deterministic assessment engine
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -19,6 +19,15 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Configurable emission-factor contracts and fail-closed validation are
   represented.
 - Synthetic recovery and climate-impact estimates cannot be labeled verified.
+- A deterministic Climate Recovery assessment engine is implemented.
+- The engine can evaluate synthetic recoverable-loss cases.
+- The engine can flag insufficient data and double-counting risk.
+- The engine can generate deterministic non-binding recommendations.
+- The engine can estimate synthetic recovery scenarios using configurable
+  assumptions.
+- The engine can estimate climate impact using a configurable synthetic
+  emission factor.
+- Results include traceability, uncertainty, and human-review requirements.
 
 ## Prohibited claims at this stage
 
@@ -35,6 +44,16 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - The fictional emission factor represents a real grid, region, or universal
   value.
 - A simulated recovery scenario is a guaranteed prediction.
+- The engine is statistically validated.
+- The engine is connected to live plants.
+- The engine provides real operational diagnoses.
+- The engine has recovered real MWh.
+- The engine has avoided verified emissions.
+- Priority scores are calibrated probabilities.
+- Recommendations are maintenance orders.
+- Climate impact estimates are certified.
+- Emission factors are official or universal.
+- The engine operates autonomously.
 
 ## Usage rule
 

@@ -1,4 +1,5 @@
 export type * from './contracts/entities';
+export type * from './contracts/assessment';
 export type * from './types/common';
 export type * from './types/taxonomy';
 export type * from './types/validation';
@@ -49,3 +50,24 @@ export {
   validateRecoveryVerification,
 } from './validation/impact';
 export { validateClimateRecoveryCase } from './validation/case';
+export {
+  CLIMATE_RECOVERY_ENGINE_VERSION,
+  DEFAULT_ASSESSMENT_CONFIGURATION,
+  DEFAULT_REQUESTED_OPERATIONS,
+  assessClimateImpact,
+  assessClimateRecoveryCase,
+  assessDataSufficiency,
+  assessEnergyLoss,
+  assessEvidence,
+  assessPriority,
+  assessRecoverability,
+  createAssessmentTraceStep,
+  deriveConfiguredConfidenceLevel,
+  generateDeterministicHypotheses,
+  generateRecommendations,
+  generateRecoveryScenarios,
+  hasIndependentEnergyEvidence,
+  normalizeEmissionFactorToKgPerKwh,
+  resolveAssessmentConfiguration,
+  validateAssessmentConfiguration,
+} from './engine';
