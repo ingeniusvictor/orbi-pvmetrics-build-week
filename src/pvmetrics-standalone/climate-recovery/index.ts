@@ -71,3 +71,14 @@ export {
   resolveAssessmentConfiguration,
   validateAssessmentConfiguration,
 } from './engine';
+export type * from './application/contracts/applicationContracts';
+export type * from './application/contracts/presentationModels';
+export type * from './application/contracts/queryContracts';
+export {
+  CLIMATE_RECOVERY_PRESENTATION_VERSION,
+  DEFAULT_CLIMATE_RECOVERY_APPLICATION_CONFIGURATION,
+  resolveClimateRecoveryApplicationConfiguration,
+  createDemoCaseRegistry,
+  resolveClimateRecoveryText,
+  createClimateRecoveryApplicationService,
+} from './application';

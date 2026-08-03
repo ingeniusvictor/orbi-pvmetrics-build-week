@@ -13,6 +13,13 @@ energy loss, simulated scenarios, estimated climate impact, non-binding
 recommendations, explainable priority, overlap risk, and traceability. Multi-loss
 cases retain individual results in `lossAssessments`.
 
+CR-03 adds `createClimateRecoveryApplicationService`, a dependency-injected,
+pure presentation boundary over CR-02. It lists the four synthetic cases and
+returns stable executive summaries, KPIs, scenarios, timelines,
+explainability, operation descriptors, and explicitly governed synthetic
+portfolio summaries. English and Spanish CR-03 labels come from a small
+deterministic registry. No React component or visual change is included.
+
 ## Safety boundary
 
 - Hypotheses remain separate from human-confirmed diagnoses.
@@ -78,3 +85,8 @@ const result = assessClimateRecoveryCase({
 
 The same complete input produces the same complete output. All results require
 human review.
+
+The CR-03 service likewise requires an explicit evaluation timestamp and
+locale. Its values preserve availability, provenance, estimate/projection
+state, synthetic disclosure, and limitations; blocked or unavailable values
+never use zero as a fallback.
