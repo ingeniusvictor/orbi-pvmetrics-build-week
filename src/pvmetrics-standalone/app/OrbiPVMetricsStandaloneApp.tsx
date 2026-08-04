@@ -28,7 +28,8 @@ import {
   Database,
   GitCommit,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Leaf
 } from 'lucide-react';
 import { PVMetricsDataSourceManagerView } from '../components/data-sources/PVMetricsDataSourceManagerView';
 import { PVMetricsSignalMappingView } from '../components/signal-mapping/PVMetricsSignalMappingView';
@@ -38,8 +39,11 @@ import { PVMetricsPlantProfileManagerView } from '../components/plant-profile/PV
 const IncidentCopilotView = lazy(
   () => import('../../build-week/incident-copilot/IncidentCopilotView'),
 );
+const ClimateRecoveryView = lazy(
+  () => import('../components/climate-recovery/ClimateRecoveryView'),
+);
 
-type MainViewType = 'dashboard' | 'incident-copilot' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
+type MainViewType = 'dashboard' | 'incident-copilot' | 'climate-recovery' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
 
 const OrbiPVMetricsStandaloneInner: React.FC = () => {
   const { 
@@ -57,6 +61,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'climate-recovery', label: 'Recuperación Climática', icon: Leaf, badge: 'CR-05' },
     { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
     { id: 'live', label: 'Monitoreo Live', icon: Activity },
     { id: 'diario', label: 'Diario', icon: Clock },
@@ -88,6 +93,18 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             }
           >
             <IncidentCopilotView />
+          </Suspense>
+        );
+      case 'climate-recovery':
+        return (
+          <Suspense
+            fallback={
+              <div className="rounded-xl border border-cyan-500/20 bg-gray-900 p-8 text-center text-xs text-cyan-300">
+                Loading Climate Recovery synthetic portfolio…
+              </div>
+            }
+          >
+            <ClimateRecoveryView onExit={() => setActiveView('dashboard')} />
           </Suspense>
         );
       case 'live':

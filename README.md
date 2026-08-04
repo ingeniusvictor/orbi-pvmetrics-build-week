@@ -173,6 +173,19 @@ Do not place the key in a Vite variable, `.env` file, shell history, source file
 
 For an authorized private live-API evaluation, follow the optional advisory-mode procedure above after deterministic behavior is verified. No credential is required for the primary judge walkthrough.
 
+## Climate Recovery executive dashboard
+
+Open **Recuperación Climática** in the existing sidebar to inspect the CR-05
+read-only executive dashboard. It presents five fictional assets and fourteen
+deterministic synthetic cases, estimated recovery and climate impact, plant
+ranking, local filters, a human-review queue, and case-level evidence,
+hypotheses, scenarios, timeline, and explainability in Spanish or English.
+
+The feature runs locally without credentials or network access. It does not
+use real plants or customer data, dispatch work, control equipment, provide a
+definitive diagnosis, or claim verified recovery or emissions. See
+`docs/competition/CR_05_EXECUTIVE_DASHBOARD.md`.
+
 ## Test commands
 
 ```bash

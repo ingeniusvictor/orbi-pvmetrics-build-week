@@ -1,5 +1,19 @@
 # OpenAI Build Week Changelog
 
+## CR-05 Executive Climate Recovery Dashboard
+
+- Added a lazy-loaded, read-only Climate Recovery executive view to the
+  existing state-based desktop and mobile navigation.
+- Added six executive KPIs, the CR-04 plant ranking, status distributions,
+  five-plant and fourteen-case browsing, local filters/sorts, a human-review
+  queue, and complete case presentation views.
+- Consumed the public CR-03 and CR-04 boundaries at the fixed CR-04 timestamp;
+  no React-domain calculation, network, credential, persistence, or operational
+  mutation was added.
+- Added bounded ES/EN visual copy and 70 CR-05 contract/static-render tests with
+  no new dependency or lockfile change.
+- Added the CR-05 competition architecture and claims documentation.
+
 ## Historical baseline
 
 - Baseline commit: `5cdc9c8dbcae93841f47175141f28e7e9871ba14`
