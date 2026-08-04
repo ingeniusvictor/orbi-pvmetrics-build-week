@@ -16,6 +16,7 @@ const keys: Record<string, { es: string; en: string }> = {
   'kpi.priorityScore': { es: 'Puntaje de prioridad', en: 'Priority Score' },
   'kpi.recommendedActionCount': { es: 'Acciones recomendadas', en: 'Recommended Actions' },
   'scenario.seven-days': { es: 'Escenario de siete días', en: 'Seven-day scenario' },
+  'seven-days': { es: 'Siete días', en: 'Seven days' },
   'Synthetic portfolio demonstration': { es: 'Demostración de portafolio sintético', en: 'Synthetic portfolio demonstration' },
   'request-more-data': { es: 'Solicitar más datos', en: 'Request more data' },
   'remote-review': { es: 'Revisión remota', en: 'Remote review' },
@@ -50,7 +51,19 @@ const keys: Record<string, { es: string; en: string }> = {
   'review-first': { es: 'Revisar primero', en: 'Review first' },
   'review-soon': { es: 'Revisar pronto', en: 'Review soon' },
   'review-routine': { es: 'Revisión rutinaria', en: 'Routine review' },
+  'field inspection recommendation gate': { es: 'Control de recomendación para inspección en terreno', en: 'Field inspection recommendation gate' },
 };
+
+export const formatCaseCount = (count: number, locale: ClimateRecoveryLocale) => (
+  locale === 'es'
+    ? `${count} ${count === 1 ? 'caso' : 'casos'}`
+    : `${count} ${count === 1 ? 'case' : 'cases'}`
+);
+
+const localizeCaseCountPlaceholders = (value: string, locale: ClimateRecoveryLocale) => value.replace(
+  /\b(\d+) case\(s\)/g,
+  (_, count: string) => formatCaseCount(Number(count), locale),
+);
 
 const caseTitlesEs: Record<string, string> = {
   'DEMO-CR-CASE-A': 'Oportunidad de inversor Aurora',
@@ -92,6 +105,19 @@ export const localizePresentationText = (
   locale: ClimateRecoveryLocale,
 ): string => {
   if (!value) return '';
+  const pluralized = localizeCaseCountPlaceholders(value, locale);
+  if (pluralized !== value) {
+    if (locale === 'en') return pluralized;
+    if (/have insufficient data and are excluded from aggregation/i.test(value)) {
+      const count = Number(value.match(/\d+/)?.[0] ?? 0);
+      return `${formatCaseCount(count, 'es')} ${count === 1 ? 'tiene' : 'tienen'} datos insuficientes y ${count === 1 ? 'se excluye' : 'se excluyen'} de la agregación.`;
+    }
+    if (/contain possible or confirmed overlap/i.test(value)) {
+      const count = Number(value.match(/\d+/)?.[0] ?? 0);
+      return `${formatCaseCount(count, 'es')} ${count === 1 ? 'contiene' : 'contienen'} solapamiento posible o confirmado y ${count === 1 ? 'se excluye' : 'se excluyen'} según la política de agregación.`;
+    }
+    return pluralized;
+  }
   const direct = keys[value];
   if (direct) return direct[locale];
   const actionKey = value.startsWith('action.') ? value.split('.')[1] : undefined;

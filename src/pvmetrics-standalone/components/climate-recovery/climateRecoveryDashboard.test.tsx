@@ -23,7 +23,16 @@ import {
   resetGuidedDemo,
   skipGuidedDemo,
 } from './demo/guidedDemoSteps';
-import { localizePresentationText } from './presentationLocalization';
+import { formatCaseCount, localizePresentationText } from './presentationLocalization';
+import {
+  GUIDED_DEMO_MAX_ANCHOR_ATTEMPTS,
+  GUIDED_DEMO_MAX_CORRECTIVE_SCROLLS,
+  GUIDED_DEMO_SCROLL_OFFSET_DESKTOP,
+  GUIDED_DEMO_SCROLL_OFFSET_MOBILE,
+  GUIDED_DEMO_SCROLL_OFFSET_TABLET,
+  getGuidedDemoScrollOffset,
+  isElementWithinViewport,
+} from './demo/useGuidedDemoNavigation';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(here, '..', '..', 'app', 'OrbiPVMetricsStandaloneApp.tsx'), 'utf8');
@@ -229,7 +238,7 @@ test('84 step 4 targets the recoverable inverter case', () => assert.equal(GUIDE
 test('85 step 5 targets the non-recoverable grid case', () => assert.equal(GUIDED_DEMO_STEPS[4].caseId, 'DEMO-CR-CASE-B'));
 test('86 step 6 targets the insufficient-data sensor case', () => assert.equal(GUIDED_DEMO_STEPS[5].caseId, 'DEMO-CR-CASE-C'));
 test('87 step 7 targets human review and explainability', () => assert.equal(GUIDED_DEMO_STEPS[6].targetSection, 'review'));
-test('88 step 8 targets scenario and climate impact', () => assert.equal(GUIDED_DEMO_STEPS[7].focusElementId, 'cr-recovery-scenario'));
+test('88 step 8 targets scenario and climate impact', () => assert.equal(GUIDED_DEMO_STEPS[7].anchorId, 'guided-demo-anchor-climate-recovery'));
 test('89 every disclosure-required demo step declares locale support', () => assert.ok(GUIDED_DEMO_STEPS.filter((step) => step.syntheticDisclosureRequired).every((step) => step.localeSupport.includes('es') && step.localeSupport.includes('en'))));
 test('90 guided demo has no autoplay contract', () => assert.doesNotMatch(source, /autoPlay|setInterval|setTimeout/));
 test('91 guided demo uses no implicit clock', () => assert.doesNotMatch(source, /Date\.now/));
@@ -238,7 +247,7 @@ test('93 guided demo performs no fetch', () => assert.doesNotMatch(source, /\bfe
 test('94 guided demo uses no browser persistence', () => assert.doesNotMatch(source, /localStorage|sessionStorage/));
 test('95 guided demo contracts include focus warnings viewport and deterministic start fields', () => {
   const step = GUIDED_DEMO_STEPS[0];
-  assert.ok(step.focusElementId && step.warnings.length && step.expectedViewport);
+  assert.ok(step.anchorId && step.warnings.length && step.expectedViewport);
   assert.equal(createGuidedDemoState('es').startedAt, '2026-08-03T12:00:00.000Z');
 });
 test('96 initial demo state is free and inactive', () => {
@@ -274,7 +283,7 @@ test('105 keyboard contract supports previous and next arrow keys', () => {
   assert.match(source, /event\.key === 'ArrowRight'/); assert.match(source, /event\.key === 'ArrowLeft'/);
 });
 test('106 guided steps declare focus targets and focus management', () => {
-  assert.ok(GUIDED_DEMO_STEPS.every((step) => step.focusElementId)); assert.match(source, /scrollIntoView[\s\S]*focus/);
+  assert.ok(GUIDED_DEMO_STEPS.every((step) => step.anchorId)); assert.match(source, /waitForAnchor[\s\S]*focus\(\{ preventScroll: true \}\)/);
 });
 test('107 guided shell announces step changes through a live region', () => assert.match(source, /aria-live="polite"/));
 test('108 case detail implements eight progressive-disclosure accordions', () => assert.equal((source.match(/<Accordion id=/g) ?? []).length, 8));
@@ -288,7 +297,7 @@ test('113 Climate Recovery free overview has exactly one h1', () => assert.equal
 test('114 ranking table has an accessible caption', () => assert.match(html, /<caption class="sr-only">Ranking de cinco plantas sintéticas/));
 test('115 opportunities table declares its caption contract', () => assert.match(source, /t\.opportunitiesCaption/));
 test('116 outer shell selects have programmatic names', () => {
-  assert.match(appSource, /htmlFor="workspace-company"/); assert.match(appSource, /aria-label="Planta Solar \/ BESS"/);
+  assert.match(appSource, /htmlFor="workspace-company"/); assert.match(appSource, /aria-label=\{shellEnglish \? 'Solar Plant \/ BESS' : 'Planta Solar \/ BESS'\}/);
 });
 test('117 primary navigation exposes semantic active state', () => assert.match(appSource, /aria-current=\{isSelected \? 'page'/));
 test('118 mobile tabs use a reduced-scrollbar fade contract', () => assert.match(cssSource, /\.cr-mobile-tabs[\s\S]*mask-image[\s\S]*scrollbar/));
@@ -302,4 +311,97 @@ test('124 reduced motion is honored by guided focus and CSS', () => {
 });
 test('125 demo source exposes no GPT or operational approval control', () => {
   assert.doesNotMatch(source, /\bGPT(?:-\d)?\b/i); assert.doesNotMatch(source, /<button[^>]*>[^<]*(approve|dispatch)/i);
+});
+test('126 guided demo declares eight unique bounded anchor IDs', () => {
+  const anchors = GUIDED_DEMO_STEPS.map((step) => step.anchorId);
+  assert.equal(anchors.length, 8); assert.equal(new Set(anchors).size, 8);
+});
+test('127 every guided step anchor is represented by the anchor component contract', () => {
+  assert.match(source, /data-guided-demo-anchor=\{stepId\}/);
+  GUIDED_DEMO_STEPS.forEach((step) => assert.ok(source.includes(step.anchorId)));
+});
+test('128 guided navigation never uses block center or scrollIntoView', () => {
+  assert.doesNotMatch(source, /scrollIntoView|block:\s*['"]center['"]/);
+});
+test('129 scroll offsets are centralized for desktop tablet and mobile', () => {
+  assert.equal(getGuidedDemoScrollOffset(1440, 400), GUIDED_DEMO_SCROLL_OFFSET_DESKTOP);
+  assert.equal(getGuidedDemoScrollOffset(768, 300), 300 + GUIDED_DEMO_SCROLL_OFFSET_TABLET);
+  assert.equal(getGuidedDemoScrollOffset(390, 250), 250 + GUIDED_DEMO_SCROLL_OFFSET_MOBILE);
+});
+test('130 reduced motion selects automatic scrolling', () => assert.match(source, /reducedMotion \? 'auto' : 'smooth'/));
+test('131 regular motion selects smooth scrolling', () => assert.match(source, /ScrollBehavior = reducedMotion \? 'auto' : 'smooth'/));
+test('132 lazy anchor synchronization is bounded to eight attempts', () => {
+  assert.equal(GUIDED_DEMO_MAX_ANCHOR_ATTEMPTS, 8); assert.match(source, /attempts <= GUIDED_DEMO_MAX_ANCHOR_ATTEMPTS/);
+});
+test('133 rapid step navigation cancels the preceding request', () => {
+  assert.match(source, /new AbortController\(\)/); assert.match(source, /return \(\) => controller\.abort\(\)/);
+});
+test('134 missing lazy targets return a typed timeout', () => assert.match(source, /status: 'timeout'/));
+test('135 focus occurs only after the mounted anchor is returned', () => {
+  assert.ok(source.indexOf('const waited = await waitForAnchor') < source.indexOf('target.focus({ preventScroll: true })'));
+});
+test('136 guided focus has no body fallback', () => assert.doesNotMatch(source, /document\.body\.focus|activeElement\s*=\s*document\.body/));
+test('137 visibility assessment reports the guided shell', () => assert.match(source, /shellVisible: within\(shell\)/));
+test('138 visibility assessment reports the target anchor', () => assert.match(source, /targetVisible: isElementWithinViewport/));
+test('139 visibility assessment reports controls and narrative', () => {
+  assert.match(source, /controlsVisible: within\(controls\)/); assert.match(source, /narrativeVisible: within\(narrative\)/);
+});
+test('140 corrective scroll is capped at one', () => {
+  assert.equal(GUIDED_DEMO_MAX_CORRECTIVE_SCROLLS, 1); assert.match(source, /correctiveScrolls >= GUIDED_DEMO_MAX_CORRECTIVE_SCROLLS/);
+});
+test('141 Exit restoration prefers the launcher', () => assert.match(source, /getElementById\('guided-demo-launcher'\)[\s\S]*focusTarget\?\.focus/));
+test('142 Escape delegates to the same restoration path', () => assert.match(source, /event\.key === 'Escape'[\s\S]*exitGuided\(true\)/));
+test('143 final Return to Overview delegates to the restoration path', () => assert.match(source, /!currentStep\.nextStepId\) exitGuided\(true\)/));
+test('144 Reset returns to step one and resets secondary open state', () => {
+  assert.equal(resetGuidedDemo({ ...createGuidedDemoState('en'), currentStepId: 'climate-impact' }).currentStepId, 'problem');
+  assert.match(source, /setOpenSections\(new Set\(guidedOpenSections\)\)/);
+});
+test('145 step 4 requires Evidence open', () => assert.deepEqual(GUIDED_DEMO_STEPS[3].requiredOpenSections, ['evidence']));
+test('146 step 6 requires Methodology open', () => assert.deepEqual(GUIDED_DEMO_STEPS[5].requiredOpenSections, ['methodology']));
+test('147 step 7 requires the review queue open', () => assert.deepEqual(GUIDED_DEMO_STEPS[6].requiredOpenSections, ['review-queue']));
+test('148 step 8 requires the recovery scenario visible', () => assert.deepEqual(GUIDED_DEMO_STEPS[7].requiredOpenSections, ['recovery-scenario']));
+test('149 the previous scroll position is captured and restored in memory', () => {
+  assert.match(source, /scrollYBeforeGuidedDemo/); assert.match(source, /top: snapshot\.scrollYBeforeGuidedDemo/);
+});
+test('150 previous section plant and case selections are captured', () => {
+  assert.match(source, /selectedSectionBeforeGuidedDemo/); assert.match(source, /selectedPlantBeforeGuidedDemo/); assert.match(source, /selectedCaseBeforeGuidedDemo/);
+});
+test('151 navigation state uses no browser persistence', () => assert.doesNotMatch(source, /localStorage|sessionStorage/));
+test('152 navigation uses no unbounded timer or interval', () => assert.doesNotMatch(source, /setTimeout|setInterval/));
+test('153 guided controls meet the 44px touch target contract', () => assert.match(source, /const button = 'inline-flex min-h-11 min-w-11/));
+test('154 mobile narrative is compactable through an accessible control', () => {
+  assert.match(source, /aria-expanded=\{expanded\}/); assert.match(source, /aria-controls="guided-demo-narrative-details"/);
+});
+test('155 Spanish case pluralization is grammatical', () => {
+  assert.equal(formatCaseCount(1, 'es'), '1 caso'); assert.equal(formatCaseCount(2, 'es'), '2 casos');
+});
+test('156 English case pluralization is grammatical', () => {
+  assert.equal(formatCaseCount(1, 'en'), '1 case'); assert.equal(formatCaseCount(2, 'en'), '2 cases');
+});
+test('157 residual Spanish statuses are complete', () => {
+  const labels = getClimateRecoveryCopy('es').statusLabels;
+  assert.deepEqual([labels['under-review'], labels.critical, labels.sufficient, labels.soon, labels.proposed, labels.generated, labels['very-high'], labels.suppressed, labels['partially-sufficient']], ['En revisión', 'Crítica', 'Suficiente', 'Pronto', 'Propuesta', 'Generada', 'Muy alta', 'Suprimida', 'Parcialmente suficiente']);
+});
+test('158 residual English statuses are complete', () => {
+  const labels = getClimateRecoveryCopy('en').statusLabels;
+  assert.deepEqual([labels['under-review'], labels.critical, labels.sufficient, labels.soon, labels.proposed, labels.generated, labels['very-high'], labels.suppressed, labels['partially-sufficient']], ['Under review', 'Critical', 'Sufficient', 'Soon', 'Proposed', 'Generated', 'Very high', 'Suppressed', 'Partially sufficient']);
+});
+test('159 visible English presentation data contains no case(s) placeholder', () => assert.doesNotMatch(JSON.stringify(en.executive), /case\(s\)/i));
+test('160 both locale flows expose no unresolved presentation keys', () => {
+  assert.doesNotMatch(esCaseHtml, /(?:kpi|scenario|action)\.[A-Za-z]/); assert.doesNotMatch(caseHtml, /(?:kpi|scenario|action)\.[A-Za-z]/);
+});
+test('161 the outer shell follows Climate Recovery English locale', () => {
+  assert.match(appSource, /shellEnglish[\s\S]*SAFE SIMULATION ENVIRONMENT/); assert.match(appSource, /Company Workspace/);
+});
+test('162 guided anchors are programmatically focusable and one pixel high', () => assert.match(source, /tabIndex=\{-1\}[\s\S]*className="block h-px w-full/));
+test('163 guided shell uses sticky bounded layout', () => {
+  assert.match(cssSource, /\.guided-demo-shell[\s\S]*position: sticky[\s\S]*max-height/);
+});
+test('164 target failure has an accessible status fallback', () => {
+  assert.match(source, /navigationMessage && <p role="status"/); assert.match(source, /guidedTargetUnavailable/);
+});
+test('165 viewport helper includes boundaries and rejects clipping', () => {
+  assert.equal(isElementWithinViewport({ top: 10, bottom: 90 }, 10, 90), true);
+  assert.equal(isElementWithinViewport({ top: 9, bottom: 90 }, 10, 90), false);
+  assert.equal(isElementWithinViewport({ top: 10, bottom: 91 }, 10, 90), false);
 });

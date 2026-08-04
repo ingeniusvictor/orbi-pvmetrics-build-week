@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, LogOut, RotateCcw, SkipForward } from 'lucide-re
 import type { ClimateRecoveryCopy } from '../copy';
 import type { GuidedDemoStep } from './guidedDemoSteps';
 
-const button = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-40';
+const button = 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-40';
 
 export const GuidedDemoControls: React.FC<{
   step: GuidedDemoStep;
@@ -14,7 +14,7 @@ export const GuidedDemoControls: React.FC<{
   onExit: () => void;
   onReset: () => void;
 }> = ({ step, t, onPrevious, onNext, onSkip, onExit, onReset }) => (
-  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-4">
+  <div id="guided-demo-controls" className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-slate-800 bg-slate-950/20 pt-3">
     <div className="flex flex-wrap gap-2">
       <button type="button" aria-label={t.exitDemo} onClick={onExit} className={`${button} border-slate-700 text-slate-300`}><LogOut className="h-4 w-4" />{t.exitDemo}</button>
       <button type="button" aria-label={t.resetDemo} onClick={onReset} className={`${button} border-slate-700 text-slate-300`}><RotateCcw className="h-4 w-4" />{t.resetDemo}</button>

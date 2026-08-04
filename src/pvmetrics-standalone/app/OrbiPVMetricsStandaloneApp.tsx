@@ -58,24 +58,26 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   const [activeView, setActiveView] = useState<MainViewType>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [climateRecoveryLocale, setClimateRecoveryLocale] = useState<'es' | 'en'>('es');
+  const shellEnglish = activeView === 'climate-recovery' && climateRecoveryLocale === 'en';
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'climate-recovery', label: 'Recuperación Climática', icon: Leaf, badge: 'CR-06' },
+    { id: 'climate-recovery', label: shellEnglish ? 'Climate Recovery' : 'Recuperación Climática', icon: Leaf, badge: 'CR-06.1' },
     { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
-    { id: 'live', label: 'Monitoreo Live', icon: Activity },
-    { id: 'diario', label: 'Diario', icon: Clock },
-    { id: 'semanal', label: 'Semanal', icon: Calendar },
-    { id: 'mensual', label: 'Mensual', icon: BarChart3 },
+    { id: 'live', label: shellEnglish ? 'Live Monitoring' : 'Monitoreo Live', icon: Activity },
+    { id: 'diario', label: shellEnglish ? 'Daily' : 'Diario', icon: Clock },
+    { id: 'semanal', label: shellEnglish ? 'Weekly' : 'Semanal', icon: Calendar },
+    { id: 'mensual', label: shellEnglish ? 'Monthly' : 'Mensual', icon: BarChart3 },
     { id: 'bess', label: 'BESS', icon: BatteryCharging },
-    { id: 'venta', label: 'Venta Energía', icon: Coins },
+    { id: 'venta', label: shellEnglish ? 'Energy Sales' : 'Venta Energía', icon: Coins },
     { id: 'scada', label: 'SCADA', icon: Radio },
-    { id: 'plantprofiles', label: 'Perfiles de Planta', icon: Building2 },
-    { id: 'datasources', label: 'Fuentes de Datos', icon: Database },
-    { id: 'signalmapping', label: 'Mapeo de Señales', icon: GitCommit },
-    { id: 'signalquality', label: 'Reglas de Calidad', icon: ShieldCheck },
-    { id: 'reportes', label: 'Reportes', icon: FileEdit },
-    { id: 'config', label: 'Configuración', icon: Sliders },
+    { id: 'plantprofiles', label: shellEnglish ? 'Plant Profiles' : 'Perfiles de Planta', icon: Building2 },
+    { id: 'datasources', label: shellEnglish ? 'Data Sources' : 'Fuentes de Datos', icon: Database },
+    { id: 'signalmapping', label: shellEnglish ? 'Signal Mapping' : 'Mapeo de Señales', icon: GitCommit },
+    { id: 'signalquality', label: shellEnglish ? 'Quality Rules' : 'Reglas de Calidad', icon: ShieldCheck },
+    { id: 'reportes', label: shellEnglish ? 'Reports' : 'Reportes', icon: FileEdit },
+    { id: 'config', label: shellEnglish ? 'Settings' : 'Configuración', icon: Sliders },
   ];
 
   // Map view to respective view components
@@ -104,7 +106,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </div>
             }
           >
-            <ClimateRecoveryView onExit={() => setActiveView('dashboard')} />
+            <ClimateRecoveryView onExit={() => setActiveView('dashboard')} onLocaleChange={setClimateRecoveryLocale} />
           </Suspense>
         );
       case 'live':
@@ -155,11 +157,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
       <div className="no-print bg-slate-950 border-b border-gray-800 text-[10px] text-gray-400 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1.5 items-center justify-between">
         <div className="flex items-center gap-1.5 font-semibold text-amber-400">
           <AlertOctagon className="w-3.5 h-3.5" />
-          <span>ENTORNO SEGURO DE SIMULACIÓN</span>
+          <span>{shellEnglish ? 'SAFE SIMULATION ENVIRONMENT' : 'ENTORNO SEGURO DE SIMULACIÓN'}</span>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">SIMULACIÓN LOCAL</span>
+          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'LOCAL SIMULATION' : 'SIMULACIÓN LOCAL'}</span>
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">READ-ONLY</span>
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">NO REAL DISPATCH</span>
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">CONFIGURABLE</span>
@@ -167,7 +169,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
         </div>
 
         <div className="text-gray-500 hidden md:block">
-          Sin conexión SCADA real activa
+          {shellEnglish ? 'No active real SCADA connection' : 'Sin conexión SCADA real activa'}
         </div>
       </div>
 
@@ -194,11 +196,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             <div className="p-4 border-b border-gray-800 space-y-3">
               <div>
                 <label htmlFor="workspace-company" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-amber-500" /> Workspace Empresa
+                  <Building2 className="w-3 h-3 text-amber-500" /> {shellEnglish ? 'Company Workspace' : 'Workspace Empresa'}
                 </label>
                 <select
                   id="workspace-company"
-                  aria-label="Workspace Empresa"
+                  aria-label={shellEnglish ? 'Company Workspace' : 'Workspace Empresa'}
                   value={activeCompanyId}
                   onChange={handleCompanyChange}
                   className="w-full bg-gray-900 border border-gray-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-amber-500 mt-1.5 font-semibold"
@@ -211,11 +213,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
               <div>
                 <label htmlFor="workspace-plant" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
-                  <Radio className="w-3 h-3 text-amber-500" /> Planta Solar / BESS
+                  <Radio className="w-3 h-3 text-amber-500" /> {shellEnglish ? 'Solar Plant / BESS' : 'Planta Solar / BESS'}
                 </label>
                 <select
                   id="workspace-plant"
-                  aria-label="Planta Solar / BESS"
+                  aria-label={shellEnglish ? 'Solar Plant / BESS' : 'Planta Solar / BESS'}
                   value={activePlantId}
                   onChange={(e) => setActivePlantId(e.target.value)}
                   className="w-full bg-gray-900 border border-gray-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-amber-500 mt-1.5"
@@ -229,7 +231,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
             {/* Mobile Nav toggle */}
             <div className="md:hidden p-4 flex justify-between items-center bg-gray-900/50 border-b border-gray-800">
-              <span className="text-xs font-semibold text-gray-300">Navegación</span>
+              <span className="text-xs font-semibold text-gray-300">{shellEnglish ? 'Navigation' : 'Navegación'}</span>
               <button 
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -286,7 +288,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           {/* Sidebar Footer with disclaimers */}
           <div className="p-4 border-t border-gray-800 text-[9px] text-gray-500 space-y-2 hidden md:block">
             <p className="leading-relaxed font-sans">
-              <strong>Garantía de Sandbox:</strong> Sin conexión con EMS/BMS o SCADA real activo.
+              <strong>{shellEnglish ? 'Sandbox guarantee:' : 'Garantía de Sandbox:'}</strong> {shellEnglish ? 'No active connection to real EMS/BMS or SCADA.' : 'Sin conexión con EMS/BMS o SCADA real activo.'}
             </p>
             <p className="text-[8px] text-gray-600">
               ORBI PVMetrics IA — Solar Forecasting, PV & BESS Simulation.
@@ -301,8 +303,9 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           <div className="no-print p-3 bg-gray-900/50 border border-gray-850 rounded-xl flex items-start gap-3">
             <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-[10px] text-gray-400 leading-relaxed">
-              <strong>Exclusividad de Operación:</strong> ORBI PVMetrics IA no opera BESS, no envía comandos al EMS/BMS y no ejecuta ventas de energía. 
-              Este software opera de manera read-only en simulación local demostrativa. Las ventanas comerciales son sugerencias de evaluación técnica no vinculantes.
+              <strong>{shellEnglish ? 'Operational boundary:' : 'Exclusividad de Operación:'}</strong> {shellEnglish
+                ? 'ORBI PVMetrics IA does not operate BESS, send commands to EMS/BMS, or execute energy sales. This software is read-only in a local demonstration simulation. Commercial windows are non-binding technical evaluation suggestions.'
+                : 'ORBI PVMetrics IA no opera BESS, no envía comandos al EMS/BMS y no ejecuta ventas de energía. Este software opera de manera read-only en simulación local demostrativa. Las ventanas comerciales son sugerencias de evaluación técnica no vinculantes.'}
             </div>
           </div>
 

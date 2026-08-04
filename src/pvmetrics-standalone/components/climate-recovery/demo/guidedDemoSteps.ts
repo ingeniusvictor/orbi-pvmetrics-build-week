@@ -21,7 +21,7 @@ export type GuidedDemoStep = {
   targetSection: ClimateRecoverySection;
   plantId?: string;
   caseId?: string;
-  focusElementId?: string;
+  anchorId: string;
   durationHintSeconds: number;
   keyPoints: GuidedDemoTextKey[];
   warnings: GuidedDemoTextKey[];
@@ -31,8 +31,15 @@ export type GuidedDemoStep = {
   expectedViewport: 'responsive' | 'desktop-preferred';
   nextStepId?: string;
   previousStepId?: string;
-  openTechnicalSection?: 'evidence' | 'explainability' | 'methodology';
+  requiredOpenSections: readonly GuidedDemoRequiredOpenSection[];
 };
+
+export type GuidedDemoRequiredOpenSection =
+  | 'evidence'
+  | 'explainability'
+  | 'methodology'
+  | 'review-queue'
+  | 'recovery-scenario';
 
 export type GuidedDemoState = {
   active: boolean;
@@ -48,51 +55,51 @@ export type GuidedDemoState = {
 const baseSteps: Omit<GuidedDemoStep, 'nextStepId' | 'previousStepId'>[] = [
   {
     id: 'problem', order: 1, titleKey: 'step.problem.title', subtitleKey: 'step.problem.subtitle', narrativeKey: 'step.problem.narrative',
-    targetSection: 'overview', focusElementId: 'cr-portfolio-overview', durationHintSeconds: 25,
+    targetSection: 'overview', anchorId: 'guided-demo-anchor-problem', durationHintSeconds: 25,
     keyPoints: ['step.problem.point.assets', 'step.problem.point.cases'], warnings: ['warning.synthetic'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: [],
   },
   {
     id: 'opportunity', order: 2, titleKey: 'step.opportunity.title', subtitleKey: 'step.opportunity.subtitle', narrativeKey: 'step.opportunity.narrative',
-    targetSection: 'overview', focusElementId: 'cr-executive-kpis', durationHintSeconds: 25,
+    targetSection: 'overview', anchorId: 'guided-demo-anchor-opportunity', durationHintSeconds: 25,
     keyPoints: ['step.opportunity.point.estimate', 'step.opportunity.point.review'], warnings: ['warning.estimated', 'warning.humanReview'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: [],
   },
   {
     id: 'ranking', order: 3, titleKey: 'step.ranking.title', subtitleKey: 'step.ranking.subtitle', narrativeKey: 'step.ranking.narrative',
-    targetSection: 'overview', focusElementId: 'cr-plant-ranking', durationHintSeconds: 30,
+    targetSection: 'overview', anchorId: 'guided-demo-anchor-portfolio-ranking', durationHintSeconds: 30,
     keyPoints: ['step.ranking.point.score', 'step.ranking.point.quality'], warnings: ['warning.estimated'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'desktop-preferred',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'desktop-preferred', requiredOpenSections: [],
   },
   {
     id: 'recoverable-case', order: 4, titleKey: 'step.recoverable.title', subtitleKey: 'step.recoverable.subtitle', narrativeKey: 'step.recoverable.narrative',
-    targetSection: 'case', plantId: 'CR04-PLANT-AURORA', caseId: 'DEMO-CR-CASE-A', focusElementId: 'cr-case-summary', durationHintSeconds: 35,
+    targetSection: 'case', plantId: 'CR04-PLANT-AURORA', caseId: 'DEMO-CR-CASE-A', anchorId: 'guided-demo-anchor-recoverable-case', durationHintSeconds: 35,
     keyPoints: ['step.recoverable.point.evidence', 'step.recoverable.point.human'], warnings: ['warning.estimated', 'warning.humanReview'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', openTechnicalSection: 'evidence',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: ['evidence'],
   },
   {
     id: 'non-recoverable', order: 5, titleKey: 'step.nonrecoverable.title', subtitleKey: 'step.nonrecoverable.subtitle', narrativeKey: 'step.nonrecoverable.narrative',
-    targetSection: 'case', plantId: 'CR04-PLANT-HELIOS', caseId: 'DEMO-CR-CASE-B', focusElementId: 'cr-case-summary', durationHintSeconds: 30,
+    targetSection: 'case', plantId: 'CR04-PLANT-HELIOS', caseId: 'DEMO-CR-CASE-B', anchorId: 'guided-demo-anchor-non-recoverable-case', durationHintSeconds: 30,
     keyPoints: ['step.nonrecoverable.point.classification', 'step.nonrecoverable.point.suppressed'], warnings: ['warning.synthetic', 'warning.humanReview'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: [],
   },
   {
     id: 'insufficient-data', order: 6, titleKey: 'step.insufficient.title', subtitleKey: 'step.insufficient.subtitle', narrativeKey: 'step.insufficient.narrative',
-    targetSection: 'case', plantId: 'CR04-PLANT-VALLE', caseId: 'DEMO-CR-CASE-C', focusElementId: 'cr-case-warnings', durationHintSeconds: 30,
+    targetSection: 'case', plantId: 'CR04-PLANT-VALLE', caseId: 'DEMO-CR-CASE-C', anchorId: 'guided-demo-anchor-insufficient-data', durationHintSeconds: 30,
     keyPoints: ['step.insufficient.point.blocked', 'step.insufficient.point.data'], warnings: ['warning.synthetic', 'warning.humanReview'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', openTechnicalSection: 'methodology',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: ['methodology'],
   },
   {
     id: 'explainability', order: 7, titleKey: 'step.explainability.title', subtitleKey: 'step.explainability.subtitle', narrativeKey: 'step.explainability.narrative',
-    targetSection: 'review', focusElementId: 'cr-review-queue', durationHintSeconds: 30,
+    targetSection: 'review', anchorId: 'guided-demo-anchor-explainability-review', durationHintSeconds: 30,
     keyPoints: ['step.explainability.point.rules', 'step.explainability.point.operator'], warnings: ['warning.humanReview'],
-    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', openTechnicalSection: 'explainability',
+    syntheticDisclosureRequired: true, allowSkip: true, localeSupport: ['es', 'en'], expectedViewport: 'responsive', requiredOpenSections: ['review-queue'],
   },
   {
     id: 'climate-impact', order: 8, titleKey: 'step.climate.title', subtitleKey: 'step.climate.subtitle', narrativeKey: 'step.climate.narrative',
-    targetSection: 'case', plantId: 'CR04-PLANT-AURORA', caseId: 'DEMO-CR-CASE-A', focusElementId: 'cr-recovery-scenario', durationHintSeconds: 35,
+    targetSection: 'case', plantId: 'CR04-PLANT-AURORA', caseId: 'DEMO-CR-CASE-A', anchorId: 'guided-demo-anchor-climate-recovery', durationHintSeconds: 35,
     keyPoints: ['step.climate.point.counterfactual', 'step.climate.point.unverified'], warnings: ['warning.estimated', 'warning.synthetic'],
-    syntheticDisclosureRequired: true, allowSkip: false, localeSupport: ['es', 'en'], expectedViewport: 'desktop-preferred',
+    syntheticDisclosureRequired: true, allowSkip: false, localeSupport: ['es', 'en'], expectedViewport: 'desktop-preferred', requiredOpenSections: ['recovery-scenario'],
   },
 ];
 

@@ -2,7 +2,18 @@
 
 Execution date: 2026-08-04
 
-Status: implemented and validated locally; pending human staged-diff approval
+Status: implemented; CR-06.1 recording navigation validated locally and pending
+human staged-diff approval
+
+## CR-06.1 recording-fix addendum
+
+CR-06.1 started from approved HEAD
+`f05eb05531c774d96c87e624e1eba3e5f535cff5`. It adds explicit content anchors,
+a cancellable viewport-aware coordinator, lazy synchronization, bounded sticky
+mobile controls, and in-memory context restoration. All eight steps passed at
+the seven required viewports (56/56 combinations), the recording rehearsal
+required zero manual recovery scrolls, and the repository suite passes 408/408.
+See `CR_06_1_GUIDED_DEMO_RECORDING_FIX.md` for the complete evidence.
 
 ## A. Summary
 

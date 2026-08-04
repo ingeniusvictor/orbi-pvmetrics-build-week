@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { CaseDetailPresentation, RecommendedActionPresentation } from '../../../climate-recovery';
 import type { ClimateRecoveryCopy, ClimateRecoveryLocale } from '../copy';
+import { GuidedDemoAnchor, type GuidedDemoAnchorContract } from '../demo/GuidedDemoAnchor';
 import { localizePresentationText } from '../presentationLocalization';
 import {
   AvailabilityValue,
@@ -80,9 +81,13 @@ export const CaseDetailView: React.FC<{
   locale: ClimateRecoveryLocale;
   t: ClimateRecoveryCopy;
   onBack: () => void;
-  guidedOpenSection?: 'evidence' | 'explainability' | 'methodology';
-}> = ({ detail, locale, t, onBack, guidedOpenSection }) => {
-  const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(guidedOpenSection ? [guidedOpenSection] : []));
+  guidedOpenSections?: readonly string[];
+  guidedAnchor?: GuidedDemoAnchorContract;
+}> = ({ detail, locale, t, onBack, guidedOpenSections, guidedAnchor }) => {
+  const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(guidedOpenSections));
+  useEffect(() => {
+    setOpenSections(new Set(guidedOpenSections));
+  }, [detail?.summary.caseId, guidedOpenSections]);
   if (!detail) return <EmptyState title={t.caseNotFound} action={<button type="button" onClick={onBack} className={buttonClass}>{t.back}</button>} />;
 
   const toggle = (id: string) => setOpenSections((current) => {
@@ -105,6 +110,7 @@ export const CaseDetailView: React.FC<{
     <div className="space-y-5">
       <button type="button" onClick={onBack} className={buttonClass}><ArrowLeft className="h-4 w-4" />{t.opportunities}</button>
 
+      {guidedAnchor && ['recoverable-case', 'non-recoverable'].includes(guidedAnchor.stepId) && <GuidedDemoAnchor {...guidedAnchor} />}
       <div id="cr-case-summary" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
         <Panel>
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
@@ -125,6 +131,7 @@ export const CaseDetailView: React.FC<{
         </Panel>
       </div>
 
+      {guidedAnchor?.stepId === 'insufficient-data' && <GuidedDemoAnchor {...guidedAnchor} />}
       {detail.warnings.length > 0 && <div id="cr-case-warnings" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><Panel><div className="flex items-center gap-2 text-sm font-bold text-amber-300"><AlertTriangle className="h-4 w-4" />{t.warnings}</div><div className="mt-3"><TextList items={detail.warnings} empty={t.noneDocumented} /></div></Panel></div>}
       {detail.climateImpact.availability === 'blocked' && <div id="cr-climate-blocking" tabIndex={-1} className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-100"><div className="flex items-center gap-2 font-bold"><ShieldAlert className="h-4 w-4" />{t.blocked}</div><div className="mt-2"><TextList items={detail.climateImpact.blockingReasons} empty={t.noneDocumented} /></div></div>}
       <DisclosurePanel disclosure={detail.disclosures[0] ?? detail.summary.syntheticDisclosure} boundary={t.operatorBoundary} ariaLabel={t.syntheticDisclosureLabel} />
@@ -143,6 +150,7 @@ export const CaseDetailView: React.FC<{
         </div>
       </Panel>
 
+      {guidedAnchor?.stepId === 'climate-impact' && <GuidedDemoAnchor {...guidedAnchor} />}
       <div id="cr-recovery-scenario" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
         <Panel>
           <SectionHeader title={t.recoveryScenario} description={t.scenarioDisclosure} />
@@ -150,7 +158,7 @@ export const CaseDetailView: React.FC<{
             const comparable = typeof scenario.noIntervention.value === 'number' && typeof scenario.intervention.value === 'number';
             const maximum = comparable ? Math.max(scenario.noIntervention.value!, scenario.intervention.value!, 1) : 1;
             return <article key={scenario.id} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-              <div className="flex flex-wrap gap-2"><SyntheticBadge label={t.projected} /><StatusBadge value="informational" label={`${t.horizon}: ${scenario.horizon}`} t={t} /></div>
+              <div className="flex flex-wrap gap-2"><SyntheticBadge label={t.projected} /><StatusBadge value="informational" label={`${t.horizon}: ${localizePresentationText(scenario.horizon, locale)}`} t={t} /></div>
               <p className="mt-3 text-sm font-bold text-white">{scenario.nameKey}</p>
               <dl className="mt-4 grid grid-cols-1 gap-2 min-[430px]:grid-cols-3 text-xs"><div className="rounded-lg bg-slate-900 p-3"><dt className="text-slate-500">{t.noIntervention}</dt><dd className="mt-2 font-mono text-slate-100"><AvailabilityValue value={scenario.noIntervention} locale={locale} t={t} /></dd></div><div className="rounded-lg bg-slate-900 p-3"><dt className="text-slate-500">{t.withIntervention}</dt><dd className="mt-2 font-mono text-slate-100"><AvailabilityValue value={scenario.intervention} locale={locale} t={t} /></dd></div><div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3"><dt className="text-emerald-300">{t.projectedRecovery}</dt><dd className="mt-2 font-mono text-emerald-100"><AvailabilityValue value={scenario.recoveredEnergy} locale={locale} t={t} /></dd></div></dl>
               {comparable && <div className="mt-4 space-y-2" role="img" aria-label={`${t.noIntervention}: ${scenario.noIntervention.formattedValue}; ${t.withIntervention}: ${scenario.intervention.formattedValue}`}><div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full rounded-full bg-slate-500" style={{ width: `${Math.max(3, (scenario.noIntervention.value! / maximum) * 100)}%` }} /></div><div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.max(3, (scenario.intervention.value! / maximum) * 100)}%` }} /></div></div>}

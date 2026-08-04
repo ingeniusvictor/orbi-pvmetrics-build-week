@@ -19,6 +19,31 @@
   background: rgba(100, 116, 139, 0.35);
 }
 
+.guided-demo-shell {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 30;
+  display: flex;
+  max-height: min(32rem, 58dvh);
+  flex-direction: column;
+}
+
+.climate-recovery-view {
+  overflow-anchor: none;
+}
+
+.guided-demo-narrative-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 1024px) {
+  .guided-demo-shell {
+    max-height: calc(100dvh - 2rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cr-mobile-tabs,
   [data-guided-mode='guided'] * {

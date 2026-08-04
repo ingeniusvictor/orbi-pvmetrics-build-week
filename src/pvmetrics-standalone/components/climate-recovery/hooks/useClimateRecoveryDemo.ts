@@ -41,6 +41,12 @@ export type ClimateRecoveryFilters = {
   climateImpactAvailability: string;
 };
 
+export type ClimateRecoveryExplorationContext = {
+  activeSection: ClimateRecoverySection;
+  selectedPlantId?: string;
+  selectedCaseId?: string;
+};
+
 export const EMPTY_CLIMATE_RECOVERY_FILTERS: ClimateRecoveryFilters = {
   plantId: '', category: '', recoverability: '', priorityBand: '', confidenceLevel: '',
   dataSufficiency: '', humanReviewRequired: '', climateImpactAvailability: '',
@@ -151,6 +157,7 @@ export type ClimateRecoveryDemo = {
   activeSection: ClimateRecoverySection;
   navigate: (section: ClimateRecoverySection) => void;
   resetExploration: () => void;
+  restoreExploration: (context: ClimateRecoveryExplorationContext) => void;
   selectedPlantId?: string;
   selectPlant: (plantId: string) => void;
   showPlantList: () => void;
@@ -240,9 +247,14 @@ export const useClimateRecoveryDemo = (): ClimateRecoveryDemo => {
     setFilters(EMPTY_CLIMATE_RECOVERY_FILTERS);
     setSort('priority-desc');
   }, []);
+  const restoreExploration = useCallback((context: ClimateRecoveryExplorationContext) => {
+    setSelectedPlantId(context.selectedPlantId);
+    setSelectedCaseId(context.selectedCaseId);
+    setActiveSection(context.activeSection);
+  }, []);
 
   return {
-    locale, setLocale, activeSection, navigate, resetExploration, selectedPlantId, selectPlant, showPlantList, selectedCaseId, selectCase,
+    locale, setLocale, activeSection, navigate, resetExploration, restoreExploration, selectedPlantId, selectPlant, showPlantList, selectedCaseId, selectCase,
     executive: snapshot.executive,
     plants: snapshot.plants,
     selectedPlant: snapshot.plants.find((item) => item.id === selectedPlantId),

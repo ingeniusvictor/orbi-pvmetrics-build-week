@@ -3,6 +3,7 @@ import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis
 import { ArrowRight, Layers3, TriangleAlert } from 'lucide-react';
 import type { PortfolioExecutivePresentation } from '../../../climate-recovery';
 import type { ClimateRecoveryCopy, ClimateRecoveryLocale } from '../copy';
+import { GuidedDemoAnchor } from '../demo/GuidedDemoAnchor';
 import { AvailabilityValue, MetricCard, Panel, SectionHeader, StatusBadge, SyntheticBadge } from '../shared/Display';
 
 const chartColors = ['#10b981', '#22d3ee', '#64748b', '#8b5cf6', '#f59e0b'];
@@ -32,7 +33,9 @@ export const PortfolioOverview: React.FC<{
   const priorities = executive.priorityDistribution.statuses.map((item) => ({ name: item.status in t.statusLabels ? t.statusLabels[item.status as keyof typeof t.statusLabels] : item.status, value: item.count }));
   return (
     <div id="cr-portfolio-overview" tabIndex={-1} className="space-y-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+      <GuidedDemoAnchor id="guided-demo-anchor-problem" stepId="problem" label={`${t.guidedDemo}: ${t.overview}`} />
       <section id="cr-executive-kpis" tabIndex={-1} aria-labelledby="portfolio-kpis-title" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+        <GuidedDemoAnchor id="guided-demo-anchor-opportunity" stepId="opportunity" label={`${t.guidedDemo}: ${t.recoverableEnergy}`} />
         <SectionHeader title={t.overview} description={executive.summary.portfolioName} />
         <h3 id="portfolio-kpis-title" className="sr-only">Portfolio KPIs</h3>
         <div className="mt-4 grid grid-cols-1 gap-3 min-[430px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
@@ -57,7 +60,9 @@ export const PortfolioOverview: React.FC<{
         </div>
       </section>
 
-      <div id="cr-plant-ranking" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><Panel ariaLabel={t.plantRanking}>
+      <div id="cr-plant-ranking" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+        <GuidedDemoAnchor id="guided-demo-anchor-portfolio-ranking" stepId="ranking" label={`${t.guidedDemo}: ${t.plantRanking}`} />
+        <Panel ariaLabel={t.plantRanking}>
         <SectionHeader title={t.plantRanking} description={t.scoreTooltip} />
         <div className="mt-4 hidden overflow-x-auto rounded-xl border border-slate-800 lg:block">
           <table className="w-full min-w-[900px] border-collapse text-left text-xs">

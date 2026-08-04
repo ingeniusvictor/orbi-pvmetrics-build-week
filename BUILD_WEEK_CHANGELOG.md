@@ -1,5 +1,18 @@
 # OpenAI Build Week Changelog
 
+## CR-06.1 Guided Demo Recording Fix
+
+- Replaced container-centered demo scrolling with eight explicit content
+  anchors and one cancellable, bounded navigation coordinator.
+- Added viewport-aware offsets, lazy-target synchronization, settled focus,
+  one corrective-scroll cap, and in-memory Exit/Escape/Return restoration.
+- Bounded the sticky mobile narrative shell while keeping progress and 44 px
+  controls visible, and completed residual ES/EN presentation localization.
+- Validated all eight steps at seven required desktop/tablet/mobile viewports:
+  56/56 visual combinations passed with no manual recovery scroll.
+- Expanded the repository suite to 408 passing tests with no dependency or
+  `package-lock.json` change.
+
 ## CR-06 Competition Storytelling and Guided Demo Flow
 
 - Resolved the 14/13 human-review discrepancy by making the CR-02 assessment

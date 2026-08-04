@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-05 functional synthetic Climate Recovery executive dashboard
+Status: CR-06.1 guided synthetic Climate Recovery recording flow
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -60,6 +60,8 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Case details use progressive disclosure while retaining evidence and
   limitations.
 - Spanish and English competition storytelling are supported.
+- Guided Demo navigation has been stabilized for local recording.
+- The guided flow has been validated across desktop and mobile viewports.
 
 ## Prohibited claims at this stage
 

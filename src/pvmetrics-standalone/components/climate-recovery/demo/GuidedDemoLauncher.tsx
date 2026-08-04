@@ -13,7 +13,7 @@ export const GuidedDemoLauncher: React.FC<{
       <button type="button" aria-pressed={!guided} onClick={onFree} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${!guided ? 'bg-slate-100 text-slate-950' : 'border border-slate-700 text-slate-300'}`}>
         <Compass className="h-4 w-4" />{t.freeExplore}
       </button>
-      <button type="button" aria-pressed={guided} onClick={onStart} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${guided ? 'bg-amber-500 text-slate-950' : 'border border-amber-500/40 bg-amber-500/10 text-amber-200'}`}>
+      <button id="guided-demo-launcher" type="button" aria-pressed={guided} onClick={onStart} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${guided ? 'bg-amber-500 text-slate-950' : 'border border-amber-500/40 bg-amber-500/10 text-amber-200'}`}>
         <Play className="h-4 w-4" />{t.startGuidedDemo}
       </button>
     </div>

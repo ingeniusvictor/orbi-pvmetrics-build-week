@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, Eye, FlaskConical, SearchCheck } from 'lucide-react';
 import type { PortfolioReviewQueueItem, SyntheticPlant } from '../../../climate-recovery';
 import type { ClimateRecoveryCopy, ClimateRecoveryLocale } from '../copy';
+import { GuidedDemoAnchor, type GuidedDemoAnchorContract } from '../demo/GuidedDemoAnchor';
 import { localizePresentationText } from '../presentationLocalization';
 import { DisclosurePanel, EmptyState, SectionHeader, StatusBadge, SyntheticBadge } from '../shared/Display';
 
@@ -14,8 +15,10 @@ export const HumanReviewQueue: React.FC<{
   t: ClimateRecoveryCopy;
   locale: ClimateRecoveryLocale;
   onCase: (caseId: string) => void;
-}> = ({ queue, plants, caseTitle, t, locale, onCase }) => (
+  guidedAnchor?: GuidedDemoAnchorContract;
+}> = ({ queue, plants, caseTitle, t, locale, onCase, guidedAnchor }) => (
   <div id="cr-review-queue" tabIndex={-1} className="space-y-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+    {guidedAnchor && <GuidedDemoAnchor {...guidedAnchor} />}
     <SectionHeader title={t.humanReviewQueue} description={t.queueNotice} />
     <DisclosurePanel disclosure={t.disclosure} boundary={t.operatorBoundary} ariaLabel={t.syntheticDisclosureLabel} />
     {queue.length === 0 && <EmptyState title={t.noResults} />}

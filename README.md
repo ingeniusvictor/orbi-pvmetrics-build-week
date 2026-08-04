@@ -187,7 +187,10 @@ Case Detail now presents an executive summary first and keeps evidence,
 hypotheses, timeline, methodology, assumptions, limitations, and suppressed
 actions in accessible progressive-disclosure sections. Spanish and English
 storytelling preserve synthetic, estimated, unverified, and human-review
-labels. See `docs/competition/CR_06_GUIDED_DEMO_STORYTELLING.md`.
+labels. CR-06.1 stabilizes anchor focus, viewport-aware scrolling, mobile
+controls, and in-memory exit restoration for local recording across the required
+desktop and mobile viewports. See `docs/competition/CR_06_GUIDED_DEMO_STORYTELLING.md`
+and `docs/competition/CR_06_1_GUIDED_DEMO_RECORDING_FIX.md`.
 
 The feature runs locally without credentials or network access. It does not
 use real plants or customer data, dispatch work, control equipment, provide a
