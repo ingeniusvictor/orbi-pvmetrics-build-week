@@ -14,6 +14,16 @@ import {
   getClimateRecoveryCaseDetail,
   listClimateRecoveryCases,
 } from './hooks/useClimateRecoveryDemo';
+import {
+  GUIDED_DEMO_STEPS,
+  advanceGuidedDemo,
+  createGuidedDemoState,
+  exitGuidedDemo,
+  previousGuidedDemo,
+  resetGuidedDemo,
+  skipGuidedDemo,
+} from './demo/guidedDemoSteps';
+import { localizePresentationText } from './presentationLocalization';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(here, '..', '..', 'app', 'OrbiPVMetricsStandaloneApp.tsx'), 'utf8');
@@ -26,6 +36,15 @@ const html = renderToStaticMarkup(React.createElement(ClimateRecoveryView));
 const caseHtml = renderToStaticMarkup(React.createElement(CaseDetailView, {
   detail: details[0], locale: 'en', t: getClimateRecoveryCopy('en'), onBack: () => undefined,
 }));
+const esDetails = listClimateRecoveryCases('es').map((item) => getClimateRecoveryCaseDetail(item.caseId, 'es')).filter((item) => item !== undefined);
+const esCaseHtml = esDetails.map((detail) => renderToStaticMarkup(React.createElement(CaseDetailView, {
+  detail, locale: 'es', t: getClimateRecoveryCopy('es'), onBack: () => undefined,
+}))).join('\n');
+const insufficientEsHtml = renderToStaticMarkup(React.createElement(CaseDetailView, {
+  detail: getClimateRecoveryCaseDetail('DEMO-CR-CASE-C', 'es'), locale: 'es', t: getClimateRecoveryCopy('es'), onBack: () => undefined,
+}));
+const indexSource = readFileSync(join(here, '..', '..', '..', '..', 'index.html'), 'utf8');
+const cssSource = readFileSync(join(here, '..', '..', '..', 'index.css'), 'utf8');
 
 const sourceFiles = (directory: string): string[] => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
   const path = join(directory, entry.name);
@@ -180,4 +199,107 @@ test('69 interface copy localizes safety language and statuses in ES and EN', ()
 test('70 pending human review uses a pending semantic token rather than an available success state', () => {
   assert.match(source, /status="pending-review"/);
   assert.match(source, /value="pending-review"/);
+});
+test('71 pending-review KPI equals the canonical queue length', () => assert.equal(en.executive.summary.pendingHumanReviewCount, en.executive.reviewQueue.length));
+test('72 Patagonia BESS is included in the canonical review queue', () => assert.ok(en.executive.reviewQueue.some((item) => item.caseId === 'CR04-CASE-BESS-OPERATION')));
+test('73 review queue contains no duplicate case IDs', () => assert.equal(new Set(en.executive.reviewQueue.map((item) => item.caseId)).size, en.executive.reviewQueue.length));
+test('74 Spanish localizes every required KPI key', () => {
+  assert.equal(localizePresentationText('kpi.estimatedEnergyLoss', 'es'), 'Pérdida de energía estimada');
+  assert.equal(localizePresentationText('kpi.estimatedRecoverableEnergy', 'es'), 'Energía recuperable estimada');
+});
+test('75 seven-day scenario key is localized in both locales', () => {
+  assert.equal(localizePresentationText('scenario.seven-days', 'es'), 'Escenario de siete días');
+  assert.equal(localizePresentationText('scenario.seven-days', 'en'), 'Seven-day scenario');
+});
+test('76 request-more-data action is localized', () => {
+  assert.equal(localizePresentationText('request-more-data', 'es'), 'Solicitar más datos');
+  assert.match(insufficientEsHtml, /Solicitar más datos/);
+});
+test('77 Spanish case detail exposes no unresolved presentation keys', () => assert.doesNotMatch(esCaseHtml, /(?:kpi|scenario|action)\.[A-Za-z]/));
+test('78 English case detail exposes no unresolved presentation keys', () => assert.doesNotMatch(caseHtml, /(?:kpi|scenario|action)\.[A-Za-z]/));
+test('79 guided demo launcher is visible in free mode', () => assert.match(html, /Iniciar demo guiada/));
+test('80 guided demo contains exactly eight steps', () => assert.equal(GUIDED_DEMO_STEPS.length, 8));
+test('81 guided demo order is stable and contiguous', () => assert.deepEqual(GUIDED_DEMO_STEPS.map((step) => step.order), [1, 2, 3, 4, 5, 6, 7, 8]));
+test('82 guided demo previous and next links are internally coherent', () => GUIDED_DEMO_STEPS.forEach((step, index) => {
+  assert.equal(step.previousStepId, GUIDED_DEMO_STEPS[index - 1]?.id);
+  assert.equal(step.nextStepId, GUIDED_DEMO_STEPS[index + 1]?.id);
+}));
+test('83 step 1 targets the portfolio overview', () => assert.equal(GUIDED_DEMO_STEPS[0].targetSection, 'overview'));
+test('84 step 4 targets the recoverable inverter case', () => assert.equal(GUIDED_DEMO_STEPS[3].caseId, 'DEMO-CR-CASE-A'));
+test('85 step 5 targets the non-recoverable grid case', () => assert.equal(GUIDED_DEMO_STEPS[4].caseId, 'DEMO-CR-CASE-B'));
+test('86 step 6 targets the insufficient-data sensor case', () => assert.equal(GUIDED_DEMO_STEPS[5].caseId, 'DEMO-CR-CASE-C'));
+test('87 step 7 targets human review and explainability', () => assert.equal(GUIDED_DEMO_STEPS[6].targetSection, 'review'));
+test('88 step 8 targets scenario and climate impact', () => assert.equal(GUIDED_DEMO_STEPS[7].focusElementId, 'cr-recovery-scenario'));
+test('89 every disclosure-required demo step declares locale support', () => assert.ok(GUIDED_DEMO_STEPS.filter((step) => step.syntheticDisclosureRequired).every((step) => step.localeSupport.includes('es') && step.localeSupport.includes('en'))));
+test('90 guided demo has no autoplay contract', () => assert.doesNotMatch(source, /autoPlay|setInterval|setTimeout/));
+test('91 guided demo uses no implicit clock', () => assert.doesNotMatch(source, /Date\.now/));
+test('92 guided demo uses no randomness', () => assert.doesNotMatch(source, /Math\.random/));
+test('93 guided demo performs no fetch', () => assert.doesNotMatch(source, /\bfetch\s*\(/));
+test('94 guided demo uses no browser persistence', () => assert.doesNotMatch(source, /localStorage|sessionStorage/));
+test('95 guided demo contracts include focus warnings viewport and deterministic start fields', () => {
+  const step = GUIDED_DEMO_STEPS[0];
+  assert.ok(step.focusElementId && step.warnings.length && step.expectedViewport);
+  assert.equal(createGuidedDemoState('es').startedAt, '2026-08-03T12:00:00.000Z');
+});
+test('96 initial demo state is free and inactive', () => {
+  const state = createGuidedDemoState('es'); assert.equal(state.mode, 'free'); assert.equal(state.active, false);
+});
+test('97 reset returns deterministically to guided step 1', () => {
+  const state = resetGuidedDemo({ ...createGuidedDemoState('es'), currentStepId: 'climate-impact', completedStepIds: ['problem'] });
+  assert.equal(state.currentStepId, 'problem'); assert.deepEqual(state.completedStepIds, []); assert.equal(state.mode, 'guided');
+});
+test('98 next advances and records completion', () => {
+  const state = advanceGuidedDemo(resetGuidedDemo(createGuidedDemoState('en')));
+  assert.equal(state.currentStepId, 'opportunity'); assert.deepEqual(state.completedStepIds, ['problem']);
+});
+test('99 previous returns without inventing completion', () => {
+  const state = previousGuidedDemo({ ...resetGuidedDemo(createGuidedDemoState('en')), currentStepId: 'opportunity' });
+  assert.equal(state.currentStepId, 'problem'); assert.deepEqual(state.completedStepIds, []);
+});
+test('100 skip follows the explicit next-step contract', () => assert.equal(skipGuidedDemo(resetGuidedDemo(createGuidedDemoState('en'))).currentStepId, 'opportunity'));
+test('101 final next exits to free mode', () => {
+  const state = advanceGuidedDemo({ ...resetGuidedDemo(createGuidedDemoState('en')), currentStepId: 'climate-impact' });
+  assert.equal(state.active, false); assert.equal(state.mode, 'free');
+});
+test('102 explicit exit preserves deterministic state without mutation', () => {
+  const original = resetGuidedDemo(createGuidedDemoState('es')); const exited = exitGuidedDemo(original);
+  assert.equal(original.active, true); assert.equal(exited.active, false); assert.equal(exited.mode, 'free');
+});
+test('103 reset preserves configured locale and reduced-motion preference', () => {
+  const state = resetGuidedDemo({ ...createGuidedDemoState('en', true), locale: 'en' });
+  assert.equal(state.locale, 'en'); assert.equal(state.reducedMotion, true);
+});
+test('104 keyboard contract supports Escape exit', () => assert.match(source, /event\.key === 'Escape'/));
+test('105 keyboard contract supports previous and next arrow keys', () => {
+  assert.match(source, /event\.key === 'ArrowRight'/); assert.match(source, /event\.key === 'ArrowLeft'/);
+});
+test('106 guided steps declare focus targets and focus management', () => {
+  assert.ok(GUIDED_DEMO_STEPS.every((step) => step.focusElementId)); assert.match(source, /scrollIntoView[\s\S]*focus/);
+});
+test('107 guided shell announces step changes through a live region', () => assert.match(source, /aria-live="polite"/));
+test('108 case detail implements eight progressive-disclosure accordions', () => assert.equal((source.match(/<Accordion id=/g) ?? []).length, 8));
+test('109 evidence accordion has explicit expanded and controls semantics', () => assert.match(source, /aria-expanded=\{open\}[\s\S]*aria-controls/));
+test('110 hypotheses remain available in secondary detail', () => assert.match(source, /id="hypotheses"[\s\S]*detail\.hypotheses/));
+test('111 suppressed actions are separated from recommended actions', () => {
+  assert.match(source, /status !== 'suppressed'/); assert.match(source, /id="suppressed-actions"/);
+});
+test('112 critical warnings render before technical accordions', () => assert.ok(source.indexOf('cr-case-warnings') < source.indexOf('id="evidence"')));
+test('113 Climate Recovery free overview has exactly one h1', () => assert.equal((html.match(/<h1\b/g) ?? []).length, 1));
+test('114 ranking table has an accessible caption', () => assert.match(html, /<caption class="sr-only">Ranking de cinco plantas sintéticas/));
+test('115 opportunities table declares its caption contract', () => assert.match(source, /t\.opportunitiesCaption/));
+test('116 outer shell selects have programmatic names', () => {
+  assert.match(appSource, /htmlFor="workspace-company"/); assert.match(appSource, /aria-label="Planta Solar \/ BESS"/);
+});
+test('117 primary navigation exposes semantic active state', () => assert.match(appSource, /aria-current=\{isSelected \? 'page'/));
+test('118 mobile tabs use a reduced-scrollbar fade contract', () => assert.match(cssSource, /\.cr-mobile-tabs[\s\S]*mask-image[\s\S]*scrollbar/));
+test('119 Climate Recovery secondary copy does not use 9–11px utilities', () => assert.doesNotMatch(source, /text-\[(?:9|10|11)px\]/));
+test('120 browser title defaults to the general product', () => assert.match(indexSource, /<title>ORBI PVMetrics IA<\/title>/));
+test('121 Climate Recovery sets and restores its scoped document title', () => assert.match(source, /document\.title = 'ORBI PVMetrics IA — Climate Recovery Edition'[\s\S]*document\.title = previousTitle/));
+test('122 Guided Demo shell is lazy-loaded', () => assert.match(source, /lazy\(\(\) => import\('\.\/demo\/GuidedDemoShell'\)/));
+test('123 case detail evaluation is deferred outside the opportunities view', () => assert.match(source, /activeSection !== 'opportunities'/));
+test('124 reduced motion is honored by guided focus and CSS', () => {
+  assert.match(source, /prefers-reduced-motion: reduce/); assert.match(cssSource, /prefers-reduced-motion: reduce/);
+});
+test('125 demo source exposes no GPT or operational approval control', () => {
+  assert.doesNotMatch(source, /\bGPT(?:-\d)?\b/i); assert.doesNotMatch(source, /<button[^>]*>[^<]*(approve|dispatch)/i);
 });

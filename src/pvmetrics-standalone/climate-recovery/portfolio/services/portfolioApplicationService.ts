@@ -255,6 +255,9 @@ export const createSyntheticClimateRecoveryPortfolioService = (
     const application = applicationFor(source, options);
     const evaluated = evaluateAll(application, source, options);
     const items = evaluated.flatMap(({ definition, assessment }) => {
+      // CR-02's assessment-level review gate is canonical. Queue reasons add
+      // context; they must never silently narrow the set of review-required cases.
+      if (!assessment.requiresHumanReview) return [];
       const reasons: string[] = [];
       const reviewTypes: string[] = [];
       if (['high', 'critical'].includes(assessment.priority.band)) reasons.push(`${assessment.priority.band} synthetic priority`);
@@ -266,7 +269,7 @@ export const createSyntheticClimateRecoveryPortfolioService = (
       if (actions.some((action) => action.actionType === 'maintenance-intervention')) { reasons.push('maintenance intervention recommendation gate'); reviewTypes.push('maintenance-review'); }
       if (assessment.hypotheses.some((item) => item.status === 'contradicted')) { reasons.push('contradicted hypothesis'); reviewTypes.push('hypothesis-review'); }
       if (assessment.recommendations.humanReviewStatus === 'needs-more-data') { reasons.push('needs more data'); reviewTypes.push('evidence-gap-review'); }
-      if (reasons.length === 0) return [];
+      if (reasons.length === 0) reasons.push('assessment requires human review');
       const evidenceGap = [...new Set([
         ...assessment.dataSufficiency.missingCriticalFields,
         ...assessment.dataSufficiency.recommendedDataRequests,

@@ -61,7 +61,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'climate-recovery', label: 'Recuperación Climática', icon: Leaf, badge: 'CR-05' },
+    { id: 'climate-recovery', label: 'Recuperación Climática', icon: Leaf, badge: 'CR-06' },
     { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
     { id: 'live', label: 'Monitoreo Live', icon: Activity },
     { id: 'diario', label: 'Diario', icon: Clock },
@@ -184,7 +184,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                   <Cpu className="w-5 h-5" />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold tracking-tight text-white uppercase">ORBI PVMetrics IA</h1>
+                  <p className="text-sm font-bold tracking-tight text-white uppercase">ORBI PVMetrics IA</p>
                   <p className="text-[9px] text-gray-500 font-mono tracking-wider">Demo Client v1.1</p>
                 </div>
               </div>
@@ -193,10 +193,12 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             {/* Workspace configuration multi-company / plant select */}
             <div className="p-4 border-b border-gray-800 space-y-3">
               <div>
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                <label htmlFor="workspace-company" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
                   <Building2 className="w-3 h-3 text-amber-500" /> Workspace Empresa
                 </label>
-                <select 
+                <select
+                  id="workspace-company"
+                  aria-label="Workspace Empresa"
                   value={activeCompanyId}
                   onChange={handleCompanyChange}
                   className="w-full bg-gray-900 border border-gray-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-amber-500 mt-1.5 font-semibold"
@@ -208,10 +210,12 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
+                <label htmlFor="workspace-plant" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
                   <Radio className="w-3 h-3 text-amber-500" /> Planta Solar / BESS
                 </label>
-                <select 
+                <select
+                  id="workspace-plant"
+                  aria-label="Planta Solar / BESS"
                   value={activePlantId}
                   onChange={(e) => setActivePlantId(e.target.value)}
                   className="w-full bg-gray-900 border border-gray-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-amber-500 mt-1.5"

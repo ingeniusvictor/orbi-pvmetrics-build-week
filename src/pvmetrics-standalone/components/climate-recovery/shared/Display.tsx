@@ -80,13 +80,13 @@ const tokenStyles: Record<string, string> = {
 };
 
 export const StatusBadge: React.FC<{ value: string; t: ClimateRecoveryCopy; label?: string }> = ({ value, t, label }) => (
-  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${tokenStyles[value] ?? 'border-slate-700 bg-slate-900 text-slate-300'}`}>
+  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${tokenStyles[value] ?? 'border-slate-700 bg-slate-900 text-slate-300'}`}>
     {label ?? (value in t.statusLabels ? t.statusLabels[value as keyof typeof t.statusLabels] : value.replaceAll('-', ' '))}
   </span>
 );
 
 export const SyntheticBadge: React.FC<{ label: string }> = ({ label }) => (
-  <span className="inline-flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-cyan-300">
+  <span className="inline-flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-cyan-300">
     <ShieldCheck className="h-3 w-3" aria-hidden="true" /> {label}
   </span>
 );
@@ -114,7 +114,7 @@ export const MetricCard: React.FC<{
 }> = ({ label, children, explanation, status = 'available', tooltip }) => (
   <article className="group relative min-w-0 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-sm transition-colors hover:border-slate-700">
     <div className="flex items-start justify-between gap-2">
-      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
       {tooltip && (
         <span title={tooltip} aria-label={tooltip} tabIndex={0} className="rounded text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
           <HelpCircle className="h-4 w-4" />
@@ -122,7 +122,7 @@ export const MetricCard: React.FC<{
       )}
     </div>
     <div className="mt-3 break-words font-mono text-2xl font-black tracking-tight text-white">{children}</div>
-    <div className="mt-3 flex items-start gap-2 border-t border-slate-800 pt-3 text-[10px] leading-4 text-slate-400">
+    <div className="mt-3 flex items-start gap-2 border-t border-slate-800 pt-3 text-xs leading-4 text-slate-400">
       {status === 'blocked' || status === 'not-applicable' ? <Ban className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-400" />
         : status === 'unavailable' ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
           : status === 'pending-review' ? <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
@@ -132,11 +132,11 @@ export const MetricCard: React.FC<{
   </article>
 );
 
-export const DisclosurePanel: React.FC<{ disclosure: string; boundary: string }> = ({ disclosure, boundary }) => (
-  <aside className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-4" aria-label="Synthetic data disclosure">
+export const DisclosurePanel: React.FC<{ disclosure: string; boundary: string; ariaLabel?: string }> = ({ disclosure, boundary, ariaLabel = 'Synthetic data disclosure' }) => (
+  <aside className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-4" aria-label={ariaLabel}>
     <div className="flex items-start gap-3">
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-      <div className="space-y-1 text-[11px] leading-5 text-cyan-100/80">
+      <div className="space-y-1 text-xs leading-5 text-cyan-100/80">
         <p className="font-semibold text-cyan-200">{disclosure}</p>
         <p>{boundary}</p>
       </div>

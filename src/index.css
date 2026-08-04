@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+.cr-mobile-tabs {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
+  mask-image: linear-gradient(to right, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+}
+
+.cr-mobile-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.cr-mobile-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cr-mobile-tabs::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgba(100, 116, 139, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-mobile-tabs,
+  [data-guided-mode='guided'] * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

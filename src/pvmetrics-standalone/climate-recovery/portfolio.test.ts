@@ -194,3 +194,26 @@ test('64 public configuration and metadata expose CR-04 version and safe flags',
   assert.equal(getSyntheticPortfolioConfiguration().portfolioVersion, SYNTHETIC_CLIMATE_RECOVERY_PORTFOLIO_VERSION);
   assert.equal(SYNTHETIC_CLIMATE_RECOVERY_PORTFOLIO_METADATA.productionOperational, false);
 });
+test('65 pending-review KPI and canonical review queue use the same assessment gate', () => {
+  const executive = service().getPortfolioExecutiveSummary();
+  assert.equal(executive.summary.pendingHumanReviewCount, executive.reviewQueue.length);
+});
+test('66 Patagonia BESS strategy review gate is represented consistently', () => {
+  const executive = service().getPortfolioExecutiveSummary();
+  const caseId = 'CR04-CASE-BESS-OPERATION';
+  assert.ok(executive.reviewQueue.some((item) => item.caseId === caseId));
+  assert.equal(executive.plantSummaries.find((item) => item.plantId === 'CR04-PLANT-PATAGONIA')?.pendingReviewCount, 3);
+});
+test('67 review queue has no duplicates and stable ordering', () => {
+  const first = service().getReviewQueue().map((item) => item.caseId);
+  const second = service().getReviewQueue().map((item) => item.caseId);
+  assert.equal(new Set(first).size, first.length);
+  assert.deepEqual(first, second);
+});
+test('68 plant pending-review totals equal the portfolio queue length', () => {
+  const executive = service().getPortfolioExecutiveSummary();
+  assert.equal(
+    executive.plantSummaries.reduce((sum, item) => sum + item.pendingReviewCount, 0),
+    executive.reviewQueue.length,
+  );
+});

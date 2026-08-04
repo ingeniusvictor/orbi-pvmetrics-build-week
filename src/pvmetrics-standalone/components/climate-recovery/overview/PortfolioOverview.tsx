@@ -14,7 +14,7 @@ const ChartTooltip: React.FC<{
   payload?: Array<{ name?: string; value?: number }>;
   disclosure: string;
 }> = ({ active, payload, disclosure }) => active && payload?.length ? (
-  <div className="max-w-56 rounded-xl border border-slate-700 bg-slate-950 p-3 text-[10px] shadow-xl">
+  <div className="max-w-56 rounded-xl border border-slate-700 bg-slate-950 p-3 text-xs shadow-xl">
     <p className="font-bold text-white">{payload[0].name}: {payload[0].value}</p>
     <p className="mt-1 leading-4 text-slate-400">{disclosure}</p>
   </div>
@@ -28,11 +28,11 @@ export const PortfolioOverview: React.FC<{
   onCase: (caseId: string) => void;
 }> = ({ executive, locale, t, onPlant, onCase }) => {
   const topRank = executive.rankings[0];
-  const distribution = executive.recoverabilityDistribution.statuses.map((item) => ({ name: item.status, value: item.count }));
-  const priorities = executive.priorityDistribution.statuses.map((item) => ({ name: item.status, value: item.count }));
+  const distribution = executive.recoverabilityDistribution.statuses.map((item) => ({ name: item.status in t.statusLabels ? t.statusLabels[item.status as keyof typeof t.statusLabels] : item.status, value: item.count }));
+  const priorities = executive.priorityDistribution.statuses.map((item) => ({ name: item.status in t.statusLabels ? t.statusLabels[item.status as keyof typeof t.statusLabels] : item.status, value: item.count }));
   return (
-    <div className="space-y-6">
-      <section aria-labelledby="portfolio-kpis-title">
+    <div id="cr-portfolio-overview" tabIndex={-1} className="space-y-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+      <section id="cr-executive-kpis" tabIndex={-1} aria-labelledby="portfolio-kpis-title" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
         <SectionHeader title={t.overview} description={executive.summary.portfolioName} />
         <h3 id="portfolio-kpis-title" className="sr-only">Portfolio KPIs</h3>
         <div className="mt-4 grid grid-cols-1 gap-3 min-[430px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
@@ -51,17 +51,18 @@ export const PortfolioOverview: React.FC<{
           <MetricCard label={t.pendingReview} explanation={t.operatorBoundary} status="pending-review">
             {executive.summary.pendingHumanReviewCount}
           </MetricCard>
-          <MetricCard label={t.opportunityScore} explanation={`${topRank.plantName} · ${topRank.scoreBand}.`} tooltip={t.scoreTooltip}>
+          <MetricCard label={t.opportunityScore} explanation={`${topRank.plantName} · ${topRank.scoreBand in t.statusLabels ? t.statusLabels[topRank.scoreBand as keyof typeof t.statusLabels] : topRank.scoreBand}.`} tooltip={t.scoreTooltip}>
             {topRank.score.toFixed(2)}<span className="ml-1 text-xs text-slate-500">/100</span>
           </MetricCard>
         </div>
       </section>
 
-      <Panel ariaLabel={t.plantRanking}>
+      <div id="cr-plant-ranking" tabIndex={-1} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><Panel ariaLabel={t.plantRanking}>
         <SectionHeader title={t.plantRanking} description={t.scoreTooltip} />
         <div className="mt-4 hidden overflow-x-auto rounded-xl border border-slate-800 lg:block">
           <table className="w-full min-w-[900px] border-collapse text-left text-xs">
-            <thead className="bg-slate-950/80 text-[10px] uppercase tracking-wide text-slate-500">
+            <caption className="sr-only">{t.rankingCaption}</caption>
+            <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-500">
               <tr>{['#', t.plant, t.asset, t.opportunityScore, t.recoverableEnergy, t.climateImpact, t.highPriority, t.pendingReview, t.dataQuality, ''].map((label) => <th key={label} scope="col" className="px-3 py-3 font-bold">{label}</th>)}</tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
@@ -72,7 +73,7 @@ export const PortfolioOverview: React.FC<{
                     <td className="px-3 py-3 font-mono text-amber-300">{item.rank}</td>
                     <td className="px-3 py-3"><div className="font-bold text-white">{item.plantName}</div><SyntheticBadge label={t.demonstration} /></td>
                     <td className="px-3 py-3 text-slate-300">{plant.assetType}</td>
-                    <td className="px-3 py-3 font-mono font-bold text-white">{item.score.toFixed(2)}{item.overlapPenalty > 0 && <span className="mt-1 block text-[9px] font-normal text-amber-300">−{item.overlapPenalty} {t.overlapPenalty.toLocaleLowerCase()}</span>}</td>
+                    <td className="px-3 py-3 font-mono font-bold text-white">{item.score.toFixed(2)}{item.overlapPenalty > 0 && <span className="mt-1 block text-xs font-normal text-amber-300">−{item.overlapPenalty} {t.overlapPenalty.toLocaleLowerCase()}</span>}</td>
                     <td className="px-3 py-3 text-slate-200"><AvailabilityValue value={item.estimatedRecoverableEnergy} locale={locale} t={t} /></td>
                     <td className="px-3 py-3 text-slate-200"><AvailabilityValue value={item.estimatedClimateImpact} locale={locale} t={t} /></td>
                     <td className="px-3 py-3 text-slate-300">{item.highPriorityCaseCount}</td>
@@ -90,18 +91,18 @@ export const PortfolioOverview: React.FC<{
             const plant = executive.plantSummaries.find((summary) => summary.plantId === item.plantId)!;
             return (
               <article key={item.plantId} className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                <div className="flex items-start justify-between gap-3"><div><p className="font-mono text-[10px] font-black text-amber-300">#{item.rank}</p><h3 className="mt-1 text-sm font-bold text-white">{item.plantName}</h3><p className="mt-1 text-[10px] text-slate-500">{plant.assetType}</p></div><SyntheticBadge label={t.demonstration} /></div>
-                <dl className="mt-4 grid grid-cols-2 gap-2 text-[10px]"><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.opportunityScore}</dt><dd className="mt-1 font-mono font-bold text-white">{item.score.toFixed(2)} /100</dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.dataQuality}</dt><dd className="mt-1"><StatusBadge value={plant.dataQualityStatus} t={t} /></dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.recoverableEnergy}</dt><dd className="mt-1"><AvailabilityValue value={item.estimatedRecoverableEnergy} locale={locale} t={t} /></dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.climateImpact}</dt><dd className="mt-1"><AvailabilityValue value={item.estimatedClimateImpact} locale={locale} t={t} /></dd></div></dl>
-                <p className="mt-3 text-[10px] text-slate-400">{t.highPriority}: {item.highPriorityCaseCount} · {t.pendingReview}: {item.pendingReviewCount}{item.overlapPenalty > 0 ? ` · ${t.overlapPenalty}: −${item.overlapPenalty}` : ''}</p>
+                <div className="flex items-start justify-between gap-3"><div><p className="font-mono text-xs font-black text-amber-300">#{item.rank}</p><h3 className="mt-1 text-sm font-bold text-white">{item.plantName}</h3><p className="mt-1 text-xs text-slate-500">{plant.assetType}</p></div><SyntheticBadge label={t.demonstration} /></div>
+                <dl className="mt-4 grid grid-cols-2 gap-2 text-xs"><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.opportunityScore}</dt><dd className="mt-1 font-mono font-bold text-white">{item.score.toFixed(2)} /100</dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.dataQuality}</dt><dd className="mt-1"><StatusBadge value={plant.dataQualityStatus} t={t} /></dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.recoverableEnergy}</dt><dd className="mt-1"><AvailabilityValue value={item.estimatedRecoverableEnergy} locale={locale} t={t} /></dd></div><div className="rounded-lg bg-slate-900 p-2"><dt className="text-slate-500">{t.climateImpact}</dt><dd className="mt-1"><AvailabilityValue value={item.estimatedClimateImpact} locale={locale} t={t} /></dd></div></dl>
+                <p className="mt-3 text-xs text-slate-400">{t.highPriority}: {item.highPriorityCaseCount} · {t.pendingReview}: {item.pendingReviewCount}{item.overlapPenalty > 0 ? ` · ${t.overlapPenalty}: −${item.overlapPenalty}` : ''}</p>
                 <button type="button" onClick={() => onPlant(item.plantId)} className={`${actionClass} mt-4 w-full`}>{t.viewPlant}<ArrowRight className="h-3.5 w-3.5" /></button>
               </article>
             );
           })}
         </div>
         {executive.rankings.some((item) => item.overlapPenalty > 0) && (
-          <p className="mt-3 flex items-center gap-2 text-[11px] text-amber-300"><TriangleAlert className="h-4 w-4" /> Overlap penalties are visible and preserved from CR-04.</p>
+          <p className="mt-3 flex items-center gap-2 text-xs text-amber-300"><TriangleAlert className="h-4 w-4" />{t.overlapNotice}</p>
         )}
-      </Panel>
+      </Panel></div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Panel ariaLabel={t.recoverability}>
@@ -111,7 +112,7 @@ export const PortfolioOverview: React.FC<{
               <PieChart><Pie data={distribution} dataKey="value" nameKey="name" innerRadius={48} outerRadius={76} paddingAngle={2} isAnimationActive={false}>{distribution.map((item, index) => <Cell key={item.name} fill={chartColors[index % chartColors.length]} />)}</Pie><Tooltip content={<ChartTooltip disclosure={t.syntheticChartDisclosure} />} /></PieChart>
             </ResponsiveContainer>
           </div>
-          <ul className="grid grid-cols-2 gap-2 text-[10px] text-slate-300">{distribution.map((item, index) => <li key={item.name} className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />{item.name in t.statusLabels ? t.statusLabels[item.name as keyof typeof t.statusLabels] : item.name}: <strong>{item.value}</strong></li>)}</ul>
+          <ul className="grid grid-cols-2 gap-2 text-xs text-slate-300">{distribution.map((item, index) => <li key={item.name} className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />{item.name}: <strong>{item.value}</strong></li>)}</ul>
         </Panel>
         <Panel ariaLabel={t.priority}>
           <h3 className="text-sm font-bold text-white">{t.priority}</h3>
@@ -120,7 +121,7 @@ export const PortfolioOverview: React.FC<{
               <BarChart data={priorities} margin={{ top: 8, right: 8, bottom: 30, left: -20 }}><XAxis dataKey="name" stroke="#64748b" fontSize={9} angle={-20} textAnchor="end" interval={0} /><YAxis allowDecimals={false} stroke="#64748b" fontSize={10} /><Tooltip cursor={{ fill: '#1e293b' }} content={<ChartTooltip disclosure={t.syntheticChartDisclosure} />} /><Bar dataKey="value" fill="#f59e0b" radius={[5, 5, 0, 0]} isAnimationActive={false} /></BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] leading-4 text-slate-500">{executive.priorityDistribution.disclosure}</p>
+          <p className="text-xs leading-4 text-slate-500">{executive.priorityDistribution.disclosure}</p>
         </Panel>
         <Panel ariaLabel={t.dataQuality}>
           <h3 className="text-sm font-bold text-white">{t.dataQuality}</h3>
@@ -133,25 +134,25 @@ export const PortfolioOverview: React.FC<{
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-[10px] leading-4 text-slate-500">{executive.dataQualityOverview.limitations[0]}</p>
+          <p className="mt-4 text-xs leading-4 text-slate-500">{executive.dataQualityOverview.limitations[0]}</p>
         </Panel>
       </div>
 
       <section>
-        <SectionHeader title={t.featured} description="Evidence suggests potential recovery opportunities; every case requires human review." />
+        <SectionHeader title={t.featured} description={t.featuredDescription} />
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-4">
           {executive.featuredCases.slice(0, 4).map((detail) => (
             <article key={detail.summary.caseId} className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
               <div className="flex flex-wrap items-center gap-2"><StatusBadge value={detail.summary.priorityBand} t={t} /><StatusBadge value={detail.summary.recoverability} t={t} />{detail.summary.humanReviewRequired && <StatusBadge value="pending-review" label={t.review} t={t} />}<SyntheticBadge label={t.demonstration} /></div>
               <h3 className="mt-4 text-sm font-bold text-white">{detail.summary.caseTitle}</h3>
-              <p className="mt-1 text-[11px] text-slate-500">{executive.plantSummaries.find((plant) => plant.plantId === detail.summary.plantId)?.plantName ?? detail.summary.plantId} · {detail.summary.category}</p>
+              <p className="mt-1 text-xs text-slate-500">{executive.plantSummaries.find((plant) => plant.plantId === detail.summary.plantId)?.plantName ?? detail.summary.plantId} · {detail.summary.category}</p>
               <p className="mt-3 line-clamp-3 text-xs leading-5 text-slate-300">{detail.summary.headline}</p>
-              <dl className="mt-4 grid grid-cols-2 gap-2 text-[10px]">
+              <dl className="mt-4 grid grid-cols-2 gap-2 text-xs">
                 <div className="rounded-lg bg-slate-950/70 p-2"><dt className="text-slate-500">{t.estimatedEnergy}</dt><dd className="mt-1 font-mono text-slate-100"><AvailabilityValue value={detail.summary.recoveryOpportunity.estimatedEnergy} locale={locale} t={t} /></dd></div>
                 <div className="rounded-lg bg-slate-950/70 p-2"><dt className="text-slate-500">{t.climateImpact}</dt><dd className="mt-1 font-mono text-slate-100"><AvailabilityValue value={detail.summary.climateImpact.estimatedAvoidedEmissions} locale={locale} t={t} /></dd></div>
               </dl>
-              <p className="mt-3 text-[10px] text-slate-400">{t.confidence}: <AvailabilityValue value={detail.summary.confidence} locale={locale} t={t} /></p>
-              <p className="mt-3 flex items-start gap-2 text-[10px] leading-4 text-amber-200"><Layers3 className="mt-0.5 h-3.5 w-3.5 shrink-0" />{detail.summary.recommendedNextStep}</p>
+              <p className="mt-3 text-xs text-slate-400">{t.confidence}: <AvailabilityValue value={detail.summary.confidence} locale={locale} t={t} /></p>
+              <p className="mt-3 flex items-start gap-2 text-xs leading-4 text-amber-200"><Layers3 className="mt-0.5 h-3.5 w-3.5 shrink-0" />{detail.summary.recommendedNextStep}</p>
               <button type="button" onClick={() => onCase(detail.summary.caseId)} className={`${actionClass} mt-4 w-full`}>{t.inspectCase}<ArrowRight className="h-3.5 w-3.5" /></button>
             </article>
           ))}

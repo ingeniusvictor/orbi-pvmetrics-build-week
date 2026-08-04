@@ -52,6 +52,14 @@ not replace evidence or authorize operational, commercial, or climate claims.
   requirements are visible.
 - The dashboard supports Spanish and English Climate Recovery content.
 - No credentials or network connection are required for the synthetic demo.
+- A guided synthetic competition demo is implemented.
+- The demo presents the Climate Recovery workflow in a deterministic sequence.
+- Users can switch between guided and free exploration modes.
+- The guided experience preserves uncertainty, synthetic disclosures and human
+  review.
+- Case details use progressive disclosure while retaining evidence and
+  limitations.
+- Spanish and English competition storytelling are supported.
 
 ## Prohibited claims at this stage
 
@@ -104,6 +112,14 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Users can dispatch or approve maintenance from the Climate Recovery view.
 - The dashboard autonomously diagnoses failures.
 - The dashboard is a commercial SaaS product in operation.
+- The guided demo represents a live operational workflow.
+- The demo uses real plants or customers.
+- The demo proves real energy recovery.
+- The demo proves verified avoided emissions.
+- The guided sequence is autonomous decision-making.
+- The platform dispatches or approves maintenance.
+- The storytelling replaces technical evidence.
+- The system is production deployed.
 
 ## Usage rule
 

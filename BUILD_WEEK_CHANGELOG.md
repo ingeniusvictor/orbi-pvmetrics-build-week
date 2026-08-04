@@ -1,5 +1,24 @@
 # OpenAI Build Week Changelog
 
+## CR-06 Competition Storytelling and Guided Demo Flow
+
+- Resolved the 14/13 human-review discrepancy by making the CR-02 assessment
+  review gate canonical for the CR-04 queue; Patagonia BESS is now represented
+  consistently in KPI, queue, plant summary, and opportunity presentation.
+- Added deterministic Free Explore and eight-step Guided Demo modes with
+  bilingual storytelling, Previous/Next/Skip/Exit/Reset controls, keyboard
+  navigation, focus management, reduced-motion support, and live announcements.
+- Added executive-first Case Detail progressive disclosure and separated
+  suppressed or not-recommended actions without removing technical evidence,
+  warnings, contradictions, assumptions, methodology, or limitations.
+- Completed bounded presentation localization, accessible table captions,
+  outer-shell select names, single-h1 semantics, mobile-tab polish, and scoped
+  browser-title restoration.
+- Lazy-loaded the 4.96 kB Guided Demo shell and 18.86 kB Case Detail renderer;
+  the initial Climate Recovery chunk is 290.56 kB (73.26 kB gzip).
+- Expanded the repository suite from 309 to 368 passing tests with no new
+  dependency or `package-lock.json` change.
+
 ## CR-05 Executive Climate Recovery Dashboard
 
 - Added a lazy-loaded, read-only Climate Recovery executive view to the

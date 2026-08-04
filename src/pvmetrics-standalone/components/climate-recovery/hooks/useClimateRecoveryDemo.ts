@@ -21,6 +21,12 @@ import type {
   SyntheticPlant,
 } from '../../../climate-recovery';
 import type { ClimateRecoveryLocale } from '../copy';
+import {
+  localizeCaseCatalogItem,
+  localizeCaseDetailPresentation,
+  localizeExecutivePresentation,
+  localizeSyntheticPlant,
+} from '../presentationLocalization';
 
 export type ClimateRecoverySection = 'overview' | 'plants' | 'opportunities' | 'review' | 'case';
 
@@ -95,10 +101,10 @@ const applicationOptions = (evaluationTimestamp: string, locale: ClimateRecovery
 });
 
 const snapshotFromRuntime = (runtime: ReturnType<typeof createDemoRuntime>, locale: ClimateRecoveryLocale) => {
-  const executive = runtime.portfolioService.getPortfolioExecutiveSummary({ locale });
+  const executive = localizeExecutivePresentation(runtime.portfolioService.getPortfolioExecutiveSummary({ locale }), locale);
   return {
     executive,
-    plants: runtime.portfolioService.listPlants(),
+    plants: runtime.portfolioService.listPlants().map((plant) => localizeSyntheticPlant(plant, locale)),
     definitions: clone(runtime.portfolio.caseDefinitions),
     availableFilters: runtime.applicationService.getAvailableFilters(),
     metadata: runtime.portfolioService.getPortfolioMetadata(),
@@ -130,13 +136,13 @@ export const listClimateRecoveryCases = (
     filters: toApplicationFilters(filters),
     sort,
     pagination: { page: 1, pageSize: 50 },
-  }).items;
+  }).items.map((item) => localizeCaseCatalogItem(item, locale));
 };
 
 export const getClimateRecoveryCaseDetail = (caseId: string, locale: ClimateRecoveryLocale) => {
   const runtime = createDemoRuntime();
   const result = runtime.applicationService.getCase(caseId, applicationOptions(runtime.portfolio.evaluationTimestamp, locale));
-  return result.ok ? result.data : undefined;
+  return result.ok ? localizeCaseDetailPresentation(result.data, locale) : undefined;
 };
 
 export type ClimateRecoveryDemo = {
@@ -144,6 +150,7 @@ export type ClimateRecoveryDemo = {
   setLocale: (locale: ClimateRecoveryLocale) => void;
   activeSection: ClimateRecoverySection;
   navigate: (section: ClimateRecoverySection) => void;
+  resetExploration: () => void;
   selectedPlantId?: string;
   selectPlant: (plantId: string) => void;
   showPlantList: () => void;
@@ -185,9 +192,10 @@ export const useClimateRecoveryDemo = (): ClimateRecoveryDemo => {
       sort,
       pagination: { page: 1, pageSize: 50 },
     });
-    if (!filters.plantId) return result.items;
+    const localized = result.items.map((item) => localizeCaseCatalogItem(item, locale));
+    if (!filters.plantId) return localized;
     const ids = new Set(snapshot.definitions.filter((item) => item.plantId === filters.plantId).map((item) => item.caseId));
-    return result.items.filter((item) => ids.has(item.caseId));
+    return localized.filter((item) => ids.has(item.caseId));
   }, [filters, locale, runtime, snapshot.definitions, sort]);
 
   const allCases = useMemo(() => runtime.applicationService.listCases({
@@ -195,21 +203,22 @@ export const useClimateRecoveryDemo = (): ClimateRecoveryDemo => {
     filters: { syntheticOnly: true },
     sort: 'priority-desc',
     pagination: { page: 1, pageSize: 50 },
-  }).items, [locale, runtime]);
+  }).items.map((item) => localizeCaseCatalogItem(item, locale)), [locale, runtime]);
 
   const selectedCase = useMemo(() => {
     if (!selectedCaseId) return undefined;
     const result = runtime.applicationService.getCase(selectedCaseId, applicationOptions(runtime.portfolio.evaluationTimestamp, locale));
-    return result.ok ? result.data : undefined;
+    return result.ok ? localizeCaseDetailPresentation(result.data, locale) : undefined;
   }, [locale, runtime, selectedCaseId]);
 
   const caseDataSufficiencyById = useMemo(() => new Map(allCases.map((item) => {
+    if (activeSection !== 'opportunities') return [item.caseId, 'unavailable'] as const;
     const result = runtime.applicationService.getCase(
       item.caseId,
       applicationOptions(runtime.portfolio.evaluationTimestamp, locale),
     );
     return [item.caseId, result.ok ? result.data.summary.dataSufficiency : 'unavailable'] as const;
-  })), [allCases, locale, runtime]);
+  })), [activeSection, allCases, locale, runtime]);
 
   const navigate = useCallback((section: ClimateRecoverySection) => setActiveSection(section), []);
   const selectPlant = useCallback((plantId: string) => {
@@ -224,9 +233,16 @@ export const useClimateRecoveryDemo = (): ClimateRecoveryDemo => {
     setSelectedCaseId(caseId);
     setActiveSection('case');
   }, []);
+  const resetExploration = useCallback(() => {
+    setActiveSection('overview');
+    setSelectedPlantId(undefined);
+    setSelectedCaseId(undefined);
+    setFilters(EMPTY_CLIMATE_RECOVERY_FILTERS);
+    setSort('priority-desc');
+  }, []);
 
   return {
-    locale, setLocale, activeSection, navigate, selectedPlantId, selectPlant, showPlantList, selectedCaseId, selectCase,
+    locale, setLocale, activeSection, navigate, resetExploration, selectedPlantId, selectPlant, showPlantList, selectedCaseId, selectCase,
     executive: snapshot.executive,
     plants: snapshot.plants,
     selectedPlant: snapshot.plants.find((item) => item.id === selectedPlantId),
@@ -235,7 +251,7 @@ export const useClimateRecoveryDemo = (): ClimateRecoveryDemo => {
     cases, selectedCase, filters, setFilters, sort, setSort,
     availableFilters: snapshot.availableFilters,
     casePlantId: (caseId) => snapshot.definitions.find((item) => item.caseId === caseId)?.plantId,
-    caseTitle: (caseId) => snapshot.definitions.find((item) => item.caseId === caseId)?.displayName ?? caseId,
+    caseTitle: (caseId) => allCases.find((item) => item.caseId === caseId)?.title ?? caseId,
     caseDataSufficiency: (caseId) => caseDataSufficiencyById.get(caseId) ?? 'unavailable',
     serviceValid: snapshot.validation.valid,
     serviceIssues: snapshot.validation.issues.map((issue) => issue.message),
