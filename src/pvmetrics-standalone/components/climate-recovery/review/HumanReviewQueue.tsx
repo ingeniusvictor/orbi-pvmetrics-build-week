@@ -6,7 +6,7 @@ import { GuidedDemoAnchor, type GuidedDemoAnchorContract } from '../demo/GuidedD
 import { localizePresentationText } from '../presentationLocalization';
 import { DisclosurePanel, EmptyState, SectionHeader, StatusBadge, SyntheticBadge } from '../shared/Display';
 
-const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-bold text-slate-200 hover:border-amber-500/40 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
+const buttonClass = 'cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-bold text-slate-200 hover:border-amber-500/40 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
 
 export const HumanReviewQueue: React.FC<{
   queue: PortfolioReviewQueueItem[];

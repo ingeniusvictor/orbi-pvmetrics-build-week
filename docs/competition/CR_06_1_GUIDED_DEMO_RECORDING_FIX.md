@@ -2,7 +2,7 @@
 
 Execution date: 2026-08-04
 
-Status: implemented and validated locally; pending human staged-diff approval
+Status: implemented and validated locally; preserved by CR-07
 
 ## Scope and preflight
 
@@ -158,3 +158,11 @@ replacement for human presentation and review.
 
 No commit has been created. The bounded CR-06.1 diff is staged only for human
 review.
+
+## CR-07 forward reference
+
+CR-07 preserves this eight-step navigation coordinator, anchors, focus policy,
+Exit/Reset restoration, responsive shell, and safety boundaries. Presentation
+Mode can host the same guided flow while reducing unrelated global chrome. See
+`CR_07_PREMIUM_UX_COMPETITION_POLISH.md` for the visual, test, smoke, and
+recording evidence added on top of CR-06.1.

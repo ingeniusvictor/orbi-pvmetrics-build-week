@@ -173,15 +173,20 @@ Do not place the key in a Vite variable, `.env` file, shell history, source file
 
 For an authorized private live-API evaluation, follow the optional advisory-mode procedure above after deterministic behavior is verified. No credential is required for the primary judge walkthrough.
 
-## Climate Recovery guided competition demo
+## Climate Recovery premium competition experience
 
-Open **Recuperación Climática** in the existing sidebar to inspect the CR-06
+Open **Recuperación Climática** in the existing sidebar to inspect the CR-07
 competition experience. **Exploración libre / Free Explore** preserves the
-read-only dashboard, while **Demo guiada / Guided Demo** provides a controlled
-eight-step judge flow across the problem, executive opportunity, portfolio
-ranking, recoverable and non-recoverable cases, insufficient data,
-explainability, human review, and estimated climate impact. It has no autoplay
-and can be exited or reset at any point.
+read-only dashboard, **Demo guiada / Guided Demo** provides the existing
+controlled eight-step judge flow, and **Modo Presentación / Presentation Mode**
+reduces technical chrome for local recording while preserving disclosures,
+Estimated labels, Human Review, Exit, Reset, and Escape. Presentation Mode does
+not request fullscreen, persist state, or guarantee recording quality.
+
+The premium overview adds an outcome-led ES/EN hero, tiered six-KPI hierarchy,
+prominent non-probabilistic Climate Opportunity Score, service-selected lead
+opportunity, Top-3 leaderboard plus the complete ranking, and clearer textual
+chart summaries without changing any CR-02/CR-03/CR-04 value.
 
 Case Detail now presents an executive summary first and keeps evidence,
 hypotheses, timeline, methodology, assumptions, limitations, and suppressed
@@ -190,7 +195,9 @@ storytelling preserve synthetic, estimated, unverified, and human-review
 labels. CR-06.1 stabilizes anchor focus, viewport-aware scrolling, mobile
 controls, and in-memory exit restoration for local recording across the required
 desktop and mobile viewports. See `docs/competition/CR_06_GUIDED_DEMO_STORYTELLING.md`
-and `docs/competition/CR_06_1_GUIDED_DEMO_RECORDING_FIX.md`.
+and `docs/competition/CR_06_1_GUIDED_DEMO_RECORDING_FIX.md`. CR-07 implementation,
+performance, test, visual-smoke, recording, and claims evidence is in
+`docs/competition/CR_07_PREMIUM_UX_COMPETITION_POLISH.md`.
 
 The feature runs locally without credentials or network access. It does not
 use real plants or customer data, dispatch work, control equipment, provide a

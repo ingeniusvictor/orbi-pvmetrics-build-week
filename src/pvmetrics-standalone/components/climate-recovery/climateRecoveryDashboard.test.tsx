@@ -54,6 +54,11 @@ const insufficientEsHtml = renderToStaticMarkup(React.createElement(CaseDetailVi
 }));
 const indexSource = readFileSync(join(here, '..', '..', '..', '..', 'index.html'), 'utf8');
 const cssSource = readFileSync(join(here, '..', '..', '..', 'index.css'), 'utf8');
+const overviewSource = readFileSync(join(here, 'overview', 'PortfolioOverview.tsx'), 'utf8');
+const viewSource = readFileSync(join(here, 'ClimateRecoveryView.tsx'), 'utf8');
+const launcherSource = readFileSync(join(here, 'demo', 'GuidedDemoLauncher.tsx'), 'utf8');
+const displaySource = readFileSync(join(here, 'shared', 'Display.tsx'), 'utf8');
+const opportunitySource = readFileSync(join(here, 'cases', 'OpportunityList.tsx'), 'utf8');
 
 const sourceFiles = (directory: string): string[] => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
   const path = join(directory, entry.name);
@@ -405,3 +410,84 @@ test('165 viewport helper includes boundaries and rejects clipping', () => {
   assert.equal(isElementWithinViewport({ top: 9, bottom: 90 }, 10, 90), false);
   assert.equal(isElementWithinViewport({ top: 10, bottom: 91 }, 10, 90), false);
 });
+
+test('166 CR-07 premium Spanish hero communicates the recovery outcome', () => {
+  const copy = getClimateRecoveryCopy('es');
+  assert.equal(copy.heroLine1, 'Recupera energía limpia perdida.');
+  assert.match(html, /Recupera energía limpia perdida/);
+});
+test('167 CR-07 premium English hero has the approved executive headline', () => {
+  const copy = getClimateRecoveryCopy('en');
+  assert.deepEqual([copy.heroLine1, copy.heroLine2, copy.heroLine3], ['Recover lost clean energy.', 'Reduce avoidable emissions.', 'Prioritize opportunities with explainable AI.']);
+});
+test('168 hero keeps the synthetic executive demonstration badge visible', () => assert.match(html, /Demostración ejecutiva sintética/));
+test('169 executive overview still renders exactly six KPI cards', () => assert.equal((html.match(/group relative min-w-0/g) ?? []).length, 6));
+test('170 score centerpiece renders the unchanged service score', () => assert.ok(html.includes(en.executive.rankings[0].score.toFixed(2))));
+test('171 score centerpiece explicitly rejects probability and certification claims', () => assert.match(html, /No es una probabilidad ni una métrica certificada/));
+test('172 reduced motion disables CR-07 reveal motion without a count-up timer', () => {
+  assert.match(cssSource, /prefers-reduced-motion: reduce[\s\S]*\.climate-recovery-view \*[\s\S]*animation-duration: 0\.01ms/);
+  assert.doesNotMatch(viewSource + displaySource, /setInterval|requestAnimationFrame|countUp/);
+});
+test('173 featured opportunity is selected from the service-provided featured list', () => assert.match(overviewSource, /executive\.featuredCases\.slice\(0, 4\)/));
+test('174 featured opportunity is not hardcoded to Aurora', () => {
+  assert.doesNotMatch(overviewSource, /CR04-PLANT-AURORA|DEMO-CR-CASE-A/);
+  assert.ok(html.includes(es.executive.featuredCases[0].summary.caseTitle));
+});
+test('175 executive leaderboard consumes the first three service rankings', () => assert.match(overviewSource, /executive\.rankings\.slice\(0, 3\)/));
+test('176 complete ranking remains accessible below the leaderboard', () => {
+  assert.match(overviewSource, /executive\.rankings\.map/);
+  assert.match(html, /<caption class="sr-only">Ranking de cinco plantas sintéticas/);
+});
+test('177 overlap penalties remain visible in leaderboard and full ranking', () => assert.match(overviewSource, /overlapPenalty[\s\S]*overlapNotice/));
+test('178 recoverability donut uses the service-provided percentage', () => {
+  const recoverable = es.executive.recoverabilityDistribution.statuses.find((item) => item.status === 'recoverable');
+  assert.match(html, new RegExp(`${recoverable?.percentage ?? 0}%`));
+});
+test('179 charts include visible textual summaries in addition to graphics', () => {
+  assert.match(overviewSource, /recoverabilitySummary/); assert.match(overviewSource, /prioritySummary/); assert.match(overviewSource, /dataQualityRecommendation/);
+});
+test('180 Presentation Mode launcher is present in the initial view', () => assert.match(html, /Modo Presentación/));
+test('181 the experience switch exposes Free Explore', () => assert.match(html, /Exploración libre/));
+test('182 the experience switch exposes Guided Demo', () => assert.match(html, /Iniciar demo guiada/));
+test('183 the experience switch exposes Presentation Mode as a real button', () => assert.match(launcherSource, /aria-pressed=\{presentation\}[\s\S]*onPresentation/));
+test('184 Guided Demo attenuates the global sidebar', () => assert.match(cssSource, /data-cr-mode='guided'[\s\S]*cr-global-sidebar[\s\S]*opacity: 0\.72/));
+test('185 Presentation Mode minimizes the global sidebar and technical chrome', () => {
+  assert.match(cssSource, /data-cr-mode='presentation'[\s\S]*cr-global-sidebar[\s\S]*width: 4\.5rem/);
+  assert.match(cssSource, /cr-technical-chrome[\s\S]*cr-operational-banner[\s\S]*display: none/);
+});
+test('186 Presentation Mode has a clear exit control', () => assert.match(launcherSource, /exitPresentation/));
+test('187 Presentation Mode has a reset control and preserves guided reset', () => {
+  assert.match(launcherSource, /resetPresentation/); assert.match(viewSource, /resetPresentationView/); assert.match(source, /onReset=\{resetDemo\}/);
+});
+test('188 Presentation Mode never invokes the Fullscreen API automatically', () => assert.doesNotMatch(source + appSource, /requestFullscreen|webkitRequestFullscreen/));
+test('189 Recording Safe is visible with a bounded non-guarantee', () => {
+  assert.match(launcherSource, /recordingSafe/); assert.match(getClimateRecoveryCopy('en').recordingSafeBoundary, /does not guarantee/);
+});
+test('190 synthetic disclosures remain present in premium and presentation layouts', () => assert.ok((html.match(/sintétic/g) ?? []).length >= 2));
+test('191 Estimated language remains visible for energy and emissions', () => {
+  assert.match(html, /Energía recuperable estimada/); assert.match(html, /Emisiones evitadas estimadas/);
+});
+test('192 Human Review remains visible in KPI featured and navigation surfaces', () => assert.match(html, /Revisión humana/));
+test('193 CR-07 centralizes surface radius spacing motion and easing tokens', () => {
+  for (const token of ['--cr-surface-primary', '--cr-surface-secondary', '--cr-surface-elevated', '--cr-radius-sm', '--cr-spacing-section', '--cr-motion-fast', '--cr-motion-standard', '--cr-motion-panel', '--cr-easing-standard']) assert.match(cssSource, new RegExp(token));
+});
+test('194 CR-07 reduced-motion contract removes transforms and delays', () => assert.match(cssSource, /prefers-reduced-motion[\s\S]*animation-delay: 0ms[\s\S]*transform: none/));
+test('195 premium buttons keep visible keyboard focus', () => assert.match(launcherSource, /focus-visible:ring-2/));
+test('196 static metric cards retain article semantics and tier metadata', () => assert.match(displaySource, /<article data-metric-card data-kpi-tier/));
+test('197 premium empty state supports an explanatory recovery hint', () => assert.match(displaySource, /description\?: string[\s\S]*border-dashed/));
+test('198 no-results state offers a real reset-filters button', () => assert.match(opportunitySource, /cases\.length === 0[\s\S]*setFilters\(EMPTY_CLIMATE_RECOVERY_FILTERS\)/));
+test('199 CR-07 Climate Recovery copy has no 9 to 11 pixel utilities', () => assert.doesNotMatch(source, /text-\[(?:9|10|11)px\]/));
+test('200 Presentation Mode has a bounded mobile 360-compatible shell rule', () => assert.match(cssSource, /@media \(max-width: 767px\)[\s\S]*data-cr-mode='presentation'[\s\S]*cr-global-sidebar[\s\S]*display: none/));
+test('201 CR-07 Climate Recovery controls use 44px minimum targets', () => assert.doesNotMatch(source, /min-h-10(?:\s|['"])/));
+test('202 CR-07 uses no local or session storage', () => assert.doesNotMatch(source, /localStorage|sessionStorage/));
+test('203 CR-07 uses no network fetch', () => assert.doesNotMatch(source, /\bfetch\s*\(/));
+test('204 CR-07 uses no implicit current clock', () => assert.doesNotMatch(source, /Date\.now/));
+test('205 CR-07 uses no random visual or data behavior', () => assert.doesNotMatch(source, /Math\.random/));
+test('206 CR-07 introduces no GPT runtime or claims', () => assert.doesNotMatch(source, /\bGPT(?:-\d)?\b/i));
+test('207 CR-07 UI still imports only public Climate Recovery presentation contracts', () => assert.doesNotMatch(source, /climate-recovery\/(?:engine|fixtures|registry|portfolio\/data)/));
+test('208 CR-07 does not add an install step or dependency mutation to tests', () => assert.doesNotMatch(packageJson.scripts.test, /npm (?:i|install)|npm ci/));
+test('209 the outer shell receives bounded free guided and presentation modes', () => assert.match(appSource, /'free' \| 'guided' \| 'presentation'[\s\S]*onExperienceModeChange/));
+test('210 Presentation Mode state is in memory only', () => assert.match(viewSource, /useState\(false\)[\s\S]*setPresentationMode/));
+test('211 premium overview preserves a single h1', () => assert.equal((html.match(/<h1\b/g) ?? []).length, 1));
+test('212 three-mode switch uses accessible pressed states', () => assert.equal((launcherSource.match(/aria-pressed=/g) ?? []).length, 3));
+test('213 score ring exposes an accessible out-of-100 label and band', () => assert.match(displaySource, /role="img"[\s\S]*out of 100[\s\S]*band/));

@@ -22,7 +22,7 @@ import {
   SyntheticBadge,
 } from '../shared/Display';
 
-const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
+const buttonClass = 'cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
 
 const formatRate = (value: number, locale: ClimateRecoveryLocale) => new Intl.NumberFormat(
   locale === 'es' ? 'es-CL' : 'en-US',
@@ -47,7 +47,7 @@ const Accordion: React.FC<{
       aria-controls={`${id}-panel`}
       id={`${id}-button`}
       onClick={onToggle}
-      className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400"
+      className="cr-button flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400"
     >
       {title}<ChevronDown className={`h-4 w-4 text-amber-300 transition-transform motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />
     </button>

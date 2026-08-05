@@ -5,8 +5,8 @@ import type { ClimateRecoveryCopy, ClimateRecoveryLocale } from '../copy';
 import { EMPTY_CLIMATE_RECOVERY_FILTERS, type ClimateRecoveryFilters } from '../hooks/useClimateRecoveryDemo';
 import { AvailabilityValue, EmptyState, SectionHeader, StatusBadge, SyntheticBadge } from '../shared/Display';
 
-const controlClass = 'min-h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
-const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
+const controlClass = 'min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
+const buttonClass = 'cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400';
 
 const options = (values: readonly string[] | undefined, t: ClimateRecoveryCopy) => (values ?? []).map((value) => (
   <option key={value} value={value}>{value in t.statusLabels ? t.statusLabels[value as keyof typeof t.statusLabels] : value}</option>
@@ -44,7 +44,7 @@ export const OpportunityList: React.FC<{
         </div>
       </section>
 
-      {cases.length === 0 ? <EmptyState title={t.noResults} action={<button type="button" onClick={() => setFilters(EMPTY_CLIMATE_RECOVERY_FILTERS)} className={buttonClass}>{t.clearFilters}</button>} /> : (
+      {cases.length === 0 ? <EmptyState title={t.noResults} description={t.noResultsHint} action={<button type="button" onClick={() => setFilters(EMPTY_CLIMATE_RECOVERY_FILTERS)} className={buttonClass}><RotateCcw className="h-4 w-4" />{t.clearFilters}</button>} /> : (
         <>
           <div className="hidden overflow-x-auto rounded-2xl border border-slate-800 xl:block">
             <table className="w-full min-w-[1200px] border-collapse text-left text-xs">

@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-06.1 guided synthetic Climate Recovery recording flow
+Status: CR-07 premium synthetic Climate Recovery competition experience
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -62,6 +62,13 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Spanish and English competition storytelling are supported.
 - Guided Demo navigation has been stabilized for local recording.
 - The guided flow has been validated across desktop and mobile viewports.
+- A premium competition-oriented visual experience is implemented.
+- Presentation Mode reduces visual chrome for local recording.
+- Climate Recovery remains synthetic, read-only, and non-operational.
+- The interface supports Free Explore, Guided Demo, and Presentation Mode.
+- Executive hierarchy and visual emphasis have been improved without changing
+  domain calculations.
+- Recording-oriented visual layouts have been validated locally.
 
 ## Prohibited claims at this stage
 
@@ -122,6 +129,9 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - The platform dispatches or approves maintenance.
 - The storytelling replaces technical evidence.
 - The system is production deployed.
+- Presentation Mode guarantees recording quality on every device.
+- Visual polish validates energy or climate calculations.
+- Premium visuals replace human review or technical evidence.
 
 ## Usage rule
 

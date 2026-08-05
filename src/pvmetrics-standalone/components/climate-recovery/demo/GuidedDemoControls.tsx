@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, LogOut, RotateCcw, SkipForward } from 'lucide-re
 import type { ClimateRecoveryCopy } from '../copy';
 import type { GuidedDemoStep } from './guidedDemoSteps';
 
-const button = 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-40';
+const button = 'inline-flex min-h-11 min-w-11 cr-button items-center justify-center gap-2 rounded-lg border px-3 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-40';
 
 export const GuidedDemoControls: React.FC<{
   step: GuidedDemoStep;

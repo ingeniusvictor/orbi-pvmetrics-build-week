@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Building2, ClipboardCheck, Languages, LayoutDashboard, Leaf, ListFilter, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Building2, ClipboardCheck, Compass, Languages, LayoutDashboard, Leaf, ListFilter, Play, ShieldAlert } from 'lucide-react';
 import { getClimateRecoveryCopy } from './copy';
 import { useClimateRecoveryDemo, type ClimateRecoverySection } from './hooks/useClimateRecoveryDemo';
 import { PortfolioOverview } from './overview/PortfolioOverview';
@@ -34,10 +34,12 @@ const CaseDetailView = lazy(() => import('./cases/CaseDetailView').then((module)
 const ClimateRecoveryView: React.FC<{
   onExit?: () => void;
   onLocaleChange?: (locale: 'es' | 'en') => void;
-}> = ({ onExit, onLocaleChange }) => {
+  onExperienceModeChange?: (mode: 'free' | 'guided' | 'presentation') => void;
+}> = ({ onExit, onLocaleChange, onExperienceModeChange }) => {
   const demo = useClimateRecoveryDemo();
   const t = getClimateRecoveryCopy(demo.locale);
   const [guidedState, setGuidedState] = useState(() => createGuidedDemoState(demo.locale));
+  const [presentationMode, setPresentationMode] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const contextBeforeGuidedDemo = useRef<GuidedDemoContextSnapshot | undefined>(undefined);
   const currentStep = guidedDemoStepById(guidedState.currentStepId);
@@ -64,6 +66,11 @@ const ClimateRecoveryView: React.FC<{
     setGuidedState((state) => ({ ...state, locale: demo.locale }));
     onLocaleChange?.(demo.locale);
   }, [demo.locale, onLocaleChange]);
+
+  useEffect(() => {
+    onExperienceModeChange?.(presentationMode ? 'presentation' : guidedState.active ? 'guided' : 'free');
+    return () => onExperienceModeChange?.('free');
+  }, [guidedState.active, onExperienceModeChange, presentationMode]);
 
   const prepareGuidedStep = useCallback((step: typeof currentStep) => {
     if (step.caseId) demo.selectCase(step.caseId);
@@ -102,6 +109,20 @@ const ClimateRecoveryView: React.FC<{
     demo.resetExploration();
     setGuidedState((state) => resetGuidedDemo(state, demo.locale));
   }, [demo.activeSection, demo.locale, demo.resetExploration, demo.selectedCaseId, demo.selectedPlantId, guidedState.active]);
+
+  const showFreeExplore = useCallback(() => {
+    setPresentationMode(false);
+    exitGuided(false);
+  }, [exitGuided]);
+
+  const togglePresentationMode = useCallback(() => {
+    setPresentationMode((active) => !active);
+  }, []);
+
+  const resetPresentationView = useCallback(() => {
+    demo.resetExploration();
+    if (guidedState.active) setGuidedState((state) => resetGuidedDemo(state, demo.locale));
+  }, [demo.locale, demo.resetExploration, guidedState.active]);
 
   const resetDemo = useCallback(() => {
     demo.resetExploration();
@@ -164,7 +185,7 @@ const ClimateRecoveryView: React.FC<{
           {sections.map((section) => {
             const Icon = navIcons[section.id];
             const active = demo.activeSection === section.id || (section.id === 'opportunities' && demo.activeSection === 'case');
-            return <button key={section.id} type="button" aria-current={active ? 'page' : undefined} onClick={() => { exitGuided(false); section.id === 'plants' ? demo.showPlantList() : demo.navigate(section.id); }} className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${active ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}><Icon className="h-4 w-4" />{section.label}{section.id === 'review' && <span className={`rounded-full px-1.5 py-0.5 font-mono text-xs ${active ? 'bg-slate-950/15' : 'bg-amber-500/10 text-amber-300'}`}>{demo.executive.reviewQueue.length}</span>}</button>;
+            return <button key={section.id} type="button" aria-current={active ? 'page' : undefined} onClick={() => { exitGuided(false); section.id === 'plants' ? demo.showPlantList() : demo.navigate(section.id); }} className={`cr-button inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${active ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}><Icon className="h-4 w-4" />{section.label}{section.id === 'review' && <span className={`rounded-full px-1.5 py-0.5 font-mono text-xs ${active ? 'bg-slate-950/15' : 'bg-amber-500/10 text-amber-300'}`}>{demo.executive.reviewQueue.length}</span>}</button>;
           })}
         </div>
       </nav>
@@ -189,23 +210,34 @@ const ClimateRecoveryView: React.FC<{
       className="climate-recovery-view mx-auto max-w-[1680px] space-y-5"
       data-testid="climate-recovery-view"
       data-guided-nav-status={navigationResult?.status ?? 'idle'}
+      data-presentation-mode={presentationMode}
+      data-experience-mode={presentationMode ? 'presentation' : guidedState.active ? 'guided' : 'free'}
     >
-      <header className="overflow-hidden rounded-3xl border border-slate-800 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_42%),linear-gradient(135deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-5 sm:p-7">
-        <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-start">
-          <div className="max-w-4xl">
-            <div className="flex flex-wrap items-center gap-2"><SyntheticBadge label={t.demonstration} /><span className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-bold uppercase text-slate-300">{t.readOnly}</span><span className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-bold uppercase text-slate-300">{t.noNetwork}</span></div>
-            <div className="mt-5 flex items-start gap-3"><div className="rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 p-2.5 text-slate-950 shadow-lg shadow-cyan-950"><Leaf className="h-6 w-6" /></div><div><p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">{t.product} · {t.edition}</p><h1 id="climate-recovery-heading" tabIndex={-1} className="mt-1 text-3xl font-black tracking-tight text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:text-4xl">{t.title}</h1></div></div>
-            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">{t.subtitle}</p>
+      <header className="cr-hero-enter overflow-hidden rounded-3xl border border-slate-700/80 bg-[radial-gradient(circle_at_85%_10%,rgba(34,211,238,0.17),transparent_36%),radial-gradient(circle_at_12%_95%,rgba(245,158,11,0.12),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.98),rgba(2,6,23,1))] p-5 shadow-[var(--cr-shadow-lg)] sm:p-6">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,350px)] xl:items-start">
+          <div className="max-w-5xl">
+            <div className="flex flex-wrap items-center gap-2"><SyntheticBadge label={t.demonstration} /><span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-300">{t.readOnly}</span><span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-slate-300">{t.noNetwork}</span></div>
+            <div className="mt-5 flex items-start gap-3"><div className="rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 p-2.5 text-slate-950 shadow-lg shadow-cyan-950"><Leaf className="h-6 w-6" /></div><div><p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">{t.product}</p><p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-cyan-200">{t.edition} · {t.title}</p></div></div>
+            <h1 id="climate-recovery-heading" tabIndex={-1} className="mt-5 max-w-4xl text-3xl font-black leading-[1.08] tracking-[-0.035em] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:text-4xl xl:text-[2.5rem]">
+              <span className="block">{t.heroLine1}</span><span className="mt-1.5 block text-cyan-200">{t.heroLine2}</span><span className="mt-1.5 block text-slate-300">{t.heroLine3}</span>
+            </h1>
+            <p className="cr-presentation-key-copy mt-4 max-w-3xl text-sm leading-6 text-slate-300">{t.subtitle}</p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button type="button" onClick={startGuided} className="cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 text-xs font-black text-slate-950 shadow-lg shadow-amber-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"><Play className="h-4 w-4" />{t.startGuidedDemo}</button>
+              <button type="button" onClick={showFreeExplore} className="cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-600 bg-slate-950/60 px-5 text-xs font-bold text-slate-200 hover:border-cyan-400/50 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"><Compass className="h-4 w-4" />{t.exploreFreely}</button>
+            </div>
+            <p className="mt-4 max-w-4xl border-l-2 border-cyan-400/50 pl-3 text-xs leading-5 text-slate-400"><span className="font-semibold text-cyan-200">{t.disclosure}</span> {t.operatorBoundary}</p>
           </div>
-          <div className="grid min-w-0 grid-cols-1 gap-3 min-[430px]:grid-cols-2 xl:w-[390px]">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3"><p className="text-xs font-bold uppercase text-slate-500">{t.evaluated} · UTC</p><p className="mt-1 font-mono text-xs text-white">{evaluatedAt}</p></div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3"><label htmlFor="climate-recovery-locale" className="flex items-center gap-2 text-xs font-bold uppercase text-slate-500"><Languages className="h-3.5 w-3.5" />{t.language}</label><select id="climate-recovery-locale" aria-label={`${t.title}: ${t.language}`} value={demo.locale} onChange={(event) => demo.setLocale(event.target.value as 'es' | 'en')} className="mt-1 min-h-8 w-full bg-transparent text-xs font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><option value="es" className="bg-slate-950">ES · Español</option><option value="en" className="bg-slate-950">EN · English</option></select></div>
-            {onExit && <button type="button" onClick={onExit} className="col-span-full inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950/70 px-3 text-xs font-bold text-slate-300 hover:border-amber-500/40 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><ArrowLeft className="h-4 w-4" />{t.back}</button>}
+          <div className="grid min-w-0 grid-cols-1 gap-3 min-[430px]:grid-cols-2 xl:grid-cols-1">
+            <div className="rounded-2xl border border-slate-700/70 bg-slate-950/65 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">{t.evaluated} · UTC</p><p className="mt-2 font-mono text-sm text-white">{evaluatedAt}</p></div>
+            <div className="rounded-2xl border border-slate-700/70 bg-slate-950/65 p-4"><label htmlFor="climate-recovery-locale" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500"><Languages className="h-3.5 w-3.5" />{t.language}</label><select id="climate-recovery-locale" aria-label={`${t.title}: ${t.language}`} value={demo.locale} onChange={(event) => demo.setLocale(event.target.value as 'es' | 'en')} className="mt-2 min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><option value="es" className="bg-slate-950">ES · Español</option><option value="en" className="bg-slate-950">EN · English</option></select></div>
+            {presentationMode && <div role="status" className="col-span-full rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4 text-xs leading-5 text-emerald-100"><span className="font-black uppercase tracking-wide">{t.recordingSafe}</span><span className="mt-1 block text-emerald-200/75">{t.recordingSafeBoundary}</span></div>}
+            {onExit && <button type="button" onClick={onExit} className="cr-button col-span-full inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950/70 px-3 text-xs font-bold text-slate-300 hover:border-amber-500/40 hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><ArrowLeft className="h-4 w-4" />{t.back}</button>}
           </div>
         </div>
       </header>
 
-      <GuidedDemoLauncher guided={guidedState.active} t={t} onStart={startGuided} onFree={() => exitGuided(false)} />
+      <GuidedDemoLauncher guided={guidedState.active} presentation={presentationMode} t={t} onStart={startGuided} onFree={showFreeExplore} onPresentation={togglePresentationMode} onReset={resetPresentationView} />
 
       {guidedState.active ? (
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(320px,420px)_minmax(0,1fr)] lg:items-start">

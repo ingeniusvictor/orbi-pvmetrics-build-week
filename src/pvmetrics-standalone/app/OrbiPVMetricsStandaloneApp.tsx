@@ -59,6 +59,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
   const [activeView, setActiveView] = useState<MainViewType>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [climateRecoveryLocale, setClimateRecoveryLocale] = useState<'es' | 'en'>('es');
+  const [climateRecoveryMode, setClimateRecoveryMode] = useState<'free' | 'guided' | 'presentation'>('free');
   const shellEnglish = activeView === 'climate-recovery' && climateRecoveryLocale === 'en';
 
   const navItems = [
@@ -106,7 +107,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </div>
             }
           >
-            <ClimateRecoveryView onExit={() => setActiveView('dashboard')} onLocaleChange={setClimateRecoveryLocale} />
+            <ClimateRecoveryView
+              onExit={() => { setClimateRecoveryMode('free'); setActiveView('dashboard'); }}
+              onLocaleChange={setClimateRecoveryLocale}
+              onExperienceModeChange={setClimateRecoveryMode}
+            />
           </Suspense>
         );
       case 'live':
@@ -151,10 +156,10 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1d] text-[#f9fafb] flex flex-col font-sans antialiased custom-scrollbar selection:bg-amber-500 selection:text-slate-900">
+    <div className="cr-shell min-h-screen bg-[#0a0f1d] text-[#f9fafb] flex flex-col font-sans antialiased custom-scrollbar selection:bg-amber-500 selection:text-slate-900" data-cr-mode={activeView === 'climate-recovery' ? climateRecoveryMode : 'free'}>
       
       {/* Top safety status alerts bar */}
-      <div className="no-print bg-slate-950 border-b border-gray-800 text-[10px] text-gray-400 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1.5 items-center justify-between">
+      <div className="cr-technical-chrome no-print bg-slate-950 border-b border-gray-800 text-[10px] text-gray-400 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1.5 items-center justify-between">
         <div className="flex items-center gap-1.5 font-semibold text-amber-400">
           <AlertOctagon className="w-3.5 h-3.5" />
           <span>{shellEnglish ? 'SAFE SIMULATION ENVIRONMENT' : 'ENTORNO SEGURO DE SIMULACIÓN'}</span>
@@ -177,7 +182,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
       <div className="flex-1 flex flex-col md:flex-row relative">
         
         {/* SIDEBAR NAVIGATION */}
-        <aside className="no-print w-full md:w-64 bg-slate-950 border-r border-gray-800 flex flex-col justify-between shrink-0">
+        <aside className="cr-global-sidebar no-print w-full md:w-64 bg-slate-950 border-r border-gray-800 flex flex-col justify-between shrink-0">
           <div>
             {/* Logo / Header Section */}
             <div className="p-5 border-b border-gray-800">
@@ -185,7 +190,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                 <div className="p-1.5 bg-amber-500 rounded text-slate-950">
                   <Cpu className="w-5 h-5" />
                 </div>
-                <div>
+                <div className="cr-sidebar-brand-copy">
                   <p className="text-sm font-bold tracking-tight text-white uppercase">ORBI PVMetrics IA</p>
                   <p className="text-[9px] text-gray-500 font-mono tracking-wider">Demo Client v1.1</p>
                 </div>
@@ -193,7 +198,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             </div>
 
             {/* Workspace configuration multi-company / plant select */}
-            <div className="p-4 border-b border-gray-800 space-y-3">
+            <div className="cr-workspace-controls p-4 border-b border-gray-800 space-y-3">
               <div>
                 <label htmlFor="workspace-company" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
                   <Building2 className="w-3 h-3 text-amber-500" /> {shellEnglish ? 'Company Workspace' : 'Workspace Empresa'}
@@ -255,10 +260,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                     key={item.id}
                     aria-current={isSelected ? 'page' : undefined}
                     onClick={() => {
+                      setClimateRecoveryMode('free');
                       setActiveView(item.id as MainViewType);
                       setMobileMenuOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                    className={`cr-global-nav-button w-full flex min-h-11 items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                       isSelected 
                         ? 'bg-amber-500 text-slate-950 font-bold' 
                         : 'text-gray-400 hover:text-white hover:bg-gray-900/50'
@@ -266,10 +272,10 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                   >
                     <Icon className="w-4 h-4 shrink-0" />
                     <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                      <span className="truncate">{item.label}</span>
+                      <span className="cr-sidebar-label truncate">{item.label}</span>
                       {'badge' in item && item.badge && (
                         <span
-                          className={`shrink-0 rounded px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider ${
+                          className={`cr-nav-badge shrink-0 rounded px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider ${
                             isSelected
                               ? 'bg-slate-950/15 text-slate-900'
                               : 'border border-amber-500/30 bg-amber-500/10 text-amber-300'
@@ -286,7 +292,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           </div>
 
           {/* Sidebar Footer with disclaimers */}
-          <div className="p-4 border-t border-gray-800 text-[9px] text-gray-500 space-y-2 hidden md:block">
+          <div className="cr-sidebar-footer p-4 border-t border-gray-800 text-[9px] text-gray-500 space-y-2 hidden md:block">
             <p className="leading-relaxed font-sans">
               <strong>{shellEnglish ? 'Sandbox guarantee:' : 'Garantía de Sandbox:'}</strong> {shellEnglish ? 'No active connection to real EMS/BMS or SCADA.' : 'Sin conexión con EMS/BMS o SCADA real activo.'}
             </p>
@@ -297,10 +303,10 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
         </aside>
 
         {/* MAIN DISPLAY AREA */}
-        <main className="flex-1 p-6 md:p-8 space-y-6 overflow-y-auto max-h-[100vh] custom-scrollbar">
+        <main className="cr-main-display flex-1 p-6 md:p-8 space-y-6 overflow-y-auto max-h-[100vh] custom-scrollbar">
           
           {/* Static disclaimers banner at top of viewport */}
-          <div className="no-print p-3 bg-gray-900/50 border border-gray-850 rounded-xl flex items-start gap-3">
+          <div className="cr-operational-banner no-print p-3 bg-gray-900/50 border border-gray-850 rounded-xl flex items-start gap-3">
             <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-[10px] text-gray-400 leading-relaxed">
               <strong>{shellEnglish ? 'Operational boundary:' : 'Exclusividad de Operación:'}</strong> {shellEnglish

@@ -98,8 +98,8 @@ export const SectionHeader: React.FC<{
 }> = ({ title, description, action }) => (
   <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
     <div>
-      <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
-      {description && <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-400">{description}</p>}
+      <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">{title}</h2>
+      {description && <p className="mt-1.5 max-w-3xl text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">{description}</p>}
     </div>
     {action}
   </div>
@@ -111,8 +111,9 @@ export const MetricCard: React.FC<{
   explanation: string;
   status?: string;
   tooltip?: string;
-}> = ({ label, children, explanation, status = 'available', tooltip }) => (
-  <article className="group relative min-w-0 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-sm transition-colors hover:border-slate-700">
+  tier?: 'primary' | 'secondary';
+}> = ({ label, children, explanation, status = 'available', tooltip, tier = 'secondary' }) => (
+  <article data-metric-card data-kpi-tier={tier} className={`group relative min-w-0 rounded-2xl border bg-slate-900/80 shadow-sm ${tier === 'primary' ? 'cr-kpi-reveal border-slate-700 p-5 sm:p-6' : 'border-slate-800 p-4'}`}>
     <div className="flex items-start justify-between gap-2">
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
       {tooltip && (
@@ -121,13 +122,44 @@ export const MetricCard: React.FC<{
         </span>
       )}
     </div>
-    <div className="mt-3 break-words font-mono text-2xl font-black tracking-tight text-white">{children}</div>
+    <div className={`mt-3 break-words font-mono font-black tracking-tight text-white ${tier === 'primary' ? 'text-3xl sm:text-4xl' : 'text-2xl'}`}>{children}</div>
     <div className="mt-3 flex items-start gap-2 border-t border-slate-800 pt-3 text-xs leading-4 text-slate-400">
       {status === 'blocked' || status === 'not-applicable' ? <Ban className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-400" />
         : status === 'unavailable' ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
           : status === 'pending-review' ? <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
             : <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />}
       <span>{explanation}</span>
+    </div>
+  </article>
+);
+
+export const ScoreMetricCard: React.FC<{
+  label: string;
+  score: number;
+  band: string;
+  explanation: string;
+  tooltip: string;
+  syntheticLabel: string;
+}> = ({ label, score, band, explanation, tooltip, syntheticLabel }) => (
+  <article data-metric-card data-kpi-tier="primary" className="group relative min-w-0 overflow-hidden rounded-3xl border border-cyan-500/30 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.14),transparent_48%),linear-gradient(145deg,rgba(15,23,42,0.98),rgba(2,6,23,0.98))] p-5 shadow-[var(--cr-glow-accent)] sm:p-6">
+    <div className="flex flex-col items-center gap-5 sm:flex-row sm:justify-between">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-200">{label}</p>
+          <span title={tooltip} aria-label={tooltip} tabIndex={0} className="rounded text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><HelpCircle className="h-4 w-4" /></span>
+        </div>
+        <p className="mt-3 text-sm font-semibold text-white">{band}</p>
+        <p className="mt-2 text-xs leading-5 text-slate-400">{explanation}</p>
+        <div className="mt-4"><SyntheticBadge label={syntheticLabel} /></div>
+      </div>
+      <div
+        className="cr-score-ring shrink-0"
+        style={{ background: `conic-gradient(#22d3ee 0 ${score}%, rgba(51,65,85,0.75) ${score}% 100%)` }}
+        role="img"
+        aria-label={`${label}: ${score.toFixed(2)} out of 100. ${band}. ${tooltip}`}
+      >
+        <div className="text-center"><span className="block font-mono text-3xl font-black text-white">{score.toFixed(2)}</span><span className="text-xs font-bold text-slate-400">/100</span></div>
+      </div>
     </div>
   </article>
 );
@@ -144,14 +176,15 @@ export const DisclosurePanel: React.FC<{ disclosure: string; boundary: string; a
   </aside>
 );
 
-export const EmptyState: React.FC<{ title: string; action?: React.ReactNode }> = ({ title, action }) => (
-  <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 px-5 py-10 text-center">
+export const EmptyState: React.FC<{ title: string; description?: string; action?: React.ReactNode }> = ({ title, description, action }) => (
+  <div className="rounded-2xl border border-dashed border-slate-700 bg-[linear-gradient(145deg,rgba(15,23,42,0.7),rgba(2,6,23,0.5))] px-5 py-10 text-center shadow-[var(--cr-shadow-sm)]">
     <Clock3 className="mx-auto h-6 w-6 text-slate-500" />
-    <p className="mt-3 text-sm text-slate-300">{title}</p>
+    <p className="mt-3 text-sm font-bold text-slate-200">{title}</p>
+    {description && <p className="mx-auto mt-2 max-w-lg text-xs leading-5 text-slate-400">{description}</p>}
     {action && <div className="mt-4">{action}</div>}
   </div>
 );
 
 export const Panel: React.FC<{ children: React.ReactNode; className?: string; ariaLabel?: string }> = ({ children, className = '', ariaLabel }) => (
-  <section aria-label={ariaLabel} className={`rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5 ${className}`}>{children}</section>
+  <section aria-label={ariaLabel} className={`cr-premium-panel rounded-2xl border p-4 sm:p-5 ${className}`}>{children}</section>
 );

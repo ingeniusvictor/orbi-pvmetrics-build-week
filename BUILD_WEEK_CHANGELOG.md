@@ -1,5 +1,22 @@
 # OpenAI Build Week Changelog
 
+## CR-07 Premium UX and Competition Polish
+
+- Added a bilingual executive hero, tiered six-KPI hierarchy, prominent
+  non-probabilistic score ring, service-selected lead opportunity, Top-3
+  leaderboard, preserved full ranking, and clearer chart summaries.
+- Added in-memory Presentation Mode with reduced global chrome, desktop icon
+  rail, hidden mobile sidebar, Recording Safe non-guarantee, and preserved
+  Guided Demo, Exit, Reset, Escape, Estimated, Synthetic, and Human Review.
+- Centralized CR-07 surfaces, borders, shadows, radii, spacing, motion, easing,
+  button/card feedback, reduced-motion behavior, and premium no-results reset.
+- Validated seven required viewports and the complete eight-step presentation
+  rehearsal with no page-level horizontal overflow, manual recovery scroll,
+  lost anchor focus, hidden guided control, browser warning, or browser error.
+- Expanded the repository suite from 408 to 456 passing tests. Dependencies,
+  `package.json`, `package-lock.json`, domain calculations, services, fixtures,
+  backend, network, and GPT runtime remain unchanged.
+
 ## CR-06.1 Guided Demo Recording Fix
 
 - Replaced container-centered demo scrolling with eight explicit content
