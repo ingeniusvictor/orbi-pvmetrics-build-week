@@ -1,5 +1,21 @@
 # OpenAI Build Week Changelog
 
+## CR-09 Competition Edition Final Submission Freeze
+
+- Audited the complete CR-01 through CR-08.1 chain at source commit
+  `40e85b18752bc15ef1de67e762f7580e479f1c91` without changing functionality.
+- Reproduced the dependency tree, 553/553 tests, TypeScript lint, production
+  build, source/security/privacy scans, seven-viewport visual smoke, and full
+  1440×900 Competition Video rehearsals in ES and EN.
+- Added the final freeze manifest, claims snapshot, and evidence index, and
+  prepared a SHA-256-verified tracked-source ZIP outside the repository.
+- Final verdict: READY FOR FINAL FREEZE WITH DOCUMENTED LOW-RISK DEBT.
+  CR08V-03 remains accepted and non-blocking; the existing main-bundle warning
+  also remains non-blocking.
+- No source, dependency, package file, commit, tag, branch, push, deployment,
+  server, official screenshot, or official video was created by the freeze
+  documentation gate.
+
 ## CR-08 Competition Video Presentation Mode
 
 - Added an isolated, lazy Competition Video Mode with nine deterministic

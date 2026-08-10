@@ -218,6 +218,17 @@ use real plants or customer data, dispatch work, control equipment, provide a
 definitive diagnosis, or claim verified recovery or emissions. See
 `docs/competition/CR_05_EXECUTIVE_DASHBOARD.md`.
 
+CR-09 records the final submission freeze candidate at source commit
+`40e85b18752bc15ef1de67e762f7580e479f1c91`. The 553-test suite, lint, build,
+seven-viewport smoke, and complete ES/EN 4:20 recording rehearsal pass. The
+verdict is **READY FOR FINAL FREEZE WITH DOCUMENTED LOW-RISK DEBT**; CR08V-03
+remains accepted and non-blocking. See
+`docs/competition/CR_09_FINAL_SUBMISSION_FREEZE_MANIFEST.md`,
+`docs/competition/CR_09_FINAL_CLAIMS_SNAPSHOT.md`, and
+`docs/competition/CR_09_EVIDENCE_INDEX.md`. No final tag, backup branch,
+publication, deployment, screenshot set, or official video is created by this
+documentation gate.
+
 ## Test commands
 
 ```bash

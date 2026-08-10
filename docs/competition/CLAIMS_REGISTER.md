@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-08 synthetic Climate Recovery competition video presentation experience
+Status: CR-09 Climate Recovery final submission freeze candidate
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -81,6 +81,17 @@ not replace evidence or authorize operational, commercial, or climate claims.
   Featured-to-Overview return behavior are implemented.
 - Competition Video Mode is local, offline, read-only, non-operational, and
   uses no GPT or external API at runtime.
+- The audited CR-08.1 source baseline has 553 passing tests with 0 failures and
+  0 skips, passing TypeScript lint and production build.
+- The seven required viewports passed the final local Free Explore, Guided
+  Demo, Presentation Mode, and Competition Video Mode smoke without page-level
+  horizontal overflow or browser console warnings/errors.
+- Complete 1440×900 Competition Video rehearsals reached the 4:20 closing in ES
+  and EN with explicit presenter-controlled advance.
+- A sanitized tracked-source backup of the audited commit has a recorded
+  SHA-256 checksum and remains outside the repository.
+- CR08V-03 is accepted low-risk polish debt and does not block the documented
+  recording path or final freeze gate.
 
 ## Prohibited claims at this stage
 
@@ -155,6 +166,8 @@ not replace evidence or authorize operational, commercial, or climate claims.
   production readiness, measured recovery, or verified emissions.
 - Explainable AI framing means GPT or a network model runs in this Climate
   Recovery demonstration.
+- The CR-09 freeze candidate means that a final tag, backup branch, commit,
+  push, deployment, official screenshot set, or official video already exists.
 
 ## Usage rule
 
