@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, Ban, CheckCircle2, Clock3, HelpCircle, Info, ShieldCheck } from 'lucide-react';
 import type { PortfolioQuantity, PresentationAvailability, PresentationValue } from '../../../climate-recovery';
 import type { ClimateRecoveryCopy, ClimateRecoveryLocale } from '../copy';
+import { formatPresentationNumber } from '../presentationLocalization';
 
 type DisplayValue = PresentationValue<unknown> | PortfolioQuantity;
 
@@ -19,9 +20,7 @@ const availabilityLabel = (availability: PresentationAvailability, t: ClimateRec
 })[availability];
 
 const presentNumber = (value: number, unit: string | undefined, locale: ClimateRecoveryLocale) => {
-  const formatted = new Intl.NumberFormat(locale === 'es' ? 'es-CL' : 'en-US', {
-    maximumFractionDigits: 2,
-  }).format(value);
+  const formatted = formatPresentationNumber(value, locale);
   return `${formatted}${unit ? ` ${unit}` : ''}`;
 };
 

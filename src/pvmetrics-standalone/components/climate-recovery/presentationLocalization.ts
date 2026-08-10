@@ -52,7 +52,25 @@ const keys: Record<string, { es: string; en: string }> = {
   'review-soon': { es: 'Revisar pronto', en: 'Review soon' },
   'review-routine': { es: 'Revisión rutinaria', en: 'Routine review' },
   'field inspection recommendation gate': { es: 'Control de recomendación para inspección en terreno', en: 'Field inspection recommendation gate' },
+  'Counterfactual estimate using a fictional configurable factor; it is not verified impact.': {
+    es: 'Estimación contrafactual con un factor configurable ficticio; no es impacto verificado.',
+    en: 'Counterfactual estimate using a fictional configurable factor; it is not verified impact.',
+  },
+  'Advisory only; follow approved site safety and authorization procedures before any field activity.': {
+    es: 'Solo asesoría; siga los procedimientos aprobados de seguridad y autorización del sitio antes de cualquier actividad en terreno.',
+    en: 'Advisory only; follow approved site safety and authorization procedures before any field activity.',
+  },
+  'Not an official, measured, regulatory, market, or regionally representative emission factor.': {
+    es: 'No es un factor de emisiones oficial, medido, regulatorio, de mercado ni representativo de una región.',
+    en: 'Not an official, measured, regulatory, market, or regionally representative emission factor.',
+  },
 };
+
+export const formatPresentationNumber = (value: number, locale: ClimateRecoveryLocale): string => (
+  new Intl.NumberFormat(locale === 'es' ? 'es-CL' : 'en-US', {
+    maximumFractionDigits: 2,
+  }).format(value)
+);
 
 export const formatCaseCount = (count: number, locale: ClimateRecoveryLocale) => (
   locale === 'es'
@@ -122,6 +140,8 @@ export const localizePresentationText = (
   if (direct) return direct[locale];
   const actionKey = value.startsWith('action.') ? value.split('.')[1] : undefined;
   if (actionKey && keys[actionKey]) return keys[actionKey][locale];
+  const demonstrativeConvention = value.match(/^Internal demonstrative ±([\d.]+)% convention$/i);
+  if (demonstrativeConvention && locale === 'es') return `Convención demostrativa interna de ±${demonstrativeConvention[1]}%`;
   if (locale === 'en' || spanishSignal.test(value) || !englishSignal.test(value)) return value;
   const priority = value.match(/^Priority band: ([a-z-]+)/i);
   if (priority) return `Banda de prioridad sintética: ${priority[1]}. No es una probabilidad ni una orden.`;
@@ -136,8 +156,9 @@ export const localizePresentationList = (values: string[], locale: ClimateRecove
   [...new Set(values.map((value) => localizePresentationText(value, locale)).filter(Boolean))]
 );
 
-const localizeValue = <T extends { limitations: string[] }>(value: T, locale: ClimateRecoveryLocale): T => ({
+const localizeValue = <T extends { limitations: string[]; tooltip?: string }>(value: T, locale: ClimateRecoveryLocale): T => ({
   ...value,
+  tooltip: value.tooltip ? localizePresentationText(value.tooltip, locale) : value.tooltip,
   limitations: localizePresentationList(value.limitations, locale),
 });
 
@@ -172,6 +193,12 @@ export const localizeCaseDetailPresentation = (
     recoveryOpportunity: {
       ...detail.summary.recoveryOpportunity,
       methodology: localizePresentationText(detail.summary.recoveryOpportunity.methodology, locale),
+      uncertainty: detail.summary.recoveryOpportunity.uncertainty
+        ? {
+          ...detail.summary.recoveryOpportunity.uncertainty,
+          confidenceDescriptor: localizePresentationText(detail.summary.recoveryOpportunity.uncertainty.confidenceDescriptor, locale),
+        }
+        : undefined,
       limitations: localizePresentationList(detail.summary.recoveryOpportunity.limitations, locale),
       estimatedEnergy: localizeValue(detail.summary.recoveryOpportunity.estimatedEnergy, locale),
     },

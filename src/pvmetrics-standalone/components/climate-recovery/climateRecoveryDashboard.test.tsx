@@ -23,7 +23,7 @@ import {
   resetGuidedDemo,
   skipGuidedDemo,
 } from './demo/guidedDemoSteps';
-import { formatCaseCount, localizePresentationText } from './presentationLocalization';
+import { formatCaseCount, formatPresentationNumber, localizePresentationText } from './presentationLocalization';
 import {
   GUIDED_DEMO_MAX_ANCHOR_ATTEMPTS,
   GUIDED_DEMO_MAX_CORRECTIVE_SCROLLS,
@@ -663,4 +663,51 @@ test('295 package.json contains no CR-08 dependency or script mutation', () => a
 test('296 package-lock contains no CR-08 dependency', () => assert.doesNotMatch(packageLockSource, /competition-video|cr-08|video-mode/i));
 test('297 CR-08 timing tolerance is 225 to 280 seconds without a clock', () => {
   assert.deepEqual([COMPETITION_VIDEO_MIN_SECONDS, COMPETITION_VIDEO_TARGET_SECONDS, COMPETITION_VIDEO_MAX_SECONDS], [225, 260, 280]); assert.doesNotMatch(videoSource, /setTimeout|setInterval/);
+});
+test('298 CR-08.1 localizes the residual Case Detail KPI explanation in Spanish', () => {
+  assert.equal(
+    localizePresentationText('Counterfactual estimate using a fictional configurable factor; it is not verified impact.', 'es'),
+    'Estimación contrafactual con un factor configurable ficticio; no es impacto verificado.',
+  );
+});
+test('299 CR-08.1 preserves the approved Case Detail KPI explanation in English', () => {
+  const value = 'Counterfactual estimate using a fictional configurable factor; it is not verified impact.';
+  assert.equal(localizePresentationText(value, 'en'), value);
+});
+test('300 CR-08.1 localizes the residual field-safety advisory in Spanish', () => {
+  assert.equal(
+    localizePresentationText('Advisory only; follow approved site safety and authorization procedures before any field activity.', 'es'),
+    'Solo asesoría; siga los procedimientos aprobados de seguridad y autorización del sitio antes de cualquier actividad en terreno.',
+  );
+});
+test('301 CR-08.1 Spanish Case Detail contains no known residual English copy', () => {
+  assert.doesNotMatch(esCaseHtml, /Counterfactual estimate using|Advisory only; follow approved|Internal demonstrative|Not an official, measured/);
+});
+test('302 CR-08.1 Spanish Case Detail localizes data sufficiency status', () => {
+  assert.match(esCaseHtml, />Suficiente</);
+});
+test('303 CR-08.1 formats Spanish presentation numbers without binary-float artifacts', () => {
+  assert.equal(formatPresentationNumber(34587.630000000005, 'es'), '34.587,63');
+});
+test('304 CR-08.1 formats English presentation numbers without binary-float artifacts', () => {
+  assert.equal(formatPresentationNumber(34587.630000000005, 'en'), '34,587.63');
+});
+test('305 CR-08.1 rendered uncertainty ranges contain no long binary-float tails', () => {
+  assert.doesNotMatch(esCaseHtml, /34587\.630000000005|42273\.770000000004/);
+});
+test('306 CR-08.1 localizes the demonstrative uncertainty descriptor', () => {
+  assert.equal(localizePresentationText('Internal demonstrative ±10% convention', 'es'), 'Convención demostrativa interna de ±10%');
+});
+test('307 CR-08.1 explicit Presentation exit delegates to the semantic exit handler', () => {
+  assert.match(viewSource, /onPresentation=\{presentationMode \? exitPresentationMode : enterPresentationMode\}/);
+});
+test('308 CR-08.1 registers the keyboard listener for standalone Presentation Mode', () => {
+  assert.match(viewSource, /!guidedState\.active && !videoState\.active && !presentationMode/);
+});
+test('309 CR-08.1 Escape preserves Video then Guided then Presentation exit priority', () => {
+  assert.match(viewSource, /event\.key === 'Escape'[\s\S]*videoState\.active\) exitVideo\(false\);[\s\S]*guidedState\.active\) exitGuided\(true\);[\s\S]*else exitPresentationMode\(\)/);
+});
+test('310 CR-08.1 Presentation exit is a single bounded state transition', () => {
+  const exitHandler = viewSource.match(/const exitPresentationMode = useCallback\(\(\) => \{[^}]+\}, \[\]\)/)?.[0] ?? '';
+  assert.equal(exitHandler, 'const exitPresentationMode = useCallback(() => { setPresentationMode(false); }, [])');
 });

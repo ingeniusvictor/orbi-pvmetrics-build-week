@@ -201,7 +201,8 @@ const ClimateRecoveryView: React.FC<{
   }, [demo.resetExploration, demo.restoreExploration]);
 
   const showFreeExplore = useCallback(() => { setPresentationMode(false); exitGuided(false); }, [exitGuided]);
-  const togglePresentationMode = useCallback(() => { setPresentationMode((active) => !active); }, []);
+  const enterPresentationMode = useCallback(() => { setPresentationMode(true); }, []);
+  const exitPresentationMode = useCallback(() => { setPresentationMode(false); }, []);
   const resetPresentationView = useCallback(() => {
     demo.resetExploration();
     if (guidedState.active) setGuidedState((state) => resetGuidedDemo(state, demo.locale));
@@ -234,12 +235,14 @@ const ClimateRecoveryView: React.FC<{
   }, [caseDetailPrefetchPending, videoAction]);
 
   useEffect(() => {
-    if (!guidedState.active && !videoState.active) return;
+    if (!guidedState.active && !videoState.active && !presentationMode) return;
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (event.key === 'Escape') {
         event.preventDefault();
-        if (videoState.active) exitVideo(false); else exitGuided(true);
+        if (videoState.active) exitVideo(false);
+        else if (guidedState.active) exitGuided(true);
+        else exitPresentationMode();
         return;
       }
       if (target?.matches('input, select, textarea, button, a')) return;
@@ -253,7 +256,7 @@ const ClimateRecoveryView: React.FC<{
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [currentStep.previousStepId, exitGuided, exitVideo, guidedState.active, moveGuided, nextGuided, nextVideo, videoAction, videoState.active]);
+  }, [currentStep.previousStepId, exitGuided, exitPresentationMode, exitVideo, guidedState.active, moveGuided, nextGuided, nextVideo, presentationMode, videoAction, videoState.active]);
 
   if (!demo.serviceValid) return <EmptyState title="Climate Recovery synthetic service is unavailable." action={<p className="text-xs text-rose-300">{demo.serviceIssues.join(' ')}</p>} />;
 
@@ -303,7 +306,7 @@ const ClimateRecoveryView: React.FC<{
           <div className="grid min-w-0 grid-cols-1 gap-3 min-[430px]:grid-cols-2 xl:grid-cols-1"><div className="rounded-2xl border border-slate-700/70 bg-slate-950/65 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">{t.evaluated} · UTC</p><p className="mt-2 font-mono text-sm text-white">{evaluatedAt}</p></div><div className="rounded-2xl border border-slate-700/70 bg-slate-950/65 p-4"><label htmlFor="climate-recovery-locale" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500"><Languages className="h-3.5 w-3.5" />{t.language}</label><select id="climate-recovery-locale" aria-label={`${t.title}: ${t.language}`} value={demo.locale} onChange={(event) => demo.setLocale(event.target.value as 'es' | 'en')} className="mt-2 min-h-11 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-xs font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><option value="es" className="bg-slate-950">ES · Español</option><option value="en" className="bg-slate-950">EN · English</option></select></div>{presentationMode && <div role="status" className="col-span-full rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4 text-xs leading-5 text-emerald-100"><span className="font-black uppercase tracking-wide">{t.recordingSafe}</span><span className="mt-1 block text-emerald-200/75">{t.recordingSafeBoundary}</span></div>}{onExit && <button type="button" onClick={onExit} className="cr-button col-span-full inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950/70 px-3 text-xs font-bold text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><ArrowLeft className="h-4 w-4" />{t.back}</button>}</div>
         </div>
       </header>
-      <GuidedDemoLauncher guided={guidedState.active} presentation={presentationMode} t={t} onStart={startGuided} onFree={showFreeExplore} onPresentation={togglePresentationMode} onVideo={startVideo} videoLabel={getCompetitionVideoText(demo.locale, 'common.begin')} onReset={resetPresentationView} />
+      <GuidedDemoLauncher guided={guidedState.active} presentation={presentationMode} t={t} onStart={startGuided} onFree={showFreeExplore} onPresentation={presentationMode ? exitPresentationMode : enterPresentationMode} onVideo={startVideo} videoLabel={getCompetitionVideoText(demo.locale, 'common.begin')} onReset={resetPresentationView} />
       {guidedState.active ? <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(320px,420px)_minmax(0,1fr)] lg:items-start"><Suspense fallback={<div className="rounded-2xl border border-amber-500/20 bg-slate-900 p-4 text-xs text-amber-200">{t.guidedDemo}</div>}><GuidedDemoShell step={currentStep} locale={demo.locale} t={t} onPrevious={() => moveGuided('previous')} onNext={nextGuided} onSkip={() => moveGuided('skip')} onExit={() => exitGuided(true)} onReset={resetDemo} narrativeExpanded={guidedState.narrationVisible} onToggleNarrative={() => setGuidedState((state) => ({ ...state, narrationVisible: !state.narrationVisible }))} navigationMessage={navigationMessage} navigationPending={guidedNavigationPending} navigationPendingMessage={getCompetitionVideoText(demo.locale, 'common.navigationPending')} /></Suspense>{workspace}</div> : workspace}
     </div>
   );
