@@ -186,6 +186,67 @@
   scrollbar-width: thin;
 }
 
+.climate-recovery-view[data-video-mode='true'] {
+  width: 100%;
+  max-width: 1800px;
+  overflow-x: clip;
+}
+
+.cr-video-mode {
+  --cr-video-safe-margin: clamp(1rem, 3.35vw, 3rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: calc(100dvh - 4rem);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cr-video-scroll-region {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.cr-video-safe-frame {
+  margin-inline: var(--cr-video-safe-margin, clamp(1rem, 3.35vw, 3rem));
+}
+
+.cr-video-opening,
+.cr-video-closing,
+.cr-video-chapter-frame {
+  animation: cr-video-frame-in var(--cr-motion-panel) var(--cr-easing-standard) both;
+}
+
+@keyframes cr-video-frame-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cr-video-product-stage {
+  overflow: clip;
+  border-radius: var(--cr-radius-lg);
+}
+
+.cr-video-cues[data-recording-excluded],
+[data-recording-excluded] {
+  outline: 1px dashed rgba(148, 163, 184, 0.18);
+  outline-offset: -1px;
+}
+
+.cr-video-controls {
+  position: relative;
+  z-index: 35;
+  box-shadow: var(--cr-shadow-md);
+  backdrop-filter: blur(12px);
+}
+
+@media (min-width: 1440px) {
+  .cr-video-safe-frame {
+    margin-inline: max(3rem, calc((100% - 1344px) / 2));
+  }
+}
+
 @media (min-width: 1024px) {
   .guided-demo-shell {
     max-height: calc(100dvh - 2rem);
@@ -200,6 +261,16 @@
   .cr-shell[data-cr-mode='presentation'] .cr-main-display {
     padding: 0.75rem;
   }
+
+  .cr-video-mode {
+    --cr-video-safe-margin: 0;
+    height: calc(100dvh - 1.5rem);
+  }
+
+  .cr-video-safe-frame {
+    border-radius: 1.25rem;
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -214,7 +285,10 @@
 
   .cr-interactive-card:hover,
   .cr-button:hover,
-  .cr-button:active {
+  .cr-button:active,
+  .cr-video-opening,
+  .cr-video-closing,
+  .cr-video-chapter-frame {
     transform: none;
   }
 }

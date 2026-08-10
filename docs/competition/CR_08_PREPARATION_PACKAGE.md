@@ -2,7 +2,7 @@
 
 Preparation date: 2026-08-05
 
-Status: documentation-only design package; no CR-08 implementation authorized
+Status: approved preparation package implemented by CR-08; evidence pending human approval
 
 Repository baseline:
 
@@ -902,3 +902,15 @@ Before any CR-08 implementation begins, the owner should approve:
 - the boundary between CR-08 implementation and CR-09 submission assurance.
 
 Until that approval is granted, this file remains planning documentation only.
+
+## CR-08 implementation trace
+
+The owner authorized CR-08 implementation from checkpoint
+`3c5f008a6b72c41b2d63f71601ff3a9e9f79a3f4`. The implemented scope follows the
+approved target duration, first-90-seconds strategy, nine-chapter narrative,
+ES/EN cues, recording-safe framing, CR-07V navigation corrections, claims
+boundaries, test matrix, and human stop gates in this package.
+
+Implementation and validation evidence is documented in
+`docs/competition/CR_08_COMPETITION_VIDEO_PRESENTATION.md`. This update does
+not authorize commit, push, deployment, recording, upload, or publication.

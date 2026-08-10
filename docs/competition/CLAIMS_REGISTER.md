@@ -1,6 +1,6 @@
 # Climate Recovery Claims Register
 
-Status: CR-07 premium synthetic Climate Recovery competition experience
+Status: CR-08 synthetic Climate Recovery competition video presentation experience
 
 Scope: AI for Climate Innovation Factory 2026 Competition Edition
 
@@ -70,6 +70,18 @@ not replace evidence or authorize operational, commercial, or climate claims.
   domain calculations.
 - Recording-oriented visual layouts have been validated locally.
 
+- An optional Competition Video Presentation Mode is implemented.
+- The video mode provides nine presenter-controlled chapters with a static
+  260-second planning guide and no automatic advance.
+- Bilingual opening, presenter cues, timing labels, recording controls, and a
+  branded closing frame are implemented for the synthetic demonstration.
+- Video Mode reuses the deterministic Guided Demo targets and service-provided
+  presentation values; it does not recalculate domain results.
+- Case Detail prefetch, pending-navigation lock, exact context restoration, and
+  Featured-to-Overview return behavior are implemented.
+- Competition Video Mode is local, offline, read-only, non-operational, and
+  uses no GPT or external API at runtime.
+
 ## Prohibited claims at this stage
 
 - Climate Recovery is operational in production.
@@ -132,6 +144,17 @@ not replace evidence or authorize operational, commercial, or climate claims.
 - Presentation Mode guarantees recording quality on every device.
 - Visual polish validates energy or climate calculations.
 - Premium visuals replace human review or technical evidence.
+
+- Competition Video Mode records, renders, encodes, uploads, or submits video.
+- Competition Video Mode provides generated voice, audio, or autonomous
+  narration.
+- Competition Video Mode automatically advances or guarantees presenter
+  timing.
+- Recording-safe framing guarantees a valid recording on every device.
+- The competition presentation proves customers, pilots, deployment,
+  production readiness, measured recovery, or verified emissions.
+- Explainable AI framing means GPT or a network model runs in this Climate
+  Recovery demonstration.
 
 ## Usage rule
 

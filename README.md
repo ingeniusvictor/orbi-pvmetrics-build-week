@@ -175,6 +175,20 @@ For an authorized private live-API evaluation, follow the optional advisory-mode
 
 ## Climate Recovery premium competition experience
 
+CR-08 adds an optional bilingual **Competition Video Presentation Mode** over
+the existing CR-07 experience. It provides a presenter-controlled nine-chapter
+story, a 260-second planning guide, cinematic opening and closing frames,
+hideable narration cues, recording-safe framing, replay/reset/exit recovery,
+and explicit pending-navigation locks. It does not autoplay, record audio or
+video, request fullscreen, persist state, call GPT, use a network service, or
+change any Climate Recovery calculation, score, case, or synthetic result.
+
+The video sequence remains a local, deterministic, read-only synthetic
+demonstration. Energy and emissions are estimates, the Climate Opportunity
+Score is not a probability, and every proposed next step remains subject to
+human review. Implementation and validation evidence is recorded in
+`docs/competition/CR_08_COMPETITION_VIDEO_PRESENTATION.md`.
+
 Open **Recuperación Climática** in the existing sidebar to inspect the CR-07
 competition experience. **Exploración libre / Free Explore** preserves the
 read-only dashboard, **Demo guiada / Guided Demo** provides the existing

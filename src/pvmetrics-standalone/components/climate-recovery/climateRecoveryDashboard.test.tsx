@@ -33,9 +33,27 @@ import {
   getGuidedDemoScrollOffset,
   isElementWithinViewport,
 } from './demo/useGuidedDemoNavigation';
+import {
+  COMPETITION_VIDEO_CHAPTERS,
+  COMPETITION_VIDEO_MAX_SECONDS,
+  COMPETITION_VIDEO_MIN_SECONDS,
+  COMPETITION_VIDEO_TARGET_SECONDS,
+  CinematicOpening,
+  CompetitionVideoMode,
+  VideoClosingFrame,
+  competitionVideoChapterById,
+  competitionVideoPlannedProgress,
+  createCompetitionVideoState,
+  getCompetitionVideoText,
+  getCompetitionVideoTextRegistry,
+  reduceCompetitionVideoState,
+  validateCompetitionVideoChapters,
+} from './video';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(here, '..', '..', 'app', 'OrbiPVMetricsStandaloneApp.tsx'), 'utf8');
+const packageSource = readFileSync(join(here, '..', '..', '..', '..', 'package.json'), 'utf8');
+const packageLockSource = readFileSync(join(here, '..', '..', '..', '..', 'package-lock.json'), 'utf8');
 const packageJson = JSON.parse(readFileSync(join(here, '..', '..', '..', '..', 'package.json'), 'utf8')) as { scripts: Record<string, string> };
 const en = createClimateRecoveryDemoSnapshot('en');
 const es = createClimateRecoveryDemoSnapshot('es');
@@ -59,12 +77,24 @@ const viewSource = readFileSync(join(here, 'ClimateRecoveryView.tsx'), 'utf8');
 const launcherSource = readFileSync(join(here, 'demo', 'GuidedDemoLauncher.tsx'), 'utf8');
 const displaySource = readFileSync(join(here, 'shared', 'Display.tsx'), 'utf8');
 const opportunitySource = readFileSync(join(here, 'cases', 'OpportunityList.tsx'), 'utf8');
+const videoDirectory = join(here, 'video');
 
 const sourceFiles = (directory: string): string[] => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
   const path = join(directory, entry.name);
   return entry.isDirectory() ? sourceFiles(path) : /\.(ts|tsx)$/.test(entry.name) ? [path] : [];
 });
 const source = sourceFiles(here).filter((file) => !file.endsWith('.test.tsx')).map((file) => readFileSync(file, 'utf8')).join('\n');
+const videoSource = sourceFiles(videoDirectory).map((file) => readFileSync(file, 'utf8')).join('\n');
+const videoOpeningHtml = renderToStaticMarkup(React.createElement(CinematicOpening, { locale: 'en', reducedMotion: false, onBegin: () => undefined, onExit: () => undefined }));
+const videoClosingHtml = renderToStaticMarkup(React.createElement(VideoClosingFrame, { locale: 'en' }));
+const videoStartedState = {
+  ...createCompetitionVideoState('en'), active: true, started: true, currentChapterId: 'portfolio-opportunity' as const, navigationStatus: 'ready' as const,
+};
+const videoModeHtml = renderToStaticMarkup(React.createElement(CompetitionVideoMode, {
+  state: videoStartedState, locale: 'en', onBegin: () => undefined, onPrevious: () => undefined, onNext: () => undefined,
+  onReplay: () => undefined, onTogglePause: () => undefined, onToggleCues: () => undefined, onToggleTiming: () => undefined,
+  onReset: () => undefined, onExit: () => undefined, onReturnToPresentation: () => undefined,
+}, React.createElement('div', null, 'Product target')));
 
 test('1 navigation shows Climate Recovery', () => {
   assert.match(appSource, /climate-recovery/);
@@ -491,3 +521,146 @@ test('210 Presentation Mode state is in memory only', () => assert.match(viewSou
 test('211 premium overview preserves a single h1', () => assert.equal((html.match(/<h1\b/g) ?? []).length, 1));
 test('212 three-mode switch uses accessible pressed states', () => assert.equal((launcherSource.match(/aria-pressed=/g) ?? []).length, 3));
 test('213 score ring exposes an accessible out-of-100 label and band', () => assert.match(displaySource, /role="img"[\s\S]*out of 100[\s\S]*band/));
+
+test('214 CR-08 chapter registry contains exactly nine chapters', () => assert.equal(COMPETITION_VIDEO_CHAPTERS.length, 9));
+test('215 CR-08 chapter IDs are unique', () => assert.equal(new Set(COMPETITION_VIDEO_CHAPTERS.map((chapter) => chapter.id)).size, 9));
+test('216 CR-08 chapter order is contiguous from one to nine', () => assert.deepEqual(COMPETITION_VIDEO_CHAPTERS.map((chapter) => chapter.order), [1, 2, 3, 4, 5, 6, 7, 8, 9]));
+test('217 CR-08 previous and next links are reciprocal', () => COMPETITION_VIDEO_CHAPTERS.forEach((chapter) => {
+  if (chapter.nextChapterId) assert.equal(competitionVideoChapterById(chapter.nextChapterId).previousChapterId, chapter.id);
+}));
+test('218 CR-08 opening has no previous link', () => assert.equal(COMPETITION_VIDEO_CHAPTERS[0].previousChapterId, undefined));
+test('219 CR-08 closing has no next link', () => assert.equal(COMPETITION_VIDEO_CHAPTERS.at(-1)?.nextChapterId, undefined));
+test('220 CR-08 target modes are bounded', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => ['presentation', 'guided'].includes(chapter.targetMode))));
+test('221 CR-08 target sections are valid', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => ['overview', 'plants', 'opportunities', 'review', 'case'].includes(chapter.targetSection))));
+test('222 CR-08 guided targets exist', () => {
+  const stepIds = new Set(GUIDED_DEMO_STEPS.map((step) => step.id));
+  assert.ok(COMPETITION_VIDEO_CHAPTERS.filter((chapter) => chapter.targetStepId).every((chapter) => stepIds.has(chapter.targetStepId!)));
+});
+test('223 CR-08 target cases exist', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.filter((chapter) => chapter.targetCaseId).every((chapter) => cases.some((item) => item.caseId === chapter.targetCaseId))));
+test('224 CR-08 durations are positive', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => chapter.durationSeconds > 0)));
+test('225 CR-08 pauses are non-negative', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => chapter.pauseAfterSeconds >= 0)));
+test('226 CR-08 planned total is exactly 260 seconds', () => assert.equal(validateCompetitionVideoChapters().totalSeconds, COMPETITION_VIDEO_TARGET_SECONDS));
+test('227 every CR-08 chapter declares disclosures', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => chapter.disclosureRequired.length > 0)));
+test('228 CR-08 opening contains product and edition', () => assert.match(videoOpeningHtml, /ORBI PVMetrics IA[\s\S]*Climate Recovery Edition/));
+test('229 CR-08 opening visibly declares synthetic demonstration', () => assert.match(videoOpeningHtml, /Synthetic Executive Demonstration/));
+test('230 CR-08 opening visibly declares read-only and offline scope', () => assert.match(videoOpeningHtml, /Read-only[\s\S]*Offline/));
+test('231 Begin Presentation requires explicit input and no autoplay', () => {
+  assert.match(videoOpeningHtml, /<button[^>]*>Begin Presentation/); assert.doesNotMatch(videoSource, /autoPlay|autoplay|setTimeout|setInterval/);
+});
+test('232 CR-08 start initializes deterministic state', () => {
+  const state = reduceCompetitionVideoState(createCompetitionVideoState('en'), { type: 'start', context: { modeBeforeVideo: 'free', sectionBeforeVideo: 'overview', scrollBeforeVideo: 42 }, locale: 'en', reducedMotion: false });
+  assert.deepEqual([state.active, state.currentChapterId, state.scrollBeforeVideo], [true, 'opening', 42]);
+});
+test('233 CR-08 Next advances exactly one ready chapter', () => {
+  const state = reduceCompetitionVideoState({ ...videoStartedState, navigationStatus: 'ready' }, { type: 'next' });
+  assert.equal(state.currentChapterId, 'prioritization');
+});
+test('234 pending navigation blocks CR-08 Next', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, navigationStatus: 'pending' }, { type: 'next' }).currentChapterId, 'portfolio-opportunity'));
+test('235 rapid repeated Next cannot pass a pending destination', () => {
+  const first = reduceCompetitionVideoState({ ...videoStartedState, navigationStatus: 'ready' }, { type: 'next' });
+  assert.equal(reduceCompetitionVideoState(first, { type: 'next' }).currentChapterId, 'prioritization');
+});
+test('236 CR-08 Previous moves exactly one chapter', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, navigationStatus: 'ready' }, { type: 'previous' }).currentChapterId, 'loss-problem'));
+test('237 Previous is unavailable on Opening', () => assert.equal(reduceCompetitionVideoState({ ...createCompetitionVideoState('en'), active: true }, { type: 'previous' }).currentChapterId, 'opening'));
+test('238 Next is unavailable on Closing', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, currentChapterId: 'closing', navigationStatus: 'ready' }, { type: 'next' }).currentChapterId, 'closing'));
+test('239 Replay preserves the current chapter', () => assert.equal(reduceCompetitionVideoState(videoStartedState, { type: 'replay' }).currentChapterId, videoStartedState.currentChapterId));
+test('240 Replay preserves completed chapter history', () => {
+  const state = { ...videoStartedState, completedChapterIds: ['opening' as const, 'loss-problem' as const] };
+  assert.deepEqual(reduceCompetitionVideoState(state, { type: 'replay' }).completedChapterIds, state.completedChapterIds);
+});
+test('241 Pause changes guidance state only', () => {
+  const state = reduceCompetitionVideoState(videoStartedState, { type: 'pause' });
+  assert.deepEqual([state.paused, state.currentChapterId, state.navigationStatus], [true, 'portfolio-opportunity', 'paused']);
+});
+test('242 Resume restores deterministic guidance', () => {
+  const state = reduceCompetitionVideoState({ ...videoStartedState, paused: true, navigationStatus: 'paused' }, { type: 'resume' });
+  assert.equal(state.paused, false); assert.equal(state.navigationStatus, 'pending');
+});
+test('243 Hide Cues removes cue state', () => assert.equal(reduceCompetitionVideoState(videoStartedState, { type: 'toggle-cues' }).narrationVisible, false));
+test('244 Show Cues restores cue state', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, narrationVisible: false }, { type: 'toggle-cues' }).narrationVisible, true));
+test('245 timing guide can be hidden and shown', () => {
+  const hidden = reduceCompetitionVideoState(videoStartedState, { type: 'toggle-timing' });
+  assert.equal(hidden.timingGuideVisible, false); assert.equal(reduceCompetitionVideoState(hidden, { type: 'toggle-timing' }).timingGuideVisible, true);
+});
+test('246 timing uses planned chapter progress only', () => {
+  assert.equal(competitionVideoPlannedProgress('opening'), 20); assert.equal(competitionVideoPlannedProgress('closing'), 260); assert.doesNotMatch(videoSource, /Date\.now|new Date|performance\.now/);
+});
+test('247 CR-08 reset returns to Opening and clears history', () => {
+  const reset = reduceCompetitionVideoState({ ...videoStartedState, completedChapterIds: ['opening', 'loss-problem'] }, { type: 'reset' });
+  assert.deepEqual([reset.currentChapterId, reset.started, reset.completedChapterIds.length], ['opening', false, 0]);
+});
+test('248 CR-08 reset delegates product navigation directly to Overview', () => assert.match(viewSource, /const resetVideo[\s\S]*demo\.resetExploration\(\)[\s\S]*type: 'reset'/));
+test('249 CR-08 exit preserves pre-video Free mode in state', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, modeBeforeVideo: 'free' }, { type: 'exit' }).modeBeforeVideo, 'free'));
+test('250 CR-08 exit preserves pre-video Guided mode in state', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, modeBeforeVideo: 'guided' }, { type: 'exit' }).modeBeforeVideo, 'guided'));
+test('251 CR-08 exit preserves pre-video Presentation mode in state', () => assert.equal(reduceCompetitionVideoState({ ...videoStartedState, modeBeforeVideo: 'presentation' }, { type: 'exit' }).modeBeforeVideo, 'presentation'));
+test('252 CR-08 state retains the exact source section', () => assert.equal(createCompetitionVideoState('en', { modeBeforeVideo: 'free', sectionBeforeVideo: 'review', scrollBeforeVideo: 0 }).sectionBeforeVideo, 'review'));
+test('253 CR-08 state retains the selected plant', () => assert.equal(createCompetitionVideoState('en', { modeBeforeVideo: 'free', sectionBeforeVideo: 'plants', selectedPlantBeforeVideo: 'PLANT', scrollBeforeVideo: 0 }).selectedPlantBeforeVideo, 'PLANT'));
+test('254 CR-08 state retains the selected case', () => assert.equal(createCompetitionVideoState('en', { modeBeforeVideo: 'free', sectionBeforeVideo: 'case', selectedCaseBeforeVideo: 'CASE', scrollBeforeVideo: 0 }).selectedCaseBeforeVideo, 'CASE'));
+test('255 CR-08 captures and restores exact scroll', () => assert.match(viewSource, /scrollBeforeVideo: snapshot\.scrollYBeforeGuidedDemo[\s\S]*restoreGuidedDemoContext/));
+test('256 CR-08 exit prefers captured focus without scroll', () => assert.match(viewSource + source, /preferCapturedFocus: true[\s\S]*focus\(\{ preventScroll: true \}\)/));
+test('257 Featured CTA captures Overview as origin', () => assert.match(viewSource, /PortfolioOverview[\s\S]*openCaseFrom\('overview'\)/));
+test('258 Featured case Back returns through captured origin', () => assert.match(viewSource, /const backFromCase = \(\) => demo\.navigate\(caseOrigin\.current\)/));
+test('259 regular catalog case captures Opportunities origin', () => assert.match(viewSource, /OpportunityList[\s\S]*openCaseFrom\('opportunities'\)/));
+test('260 Case Detail is prefetched before Aurora navigation', () => assert.match(viewSource, /videoWillOpenCase[\s\S]*loadCaseDetailView\(\)/));
+test('261 prefetch loads one lazy component rather than fourteen details', () => {
+  assert.match(viewSource, /const loadCaseDetailView = \(\) => import\('\.\/cases\/CaseDetailView'\)/); assert.doesNotMatch(viewSource, /fourteen|14.*loadCaseDetailView/);
+});
+test('262 failed target exposes accessible recovery status', () => {
+  const failed = renderToStaticMarkup(React.createElement(CompetitionVideoMode, { ...{
+    state: { ...videoStartedState, navigationStatus: 'failed' as const }, locale: 'en', onBegin: () => undefined, onPrevious: () => undefined, onNext: () => undefined, onReplay: () => undefined, onTogglePause: () => undefined, onToggleCues: () => undefined, onToggleTiming: () => undefined, onReset: () => undefined, onExit: () => undefined, onReturnToPresentation: () => undefined,
+  } }, React.createElement('div')));
+  assert.match(failed, /role="status"[\s\S]*target is unavailable/);
+});
+test('263 obsolete CR-08 navigation uses the existing abort coordinator', () => assert.match(viewSource + source, /requestKey[\s\S]*new AbortController\(\)[\s\S]*controller\.abort\(\)/));
+test('264 Escape exits CR-08 through the restoration path', () => assert.match(viewSource, /event\.key === 'Escape'[\s\S]*videoState\.active\) exitVideo\(false\)/));
+test('265 Spanish opening has no visible keys or English leakage', () => {
+  const value = Object.values(getCompetitionVideoTextRegistry('es')).join(' '); assert.doesNotMatch(value, /common\.|opening\.|Begin Presentation|Human review\./);
+});
+test('266 English opening has no visible keys or Spanish leakage', () => {
+  const value = Object.values(getCompetitionVideoTextRegistry('en')).join(' '); assert.doesNotMatch(value, /common\.|opening\.|Comenzar presentación|Revisión humana\./);
+});
+test('267 all Spanish CR-08 keys resolve', () => assert.ok(Object.values(getCompetitionVideoTextRegistry('es')).every((value) => value.length > 0)));
+test('268 all English CR-08 keys resolve', () => assert.deepEqual(Object.keys(getCompetitionVideoTextRegistry('en')).sort(), Object.keys(getCompetitionVideoTextRegistry('es')).sort()));
+test('269 locale switch preserves CR-08 chapter and state', () => {
+  const switched = reduceCompetitionVideoState(videoStartedState, { type: 'set-locale', locale: 'es' }); assert.equal(switched.currentChapterId, 'portfolio-opportunity'); assert.equal(switched.locale, 'es');
+});
+test('270 ES and EN use the same chapter disclosure contracts', () => assert.ok(COMPETITION_VIDEO_CHAPTERS.every((chapter) => chapter.disclosureRequired.includes('synthetic'))));
+test('271 reduced motion removes CR-08 decorative motion', () => assert.match(cssSource, /prefers-reduced-motion[\s\S]*\.cr-video-opening[\s\S]*transform: none/));
+test('272 reduced motion preserves CR-08 navigation and focus', () => assert.match(viewSource, /set-reduced-motion[\s\S]*useGuidedDemoNavigation/));
+test('273 CR-08 controls expose localized accessible text labels', () => ['common.previous', 'common.next', 'common.replay', 'common.exitVideo'].forEach((key) => assert.ok(videoModeHtml.includes(getCompetitionVideoText('en', key as Parameters<typeof getCompetitionVideoText>[1])))));
+test('274 active chapter exposes aria-current step', () => assert.match(videoModeHtml, /aria-current="step"/));
+test('275 CR-08 toggles expose aria-pressed', () => assert.ok((videoModeHtml.match(/aria-pressed=/g) ?? []).length >= 3));
+test('276 chapter changes expose a polite live announcement', () => assert.match(videoModeHtml, /aria-live="polite"/));
+test('277 closing contains company and approved CTA', () => {
+  assert.match(videoClosingHtml, /ORBI Ecosystem SpA/); assert.match(videoClosingHtml, /Prioritize the right opportunity/);
+});
+test('278 closing contains synthetic estimated and human-review boundaries', () => assert.match(videoClosingHtml, /Human review[\s\S]*Estimated climate impact[\s\S]*Synthetic demonstration/));
+test('279 current portfolio values remain 129.16 MWh and 47.92 tCO2e', () => {
+  const copy = getCompetitionVideoText('en', 'portfolio-opportunity.fact'); assert.match(copy, /129\.16 MWh/); assert.match(copy, /47\.92 tCO2e/);
+});
+test('280 current leading score remains 92.58 and is not called probability', () => {
+  assert.equal(en.executive.rankings[0].score.toFixed(2), '92.58'); assert.match(getCompetitionVideoText('en', 'prioritization.fact'), /not a probability/);
+});
+test('281 Aurora values remain 9.8 MWh 3.64 tCO2e and 59 percent', () => assert.match(getCompetitionVideoText('en', 'recoverable-case.fact'), /9\.8 MWh · 3\.64 tCO2e · 59%/));
+test('282 Helios remains non-recoverable through asset maintenance', () => {
+  const detail = getClimateRecoveryCaseDetail('DEMO-CR-CASE-B', 'en')!; assert.equal(detail.summary.recoverability, 'non-recoverable'); assert.match(getCompetitionVideoText('en', 'common.proofHelios'), /not recoverable through asset maintenance/);
+});
+test('283 Valle Verde impact remains blocked rather than zero', () => {
+  const detail = getClimateRecoveryCaseDetail('DEMO-CR-CASE-C', 'en')!; assert.equal(detail.climateImpact.availability, 'blocked'); assert.match(getCompetitionVideoText('en', 'common.proofValle'), /blocked, not zero/);
+});
+test('284 human-review total remains fourteen', () => assert.equal(en.executive.reviewQueue.length, 14));
+test('285 CR-08 source uses no Date.now or current-time clock', () => assert.doesNotMatch(videoSource, /Date\.now|new Date|performance\.now/));
+test('286 CR-08 source uses no random values', () => assert.doesNotMatch(videoSource, /Math\.random|crypto\.randomUUID/));
+test('287 CR-08 source uses no localStorage', () => assert.doesNotMatch(videoSource, /localStorage/));
+test('288 CR-08 source uses no sessionStorage', () => assert.doesNotMatch(videoSource, /sessionStorage/));
+test('289 CR-08 source uses no fetch or network client', () => assert.doesNotMatch(videoSource, /\bfetch\s*\(|XMLHttpRequest|WebSocket/));
+test('290 CR-08 source imports no GPT or OpenAI advisory', () => assert.doesNotMatch(videoSource, /\bGPT(?:-\d)?\b|openai|advisory/i));
+test('291 CR-08 source invokes no fullscreen or media capture API', () => assert.doesNotMatch(videoSource, /requestFullscreen|getDisplayMedia|getUserMedia|MediaRecorder/));
+test('292 CR-08 video components import no domain engines or fixtures', () => assert.doesNotMatch(videoSource, /climate-recovery\/(?:engine|fixtures|portfolio\/data)/));
+test('293 CR-08 video layer does not mutate product data', () => assert.doesNotMatch(videoSource, /executive\.[A-Za-z]+\s*=|selectedCase\.[A-Za-z]+\s*=|portfolio\.[A-Za-z]+\s*=/));
+test('294 historical tests remain in the unchanged test command', () => assert.match(packageJson.scripts.test, /incidentCopilot\.test\.ts[\s\S]*climateRecoveryDashboard\.test\.tsx/));
+test('295 package.json contains no CR-08 dependency or script mutation', () => assert.doesNotMatch(packageSource, /competition-video|cr-08|video-mode/i));
+test('296 package-lock contains no CR-08 dependency', () => assert.doesNotMatch(packageLockSource, /competition-video|cr-08|video-mode/i));
+test('297 CR-08 timing tolerance is 225 to 280 seconds without a clock', () => {
+  assert.deepEqual([COMPETITION_VIDEO_MIN_SECONDS, COMPETITION_VIDEO_TARGET_SECONDS, COMPETITION_VIDEO_MAX_SECONDS], [225, 260, 280]); assert.doesNotMatch(videoSource, /setTimeout|setInterval/);
+});

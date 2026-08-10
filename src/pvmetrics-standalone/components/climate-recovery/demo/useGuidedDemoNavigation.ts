@@ -35,6 +35,7 @@ export type GuidedDemoVisibility = {
 export type GuidedDemoContextSnapshot = {
   scrollYBeforeGuidedDemo: number;
   focusedElementBeforeGuidedDemo: HTMLElement | null;
+  focusedElementIdBeforeGuidedDemo?: string;
   selectedSectionBeforeGuidedDemo: ClimateRecoverySection;
   selectedPlantBeforeGuidedDemo?: string;
   selectedCaseBeforeGuidedDemo?: string;
@@ -259,6 +260,9 @@ export const captureGuidedDemoContext = (
   return {
     scrollYBeforeGuidedDemo: isDocument ? window.scrollY : scrollContainer.scrollTop,
     focusedElementBeforeGuidedDemo: document.activeElement instanceof HTMLElement ? document.activeElement : null,
+    focusedElementIdBeforeGuidedDemo: document.activeElement instanceof HTMLElement && document.activeElement.id
+      ? document.activeElement.id
+      : undefined,
     selectedSectionBeforeGuidedDemo,
     selectedPlantBeforeGuidedDemo,
     selectedCaseBeforeGuidedDemo,
@@ -269,8 +273,10 @@ export const captureGuidedDemoContext = (
 export const restoreGuidedDemoContext = async (
   snapshot: GuidedDemoContextSnapshot,
   restoreSelection: () => void,
+  options: { preferCapturedFocus?: boolean } = {},
 ) => {
   restoreSelection();
+  await nextAnimationFrame();
   await nextAnimationFrame();
   const isDocument = snapshot.scrollContainer === document.documentElement
     || snapshot.scrollContainer === document.body
@@ -279,11 +285,19 @@ export const restoreGuidedDemoContext = async (
   else snapshot.scrollContainer.scrollTo({ top: snapshot.scrollYBeforeGuidedDemo, behavior: 'auto' });
   const launcher = document.getElementById('guided-demo-launcher');
   const heading = document.getElementById('climate-recovery-heading');
-  const focusTarget = launcher instanceof HTMLElement
-    ? launcher
-    : snapshot.focusedElementBeforeGuidedDemo?.isConnected
-      ? snapshot.focusedElementBeforeGuidedDemo
+  const remountedFocus = snapshot.focusedElementIdBeforeGuidedDemo
+    ? document.getElementById(snapshot.focusedElementIdBeforeGuidedDemo)
+    : null;
+  const capturedFocus = snapshot.focusedElementBeforeGuidedDemo?.isConnected
+    ? snapshot.focusedElementBeforeGuidedDemo
+    : remountedFocus instanceof HTMLElement
+      ? remountedFocus
       : heading;
+  const focusTarget = options.preferCapturedFocus
+    ? capturedFocus
+    : launcher instanceof HTMLElement
+      ? launcher
+      : capturedFocus;
   focusTarget?.focus({ preventScroll: true });
 };
 
@@ -292,11 +306,13 @@ export const useGuidedDemoNavigation = ({
   step,
   reducedMotion,
   prepareStep,
+  requestKey = 0,
 }: {
   active: boolean;
   step: GuidedDemoStep;
   reducedMotion: boolean;
   prepareStep: (step: GuidedDemoStep) => void;
+  requestKey?: number;
 }) => {
   const sequence = useRef(0);
   const wasActive = useRef(false);
@@ -315,7 +331,7 @@ export const useGuidedDemoNavigation = ({
       if (sequence.current === currentSequence && nextResult.status !== 'cancelled') setResult(nextResult);
     });
     return () => controller.abort();
-  }, [active, prepareStep, reducedMotion, step]);
+  }, [active, prepareStep, reducedMotion, requestKey, step]);
 
   return result;
 };

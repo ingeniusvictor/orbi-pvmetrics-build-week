@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, MonitorUp, Play, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Compass, Film, MonitorUp, Play, RotateCcw, ShieldCheck } from 'lucide-react';
 import type { ClimateRecoveryCopy } from '../copy';
 
 export const GuidedDemoLauncher: React.FC<{
@@ -9,10 +9,12 @@ export const GuidedDemoLauncher: React.FC<{
   onStart: () => void;
   onFree: () => void;
   onPresentation: () => void;
+  onVideo: () => void;
+  videoLabel: string;
   onReset: () => void;
-}> = ({ guided, presentation, t, onStart, onFree, onPresentation, onReset }) => (
+}> = ({ guided, presentation, t, onStart, onFree, onPresentation, onVideo, videoLabel, onReset }) => (
   <div className="cr-premium-panel rounded-2xl border p-3" aria-label={`${t.freeExplore} / ${t.guidedDemo} / ${t.presentationMode}`}>
-    <div role="group" aria-label={t.presentationModeDescription} className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+    <div role="group" aria-label={t.presentationModeDescription} className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
       <button type="button" aria-pressed={!guided && !presentation} onClick={onFree} className={`cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${!guided && !presentation ? 'bg-slate-100 text-slate-950' : 'border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white'}`}>
         <Compass className="h-4 w-4" />{t.freeExplore}
       </button>
@@ -21,6 +23,9 @@ export const GuidedDemoLauncher: React.FC<{
       </button>
       <button type="button" aria-pressed={presentation} aria-label={presentation ? t.exitPresentation : t.enterPresentation} onClick={onPresentation} className={`cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${presentation ? 'border border-cyan-300/60 bg-cyan-400 text-slate-950' : 'border border-cyan-500/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20'}`}>
         <MonitorUp className="h-4 w-4" />{t.presentationMode}
+      </button>
+      <button id="competition-video-launcher" type="button" onClick={onVideo} className="cr-button inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-fuchsia-400/35 bg-fuchsia-400/10 px-4 text-xs font-bold text-fuchsia-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300">
+        <Film className="h-4 w-4" />{videoLabel}
       </button>
     </div>
     <div className="mt-2 flex flex-col justify-between gap-2 text-xs leading-5 text-slate-400 sm:flex-row sm:items-center">

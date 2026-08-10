@@ -1,5 +1,20 @@
 # OpenAI Build Week Changelog
 
+## CR-08 Competition Video Presentation Mode
+
+- Added an isolated, lazy Competition Video Mode with nine deterministic
+  chapters and a 260-second planned narrative over the existing CR-06/CR-07
+  navigation and product presentation.
+- Added bilingual opening, chapter framing, narration cues, planned timing,
+  recording controls, 16:9-safe margins, and a stable competition closing;
+  every advance remains explicit and no audio/video recording is implemented.
+- Prefetched the existing Case Detail chunk before Aurora, locked Next while a
+  target is pending, preserved cancellation, restored exact context on Exit,
+  and returned Featured case navigation to its originating Overview.
+- Added 84 focused CR-08 checks while preserving the historical 456-test suite;
+  no domain, service, fixture, dependency, package, lockfile, backend, network,
+  GPT runtime, persistence, fullscreen, or operational-control change was made.
+
 ## CR-07 Premium UX and Competition Polish
 
 - Added a bilingual executive hero, tiered six-KPI hierarchy, prominent
