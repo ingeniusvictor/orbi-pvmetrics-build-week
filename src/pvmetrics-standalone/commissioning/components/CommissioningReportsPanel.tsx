@@ -46,6 +46,7 @@ export const CommissioningReportsPanel: React.FC = () => {
 
   const refreshStored = () => adoptState(service.getState());
   const openSyntheticLab = () => adoptState(service.initializeSyntheticLab());
+  const openSyntheticCertificationScenario = () => adoptState(service.initializeSyntheticCertificationScenario());
 
   const handleProjectChange = (nextProjectId: string) => {
     setProjectId(nextProjectId);
@@ -97,10 +98,14 @@ export const CommissioningReportsPanel: React.FC = () => {
     return (
       <section className="space-y-5" aria-label="Commissioning reports">
         <div className="rounded-xl border border-emerald-500/20 bg-gray-900 p-5">
-          <div className="flex items-start gap-3"><ClipboardCheck className="mt-0.5 h-5 w-5 text-emerald-400" /><div><p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">BESS Commissioning Report</p><h2 className="mt-1 text-lg font-bold text-white">No stored commissioning dataset</h2><p className="mt-2 text-xs leading-relaxed text-gray-400">Reports reads the scoped Commissioning repository. No persisted project is currently available. You can refresh stored data or open the synthetic lab in memory for a safe report preview.</p></div></div>
+          <div className="flex items-start gap-3"><ClipboardCheck className="mt-0.5 h-5 w-5 text-emerald-400" /><div><p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">BESS Commissioning Report</p><h2 className="mt-1 text-lg font-bold text-white">No stored commissioning dataset</h2><p className="mt-2 text-xs leading-relaxed text-gray-400">Reports reads the scoped Commissioning repository. No persisted project is currently available. You can refresh stored data or open a synthetic in-memory preview without creating a real commissioning record.</p></div></div>
         </div>
-        <div className="flex flex-wrap gap-2"><button type="button" onClick={refreshStored} className="min-h-11 rounded-lg border border-gray-700 bg-gray-950 px-4 text-xs font-bold text-gray-300 hover:border-emerald-500/40"><RefreshCw className="mr-2 inline h-3.5 w-3.5" />Refresh stored data</button><button type="button" onClick={openSyntheticLab} className="min-h-11 rounded-lg bg-emerald-500 px-4 text-xs font-extrabold text-slate-950 hover:bg-emerald-400">Open synthetic report preview</button></div>
-        <div className="rounded-lg border border-amber-500/15 bg-amber-500/5 px-3 py-2 text-[10px] leading-relaxed text-amber-200">Synthetic preview is in-memory only and does not create a real commissioning record, human acceptance or contractual handover.</div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[auto_1fr_1fr]">
+          <button type="button" onClick={refreshStored} className="min-h-11 rounded-lg border border-gray-700 bg-gray-950 px-4 text-xs font-bold text-gray-300 hover:border-emerald-500/40"><RefreshCw className="mr-2 inline h-3.5 w-3.5" />Refresh stored data</button>
+          <button type="button" onClick={openSyntheticLab} className="min-h-11 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-xs font-extrabold text-emerald-300 hover:bg-emerald-500/15">Open base synthetic preview</button>
+          <button type="button" onClick={openSyntheticCertificationScenario} className="min-h-11 rounded-lg bg-cyan-400 px-4 text-xs font-extrabold text-slate-950 hover:bg-cyan-300">Open processed E2E preview</button>
+        </div>
+        <div className="rounded-lg border border-amber-500/15 bg-amber-500/5 px-3 py-2 text-[10px] leading-relaxed text-amber-200">Synthetic previews are in-memory only. They do not create a real commissioning record, authorize energization, grant human acceptance, close real Punch Items or write to OT systems.</div>
       </section>
     );
   }
@@ -108,7 +113,7 @@ export const CommissioningReportsPanel: React.FC = () => {
   return (
     <section className="space-y-5" aria-label="Commissioning reports">
       <header className="rounded-xl border border-emerald-500/20 bg-gray-900 p-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-start gap-3"><FileText className="mt-0.5 h-5 w-5 text-emerald-400" /><div><p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">BESS Commissioning Report</p><h2 className="mt-1 text-lg font-bold text-white">Deterministic commissioning snapshot</h2><p className="mt-2 text-xs leading-relaxed text-gray-400">Build a local, traceable report from the stored Commissioning snapshot. Report generation does not execute tests, change acceptance, close Punch Items or write to OT systems.</p></div></div><span className="rounded border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-[10px] font-black text-cyan-300">READ-ONLY SHADOW MODE</span></div>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-start gap-3"><FileText className="mt-0.5 h-5 w-5 text-emerald-400" /><div><p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">BESS Commissioning Report</p><h2 className="mt-1 text-lg font-bold text-white">Deterministic commissioning snapshot</h2><p className="mt-2 text-xs leading-relaxed text-gray-400">Build a local, traceable report from the stored or explicitly loaded Commissioning snapshot. Report generation does not execute tests, change acceptance, close Punch Items or write to OT systems.</p></div></div><span className="rounded border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-[10px] font-black text-cyan-300">READ-ONLY SHADOW MODE</span></div>
       </header>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_auto]">
