@@ -10,6 +10,7 @@ import { CommissioningAnomalyRadarView } from './CommissioningAnomalyRadarView';
 import { CommissioningFindingsView } from './CommissioningFindingsView';
 import { CommissioningPunchRetestView } from './CommissioningPunchRetestView';
 import { CommissioningEvidenceView } from './CommissioningEvidenceView';
+import { CommissioningBaselineView } from './CommissioningBaselineView';
 
 type WorkspaceSection =
   | 'overview'
@@ -57,6 +58,7 @@ const CommissioningWorkspaceView: React.FC = () => {
     if (activeSection === 'findings') return <CommissioningFindingsView state={state} />;
     if (activeSection === 'punch') return <CommissioningPunchRetestView state={state} />;
     if (activeSection === 'evidence') return <CommissioningEvidenceView state={state} />;
+    if (activeSection === 'baseline') return <CommissioningBaselineView state={state} />;
     return (
       <div className="space-y-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Sección activa</p>
