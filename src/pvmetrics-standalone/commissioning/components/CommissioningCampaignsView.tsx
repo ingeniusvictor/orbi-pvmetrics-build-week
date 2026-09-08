@@ -14,7 +14,9 @@ const statusClass: Record<string, string> = {
 export const CommissioningCampaignsView: React.FC<{ state: CommissioningWorkspaceState }> = ({ state }) => {
   const campaigns = state.snapshot.campaigns;
   const executionCountByCampaign = new Map<string, number>();
-  const testInstanceById = new Map(state.snapshot.testInstances.map((item) => [item.testInstanceId, item]));
+  const testInstanceById = new Map(
+    state.snapshot.testInstances.map((item) => [item.testInstanceId, item] as const),
+  );
   for (const execution of state.snapshot.testExecutions) {
     const instance = testInstanceById.get(execution.testInstanceId);
     if (!instance) continue;
