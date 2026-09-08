@@ -5,6 +5,7 @@ import { BrowserLocalStorageDriver, CommissioningRepository } from '../persisten
 import { CommissioningOverview } from './CommissioningOverview';
 import { CommissioningScopeView } from './CommissioningScopeView';
 import { CommissioningCampaignsView } from './CommissioningCampaignsView';
+import { CommissioningTestsView } from './CommissioningTestsView';
 
 type WorkspaceSection =
   | 'overview'
@@ -47,6 +48,7 @@ const CommissioningWorkspaceView: React.FC = () => {
     if (activeSection === 'overview') return <CommissioningOverview state={state} />;
     if (activeSection === 'scope') return <CommissioningScopeView state={state} />;
     if (activeSection === 'campaigns') return <CommissioningCampaignsView state={state} />;
+    if (activeSection === 'tests') return <CommissioningTestsView state={state} />;
     return (
       <div className="space-y-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Sección activa</p>
