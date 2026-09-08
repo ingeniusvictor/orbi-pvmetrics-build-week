@@ -45,8 +45,15 @@ const qualityRank: Record<SampleQuality, number> = {
 
 const classify = (summary: Omit<DataQualitySummary, 'quality'>): DataQuality => {
   if (summary.totalSamples === 0 || summary.invalidSamples > 0 || summary.coveragePercent < 50) return 'INVALID';
-  if (summary.missingSamples > 0 || summary.coveragePercent < 80) return 'POOR';
-  if (summary.suspectSamples > 0 || summary.duplicateSamples > 0 || summary.frozenSignalKeys.length > 0 || summary.coveragePercent < 95) return 'DEGRADED';
+  const missingRatio = summary.totalSamples > 0 ? summary.missingSamples / summary.totalSamples : 1;
+  if (summary.coveragePercent < 80 || missingRatio > 0.05) return 'POOR';
+  if (
+    summary.missingSamples > 0 ||
+    summary.suspectSamples > 0 ||
+    summary.duplicateSamples > 0 ||
+    summary.frozenSignalKeys.length > 0 ||
+    summary.coveragePercent < 95
+  ) return 'DEGRADED';
   return 'GOOD';
 };
 
