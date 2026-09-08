@@ -22,6 +22,23 @@ test('synthetic lab initialization is explicit and not persisted automatically',
   assert.equal(secondService.getState().loadStatus, 'EMPTY');
 });
 
+test('processed certification scenario is explicit, populated and not persisted automatically', () => {
+  const driver = new MemoryCommissioningStorageDriver();
+  const service = new CommissioningService(new CommissioningRepository(driver));
+  const state = service.initializeSyntheticCertificationScenario();
+
+  assert.equal(state.summary.projectCount, 1);
+  assert.equal(state.summary.executionCount, 5);
+  assert.equal(state.snapshot.anomalies.length, 9);
+  assert.equal(state.snapshot.findings.length, 5);
+  assert.equal(state.snapshot.punchItems.length, 3);
+  assert.equal(state.summary.availableBaselineCount, 1);
+  assert.equal(state.summary.readyHandoverCount, 1);
+
+  const secondService = new CommissioningService(new CommissioningRepository(driver));
+  assert.equal(secondService.getState().loadStatus, 'EMPTY');
+});
+
 test('explicit save persists the synthetic workspace', () => {
   const driver = new MemoryCommissioningStorageDriver();
   const service = new CommissioningService(new CommissioningRepository(driver));
