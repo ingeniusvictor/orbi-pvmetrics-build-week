@@ -49,6 +49,7 @@ const CommissioningWorkspaceView: React.FC = () => {
   const [state, setState] = useState(() => service.getState());
 
   const loadSyntheticLab = () => setState(service.initializeSyntheticLab());
+  const loadSyntheticCertificationScenario = () => setState(service.initializeSyntheticCertificationScenario());
 
   const renderActiveSection = () => {
     if (activeSection === 'overview') return <CommissioningOverview state={state} />;
@@ -105,10 +106,29 @@ const CommissioningWorkspaceView: React.FC = () => {
 
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
         {state.loadStatus === 'EMPTY' ? (
-          <div className="space-y-4 py-8 text-center">
-            <p className="text-sm font-semibold text-white">Commissioning workspace sin dataset cargado</p>
-            <p className="mx-auto max-w-xl text-xs leading-relaxed text-gray-400">El Core está preparado para carga manual/archivo y lectura de datos PVMetrics. Para validar la interfaz puede abrir el laboratorio sintético local. Esto no conecta SCADA/BMS/PCS reales y no persiste hasta una acción explícita de guardado.</p>
-            <button type="button" onClick={loadSyntheticLab} className="min-h-11 rounded-lg bg-emerald-500 px-4 text-xs font-extrabold text-slate-950 hover:bg-emerald-400">Abrir laboratorio sintético</button>
+          <div className="space-y-5 py-8 text-center">
+            <div>
+              <p className="text-sm font-semibold text-white">Commissioning workspace sin dataset cargado</p>
+              <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-gray-400">El Core está preparado para carga manual/archivo y lectura de datos PVMetrics. Para validar la interfaz puede abrir uno de los laboratorios sintéticos locales. Ninguna opción conecta SCADA/BMS/PCS reales y ninguna persiste hasta una acción explícita de guardado.</p>
+            </div>
+
+            <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 md:grid-cols-2">
+              <article className="rounded-xl border border-gray-800 bg-gray-950 p-4 text-left">
+                <p className="text-[9px] font-black uppercase tracking-wider text-gray-500">Synthetic base lab</p>
+                <h2 className="mt-2 text-sm font-bold text-white">Contexto base / empty-state validation</h2>
+                <p className="mt-2 text-[10px] leading-relaxed text-gray-500">Carga proyecto, scope, campaña y jerarquía de activos. Los registros analíticos posteriores permanecen vacíos hasta procesamiento explícito.</p>
+                <button type="button" onClick={loadSyntheticLab} className="mt-4 min-h-11 w-full rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-xs font-extrabold text-emerald-300 hover:bg-emerald-500/15">Abrir laboratorio sintético</button>
+              </article>
+
+              <article className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-left">
+                <p className="text-[9px] font-black uppercase tracking-wider text-cyan-300">G32 visual certification</p>
+                <h2 className="mt-2 text-sm font-bold text-white">Escenario E2E procesado</h2>
+                <p className="mt-2 text-[10px] leading-relaxed text-gray-400">Reutiliza los motores determinísticos del Core para poblar Anomaly → Finding → Punch → Retest → Baseline → Handover. Es exclusivamente sintético y no otorga autoridad operacional.</p>
+                <button type="button" onClick={loadSyntheticCertificationScenario} className="mt-4 min-h-11 w-full rounded-lg bg-cyan-400 px-4 text-xs font-extrabold text-slate-950 hover:bg-cyan-300">Abrir escenario E2E procesado</button>
+              </article>
+            </div>
+
+            <p className="mx-auto max-w-2xl text-[10px] leading-relaxed text-amber-200">Los laboratorios son herramientas de validación local. Sus estados PASS / READY / ACCEPTED son registros sintéticos de prueba y nunca autorizan energización, operación de equipos ni acciones sobre sistemas OT reales.</p>
           </div>
         ) : renderActiveSection()}
       </div>
