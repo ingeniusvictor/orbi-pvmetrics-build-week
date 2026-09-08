@@ -1,6 +1,7 @@
 import React from 'react';
 import { CalendarClock, CheckCircle2, CircleDot, Clock3 } from 'lucide-react';
 import type { CommissioningWorkspaceState } from '../application/commissioningService';
+import type { TestInstance } from '../contracts';
 
 const statusClass: Record<string, string> = {
   PLANNED: 'border-gray-700 bg-gray-900 text-gray-300',
@@ -14,8 +15,8 @@ const statusClass: Record<string, string> = {
 export const CommissioningCampaignsView: React.FC<{ state: CommissioningWorkspaceState }> = ({ state }) => {
   const campaigns = state.snapshot.campaigns;
   const executionCountByCampaign = new Map<string, number>();
-  const testInstanceById = new Map(
-    state.snapshot.testInstances.map((item) => [item.testInstanceId, item] as const),
+  const testInstanceById = new Map<string, TestInstance>(
+    state.snapshot.testInstances.map((item): [string, TestInstance] => [item.testInstanceId, item]),
   );
   for (const execution of state.snapshot.testExecutions) {
     const instance = testInstanceById.get(execution.testInstanceId);
