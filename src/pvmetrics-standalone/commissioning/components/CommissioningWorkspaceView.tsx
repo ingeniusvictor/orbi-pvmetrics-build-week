@@ -11,6 +11,7 @@ import { CommissioningFindingsView } from './CommissioningFindingsView';
 import { CommissioningPunchRetestView } from './CommissioningPunchRetestView';
 import { CommissioningEvidenceView } from './CommissioningEvidenceView';
 import { CommissioningBaselineView } from './CommissioningBaselineView';
+import { CommissioningHandoverView } from './CommissioningHandoverView';
 
 type WorkspaceSection =
   | 'overview'
@@ -59,13 +60,8 @@ const CommissioningWorkspaceView: React.FC = () => {
     if (activeSection === 'punch') return <CommissioningPunchRetestView state={state} />;
     if (activeSection === 'evidence') return <CommissioningEvidenceView state={state} />;
     if (activeSection === 'baseline') return <CommissioningBaselineView state={state} />;
-    return (
-      <div className="space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Sección activa</p>
-        <h2 className="text-lg font-bold text-white">{sections.find((section) => section.id === activeSection)?.label}</h2>
-        <p className="text-xs text-gray-500">La vista detallada de {sections.find((section) => section.id === activeSection)?.label} se implementa en los siguientes bloques UI. Este shell no contiene controles operacionales.</p>
-      </div>
-    );
+    if (activeSection === 'handover') return <CommissioningHandoverView state={state} />;
+    return null;
   };
 
   return (
