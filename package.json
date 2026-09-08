@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "node --import tsx --test src/build-week/incident-copilot/incidentCopilot.test.ts src/build-week/incident-copilot/incidentAdvisory.test.ts src/pvmetrics-standalone/climate-recovery/climateRecovery.test.ts src/pvmetrics-standalone/climate-recovery/assessmentEngine.test.ts src/pvmetrics-standalone/climate-recovery/applicationService.test.ts src/pvmetrics-standalone/climate-recovery/portfolio.test.ts src/pvmetrics-standalone/components/climate-recovery/climateRecoveryDashboard.test.tsx src/pvmetrics-standalone/commissioning/contracts/contracts.test.ts",
+    "test": "node --import tsx --test src/build-week/incident-copilot/incidentCopilot.test.ts src/build-week/incident-copilot/incidentAdvisory.test.ts src/pvmetrics-standalone/climate-recovery/climateRecovery.test.ts src/pvmetrics-standalone/climate-recovery/assessmentEngine.test.ts src/pvmetrics-standalone/climate-recovery/applicationService.test.ts src/pvmetrics-standalone/climate-recovery/portfolio.test.ts src/pvmetrics-standalone/components/climate-recovery/climateRecoveryDashboard.test.tsx src/pvmetrics-standalone/commissioning/contracts/contracts.test.ts src/pvmetrics-standalone/commissioning/persistence/persistence.test.ts",
     "check": "npm run lint && npm run build"
   },
   "dependencies": {
