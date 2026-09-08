@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AlertCircle, ClipboardSearch, Link2, Search, ShieldQuestion } from 'lucide-react';
 import type { CommissioningWorkspaceState } from '../application/commissioningService';
-import type { Finding, FindingSeverity, FindingStatus, RootCauseState } from '../contracts';
+import type { Anomaly, Finding, FindingSeverity, FindingStatus, RootCauseState } from '../contracts';
 
 const severityClass: Record<FindingSeverity, string> = {
   INFO: 'border-cyan-500/25 bg-cyan-500/10 text-cyan-300',
@@ -42,7 +42,9 @@ export const CommissioningFindingsView: React.FC<{ state: CommissioningWorkspace
     [snapshot.assets],
   );
   const anomalyById = useMemo(
-    () => new Map(snapshot.anomalies.map((anomaly) => [anomaly.anomalyId, anomaly] as const)),
+    () => new Map<string, Anomaly>(
+      snapshot.anomalies.map((anomaly): [string, Anomaly] => [anomaly.anomalyId, anomaly]),
+    ),
     [snapshot.anomalies],
   );
 
