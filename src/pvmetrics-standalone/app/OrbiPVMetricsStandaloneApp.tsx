@@ -6,7 +6,7 @@ import { ForecastViews } from '../components/ForecastViews';
 import { BessView } from '../components/BessView';
 import { EnergySalesView } from '../components/EnergySalesView';
 import { ScadaView } from '../components/ScadaView';
-import { ReportsView } from '../components/ReportsView';
+import { UnifiedReportsView } from '../components/UnifiedReportsView';
 import { ConfigView } from '../components/ConfigView';
 import {
   LayoutDashboard,
@@ -156,7 +156,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
       case 'signalquality':
         return <PVMetricsSignalQualityRulesView />;
       case 'reportes':
-        return <ReportsView />;
+        return <UnifiedReportsView />;
       case 'config':
         return <ConfigView />;
       default:
