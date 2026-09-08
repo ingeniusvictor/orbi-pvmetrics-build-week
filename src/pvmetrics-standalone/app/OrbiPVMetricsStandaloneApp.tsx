@@ -8,18 +8,18 @@ import { EnergySalesView } from '../components/EnergySalesView';
 import { ScadaView } from '../components/ScadaView';
 import { ReportsView } from '../components/ReportsView';
 import { ConfigView } from '../components/ConfigView';
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   Activity,
-  Clock, 
-  Calendar, 
-  BarChart3, 
-  BatteryCharging, 
-  Coins, 
-  Radio, 
-  FileEdit, 
-  Sliders, 
-  AlertOctagon, 
+  Clock,
+  Calendar,
+  BarChart3,
+  BatteryCharging,
+  Coins,
+  Radio,
+  FileEdit,
+  Sliders,
+  AlertOctagon,
   Info,
   Menu,
   X,
@@ -29,12 +29,14 @@ import {
   GitCommit,
   ShieldCheck,
   Sparkles,
-  Leaf
+  Leaf,
+  ClipboardCheck,
 } from 'lucide-react';
 import { PVMetricsDataSourceManagerView } from '../components/data-sources/PVMetricsDataSourceManagerView';
 import { PVMetricsSignalMappingView } from '../components/signal-mapping/PVMetricsSignalMappingView';
 import { PVMetricsSignalQualityRulesView } from '../components/signal-quality/PVMetricsSignalQualityRulesView';
 import { PVMetricsPlantProfileManagerView } from '../components/plant-profile/PVMetricsPlantProfileManagerView';
+import { COMMISSIONING_FEATURE_FLAGS } from '../commissioning/config/commissioningFeatureFlags';
 
 const IncidentCopilotView = lazy(
   () => import('../../build-week/incident-copilot/IncidentCopilotView'),
@@ -42,15 +44,18 @@ const IncidentCopilotView = lazy(
 const ClimateRecoveryView = lazy(
   () => import('../components/climate-recovery/ClimateRecoveryView'),
 );
+const CommissioningWorkspaceView = lazy(
+  () => import('../commissioning/components/CommissioningWorkspaceView'),
+);
 
-type MainViewType = 'dashboard' | 'incident-copilot' | 'climate-recovery' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
+type MainViewType = 'dashboard' | 'incident-copilot' | 'climate-recovery' | 'commissioning' | 'live' | 'diario' | 'semanal' | 'mensual' | 'bess' | 'venta' | 'scada' | 'reportes' | 'config' | 'datasources' | 'signalmapping' | 'signalquality' | 'plantprofiles';
 
 const OrbiPVMetricsStandaloneInner: React.FC = () => {
-  const { 
-    companies, 
-    activeCompanyId, 
-    activePlantId, 
-    activeCompany, 
+  const {
+    companies,
+    activeCompanyId,
+    activePlantId,
+    activeCompany,
     activePlant,
     setActiveCompanyId,
     setActivePlantId
@@ -64,6 +69,9 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    ...(COMMISSIONING_FEATURE_FLAGS.workspaceEnabled
+      ? [{ id: 'commissioning', label: 'Commissioning', icon: ClipboardCheck, badge: 'BESS' }]
+      : []),
     { id: 'climate-recovery', label: shellEnglish ? 'Climate Recovery' : 'Recuperación Climática', icon: Leaf, badge: 'CR-06.1' },
     { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
     { id: 'live', label: shellEnglish ? 'Live Monitoring' : 'Monitoreo Live', icon: Activity },
@@ -81,7 +89,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
     { id: 'config', label: shellEnglish ? 'Settings' : 'Configuración', icon: Sliders },
   ];
 
-  // Map view to respective view components
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
@@ -112,6 +119,18 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               onLocaleChange={setClimateRecoveryLocale}
               onExperienceModeChange={setClimateRecoveryMode}
             />
+          </Suspense>
+        );
+      case 'commissioning':
+        return (
+          <Suspense
+            fallback={
+              <div className="rounded-xl border border-emerald-500/20 bg-gray-900 p-8 text-center text-xs text-emerald-300">
+                Loading BESS Commissioning Workspace…
+              </div>
+            }
+          >
+            <CommissioningWorkspaceView />
           </Suspense>
         );
       case 'live':
@@ -148,7 +167,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const cid = e.target.value;
     setActiveCompanyId(cid);
-    // Auto-select first plant of newly selected company
     const nextCompany = companies.find(c => c.id === cid);
     if (nextCompany && nextCompany.plants.length > 0) {
       setActivePlantId(nextCompany.plants[0].id);
@@ -157,14 +175,11 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
 
   return (
     <div className="cr-shell min-h-screen bg-[#0a0f1d] text-[#f9fafb] flex flex-col font-sans antialiased custom-scrollbar selection:bg-amber-500 selection:text-slate-900" data-cr-mode={activeView === 'climate-recovery' ? climateRecoveryMode : 'free'}>
-      
-      {/* Top safety status alerts bar */}
       <div className="cr-technical-chrome no-print bg-slate-950 border-b border-gray-800 text-[10px] text-gray-400 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1.5 items-center justify-between">
         <div className="flex items-center gap-1.5 font-semibold text-amber-400">
           <AlertOctagon className="w-3.5 h-3.5" />
           <span>{shellEnglish ? 'SAFE SIMULATION ENVIRONMENT' : 'ENTORNO SEGURO DE SIMULACIÓN'}</span>
         </div>
-        
         <div className="flex flex-wrap items-center gap-2">
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'LOCAL SIMULATION' : 'SIMULACIÓN LOCAL'}</span>
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">READ-ONLY</span>
@@ -172,19 +187,14 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">CONFIGURABLE</span>
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">SCADA READY</span>
         </div>
-
         <div className="text-gray-500 hidden md:block">
           {shellEnglish ? 'No active real SCADA connection' : 'Sin conexión SCADA real activa'}
         </div>
       </div>
 
-      {/* Main Container */}
       <div className="flex-1 flex flex-col md:flex-row relative">
-        
-        {/* SIDEBAR NAVIGATION */}
         <aside className="cr-global-sidebar no-print w-full md:w-64 bg-slate-950 border-r border-gray-800 flex flex-col justify-between shrink-0">
           <div>
-            {/* Logo / Header Section */}
             <div className="p-5 border-b border-gray-800">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-amber-500 rounded text-slate-950">
@@ -197,7 +207,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </div>
             </div>
 
-            {/* Workspace configuration multi-company / plant select */}
             <div className="cr-workspace-controls p-4 border-b border-gray-800 space-y-3">
               <div>
                 <label htmlFor="workspace-company" className="text-xs text-gray-500 uppercase font-bold tracking-wider flex items-center gap-1">
@@ -234,10 +243,9 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile Nav toggle */}
             <div className="md:hidden p-4 flex justify-between items-center bg-gray-900/50 border-b border-gray-800">
               <span className="text-xs font-semibold text-gray-300">{shellEnglish ? 'Navigation' : 'Navegación'}</span>
-              <button 
+              <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
@@ -249,7 +257,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               </button>
             </div>
 
-            {/* Links */}
             <nav id="primary-navigation" className={`p-3 space-y-1 ${mobileMenuOpen ? 'block' : 'hidden md:block'}`}>
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -265,8 +272,8 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
                       setMobileMenuOpen(false);
                     }}
                     className={`cr-global-nav-button w-full flex min-h-11 items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
-                      isSelected 
-                        ? 'bg-amber-500 text-slate-950 font-bold' 
+                      isSelected
+                        ? 'bg-amber-500 text-slate-950 font-bold'
                         : 'text-gray-400 hover:text-white hover:bg-gray-900/50'
                     }`}
                   >
@@ -291,7 +298,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             </nav>
           </div>
 
-          {/* Sidebar Footer with disclaimers */}
           <div className="cr-sidebar-footer p-4 border-t border-gray-800 text-[9px] text-gray-500 space-y-2 hidden md:block">
             <p className="leading-relaxed font-sans">
               <strong>{shellEnglish ? 'Sandbox guarantee:' : 'Garantía de Sandbox:'}</strong> {shellEnglish ? 'No active connection to real EMS/BMS or SCADA.' : 'Sin conexión con EMS/BMS o SCADA real activo.'}
@@ -302,10 +308,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           </div>
         </aside>
 
-        {/* MAIN DISPLAY AREA */}
         <main className="cr-main-display flex-1 p-6 md:p-8 space-y-6 overflow-y-auto max-h-[100vh] custom-scrollbar">
-          
-          {/* Static disclaimers banner at top of viewport */}
           <div className="cr-operational-banner no-print p-3 bg-gray-900/50 border border-gray-850 rounded-xl flex items-start gap-3">
             <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-[10px] text-gray-400 leading-relaxed">
@@ -315,13 +318,10 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
             </div>
           </div>
 
-          {/* Render the Active View */}
           <div className="animate-fadeIn">
             {renderView()}
           </div>
-
         </main>
-
       </div>
     </div>
   );
