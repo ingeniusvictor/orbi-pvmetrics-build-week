@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { CommissioningWorkspaceState } from '../application/commissioningService';
 import type {
+  CriterionEvaluation,
   CriterionSnapshot,
   Evidence,
   TestExecution,
@@ -124,8 +125,10 @@ export const CommissioningTestsView: React.FC<{ state: CommissioningWorkspaceSta
   const evaluations = executionId ? snapshot.criterionEvaluations.filter((evaluation) => evaluation.executionId === executionId) : [];
   const calculations = executionId ? snapshot.calculations.filter((calculation) => calculation.executionId === executionId) : [];
   const evidence: Evidence[] = executionId ? snapshot.evidence.filter((item) => item.executionId === executionId) : [];
-  const evaluationByCriterionSnapshotId = new Map(
-    evaluations.map((evaluation) => [evaluation.criterionSnapshotId, evaluation] as const),
+  const evaluationByCriterionSnapshotId = new Map<string, CriterionEvaluation>(
+    evaluations.map(
+      (evaluation): [string, CriterionEvaluation] => [evaluation.criterionSnapshotId, evaluation],
+    ),
   );
   const nextAction = deriveNextAction(latestExecution, evidence.length);
   const risk = deriveRisk(latestExecution, evidence.length);
