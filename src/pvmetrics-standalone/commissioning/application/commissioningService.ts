@@ -10,6 +10,7 @@ import type {
   TestExecution,
 } from '../contracts';
 import { createCommissioningLabFixture } from '../fixtures/createCommissioningLabFixture';
+import { createCommissioningCertificationFixture } from '../fixtures/createCommissioningCertificationFixture';
 import {
   CommissioningRepository,
   type CommissioningLoadResult,
@@ -66,6 +67,12 @@ export class CommissioningService {
 
   initializeSyntheticLab(): CommissioningWorkspaceState {
     this.snapshot = createCommissioningLabFixture();
+    this.loadStatus = 'LOADED';
+    return this.getState();
+  }
+
+  initializeSyntheticCertificationScenario(): CommissioningWorkspaceState {
+    this.snapshot = createCommissioningCertificationFixture();
     this.loadStatus = 'LOADED';
     return this.getState();
   }
