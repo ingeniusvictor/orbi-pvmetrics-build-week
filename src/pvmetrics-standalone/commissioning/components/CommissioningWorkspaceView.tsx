@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ClipboardCheck, ShieldCheck } from 'lucide-react';
 import { CommissioningService } from '../application/commissioningService';
 import { BrowserLocalStorageDriver, CommissioningRepository } from '../persistence';
+import { CommissioningOverview } from './CommissioningOverview';
 
 type WorkspaceSection =
   | 'overview'
@@ -39,6 +40,17 @@ const CommissioningWorkspaceView: React.FC = () => {
   const [state, setState] = useState(() => service.getState());
 
   const loadSyntheticLab = () => setState(service.initializeSyntheticLab());
+
+  const renderActiveSection = () => {
+    if (activeSection === 'overview') return <CommissioningOverview state={state} />;
+    return (
+      <div className="space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Sección activa</p>
+        <h2 className="text-lg font-bold text-white">{sections.find((section) => section.id === activeSection)?.label}</h2>
+        <p className="text-xs text-gray-500">La vista detallada de {sections.find((section) => section.id === activeSection)?.label} se implementa en los siguientes bloques UI. Este shell no contiene controles operacionales.</p>
+      </div>
+    );
+  };
 
   return (
     <section className="space-y-5" id="commissioning-workspace" aria-label="BESS Commissioning Workspace">
@@ -86,20 +98,7 @@ const CommissioningWorkspaceView: React.FC = () => {
             <p className="mx-auto max-w-xl text-xs leading-relaxed text-gray-400">El Core está preparado para carga manual/archivo y lectura de datos PVMetrics. Para validar la interfaz puede abrir el laboratorio sintético local. Esto no conecta SCADA/BMS/PCS reales y no persiste hasta una acción explícita de guardado.</p>
             <button type="button" onClick={loadSyntheticLab} className="min-h-11 rounded-lg bg-emerald-500 px-4 text-xs font-extrabold text-slate-950 hover:bg-emerald-400">Abrir laboratorio sintético</button>
           </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Sección activa</p>
-            <h2 className="text-lg font-bold text-white">{sections.find((section) => section.id === activeSection)?.label}</h2>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-              <div className="rounded-lg border border-gray-800 bg-gray-950 p-3"><p className="text-[10px] uppercase text-gray-500">Projects</p><p className="mt-1 text-xl font-bold text-white">{state.summary.projectCount}</p></div>
-              <div className="rounded-lg border border-gray-800 bg-gray-950 p-3"><p className="text-[10px] uppercase text-gray-500">Campaigns</p><p className="mt-1 text-xl font-bold text-white">{state.summary.campaignCount}</p></div>
-              <div className="rounded-lg border border-gray-800 bg-gray-950 p-3"><p className="text-[10px] uppercase text-gray-500">Anomalies</p><p className="mt-1 text-xl font-bold text-white">{state.summary.activeAnomalyCount}</p></div>
-              <div className="rounded-lg border border-gray-800 bg-gray-950 p-3"><p className="text-[10px] uppercase text-gray-500">Findings</p><p className="mt-1 text-xl font-bold text-white">{state.summary.openFindingCount}</p></div>
-              <div className="rounded-lg border border-gray-800 bg-gray-950 p-3"><p className="text-[10px] uppercase text-gray-500">Punch</p><p className="mt-1 text-xl font-bold text-white">{state.summary.openPunchCount}</p></div>
-            </div>
-            <p className="text-xs text-gray-500">La vista detallada de {sections.find((section) => section.id === activeSection)?.label} se implementa en los siguientes bloques UI. Este shell no contiene controles operacionales.</p>
-          </div>
-        )}
+        ) : renderActiveSection()}
       </div>
     </section>
   );
