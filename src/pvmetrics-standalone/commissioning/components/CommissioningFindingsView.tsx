@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { AlertCircle, ClipboardSearch, Link2, Search, ShieldQuestion } from 'lucide-react';
+import { AlertCircle, Clipboard, Link2, Search, ShieldQuestion } from 'lucide-react';
 import type { CommissioningWorkspaceState } from '../application/commissioningService';
 import type { Anomaly, Finding, FindingSeverity, FindingStatus, RootCauseState } from '../contracts';
 
@@ -66,7 +66,7 @@ export const CommissioningFindingsView: React.FC<{ state: CommissioningWorkspace
       <div className="space-y-5" id="commissioning-findings-view">
         <div><p className="text-[10px] font-black uppercase tracking-wider text-gray-500">Findings</p><h2 className="mt-1 text-lg font-bold text-white">No formal findings loaded</h2></div>
         <div className="rounded-xl border border-dashed border-gray-700 bg-gray-950 p-8 text-center">
-          <ClipboardSearch className="mx-auto h-8 w-8 text-gray-600" />
+          <Clipboard className="mx-auto h-8 w-8 text-gray-600" />
           <p className="mt-3 text-sm font-semibold text-gray-200">No anomaly has been represented here as a formal Finding.</p>
           <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-gray-500">An anomaly may remain informational, require data review, or later become a formal Finding according to the approved workflow. An empty register does not imply commissioning acceptance.</p>
           <div className="mx-auto mt-4 max-w-xl rounded-lg border border-amber-500/15 bg-amber-500/5 p-3 text-[10px] leading-relaxed text-amber-200">Root cause remains UNKNOWN unless an authorized review explicitly records another state. The Findings engine does not auto-confirm root cause.</div>
