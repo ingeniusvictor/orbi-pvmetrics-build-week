@@ -1,7 +1,9 @@
 # G34-H — Offline Telemetry Content Validation
 
-Status: IMPLEMENTED — CI CERTIFICATION PENDING
+Status: PASS — IMPLEMENTED AND CI CERTIFIED
 Branch: `feature/bess-commissioning-workspace`
+Certified implementation head: `5e375f6ded27dc685525f147f230b829bdd1ec7f`
+CI evidence: Commissioning CI run 131 — Test PASS, TypeScript lint PASS, Production build PASS.
 
 ## Purpose
 
@@ -81,8 +83,10 @@ It does **not** mean:
 - `src/pvmetrics-standalone/commissioning/pilot/telemetryContentValidation.test.ts`
 - `src/pvmetrics-standalone/commissioning/components/CommissioningPilotIntakeView.tsx`
 
-## Expected UI behavior
+## Certified behavior
 
 A valid telemetry CSV becomes `PROVIDED` and records a content-admission PASS note.
 
 A telemetry CSV with deterministic content defects becomes `PENDING_VALIDATION` and reports issue codes/rows without altering the source file.
+
+Focused tests cover valid content, header-only content, invalid timestamp, empty asset, non-numeric value, missing unit, invalid quality, exact duplicates, conflicting samples, unit inconsistency, out-of-order timestamps and quoted CSV fields.
