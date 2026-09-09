@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { StateProvider, useAppState } from './StateContext';
+import { PRODUCT_FEATURE_VISIBILITY, isProductNavVisible } from './productFeatureVisibility';
 import { DashboardView } from '../components/DashboardView';
 import { PVMetricsLiveMonitoringDashboard } from '../components/live/PVMetricsLiveMonitoringDashboard';
 import { ForecastViews } from '../components/ForecastViews';
@@ -72,8 +73,12 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
     ...(COMMISSIONING_FEATURE_FLAGS.workspaceEnabled
       ? [{ id: 'commissioning', label: 'Commissioning', icon: ClipboardCheck, badge: 'BESS' }]
       : []),
-    { id: 'climate-recovery', label: shellEnglish ? 'Climate Recovery' : 'Recuperación Climática', icon: Leaf, badge: 'CR-06.1' },
-    { id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' },
+    ...(isProductNavVisible(PRODUCT_FEATURE_VISIBILITY.climateRecovery)
+      ? [{ id: 'climate-recovery', label: shellEnglish ? 'Climate Recovery' : 'Recuperación Climática', icon: Leaf, badge: 'CR-06.1' }]
+      : []),
+    ...(isProductNavVisible(PRODUCT_FEATURE_VISIBILITY.incidentCopilot)
+      ? [{ id: 'incident-copilot', label: 'Incident Copilot', icon: Sparkles, badge: 'Build Week' }]
+      : []),
     { id: 'live', label: shellEnglish ? 'Live Monitoring' : 'Monitoreo Live', icon: Activity },
     { id: 'diario', label: shellEnglish ? 'Daily' : 'Diario', icon: Clock },
     { id: 'semanal', label: shellEnglish ? 'Weekly' : 'Semanal', icon: Calendar },
