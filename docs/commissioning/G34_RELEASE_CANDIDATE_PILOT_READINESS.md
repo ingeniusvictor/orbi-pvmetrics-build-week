@@ -138,25 +138,55 @@ The selected files remain in browser memory for the current interaction. This G3
 
 ### G34-E — Project Mapping Profile
 
-Status: **SOURCE GATE OPEN — PENDING VERIFIED REAL PILOT INPUTS**.
+Status: **FRAMEWORK IMPLEMENTED — SOURCE GATE OPEN / PENDING VERIFIED REAL PILOT INPUTS**.
 
 A formal source-data request/checklist is prepared at:
 
 `docs/commissioning/G34_E_PROJECT_MAPPING_DATA_REQUEST.md`
 
-The first mapping profile must be built only from verified as-built/project sources. It must not infer missing topology, device hierarchy, tag names, units, scaling, sign convention, firmware, thresholds or OEM criteria.
+A deterministic generic framework now exists at:
+
+- `src/pvmetrics-standalone/commissioning/pilot/projectMappingProfile.ts`
+- `src/pvmetrics-standalone/commissioning/pilot/projectMappingProfile.test.ts`
+
+The framework distinguishes `UNVERIFIED` from `SOURCE_CONFIRMED`, blocks confirmed mappings that rely on unverified sources, and prevents incomplete units from being silently converted.
+
+The first project-specific mapping profile must still be built only from verified as-built/project sources. It must not infer missing topology, device hierarchy, tag names, units, scaling, sign convention, firmware, thresholds or OEM criteria.
 
 Recommended strategy: begin with one narrow, well-documented commissioning test slice with authoritative procedure + criteria + telemetry + evidence + human witness/reviewer information, rather than attempting the full BESS project in the first real-data dry run.
 
-Until the real source package is supplied and validated, G34-E remains `PENDING_SOURCE_VERIFICATION` and no project-specific mapping claims are certified.
+Until the real source package is supplied and validated, G34-E remains `PENDING_SOURCE_VERIFICATION` at the project-specific level and no real project mapping claims are certified.
 
 ### G34-F — Offline Real-Data Dry Run
 
-Planned after mapping validation. Process sanitized/exported real project records through Scope → Test → Data → Evidence → Result → Finding → Punch → Retest → Acceptance traceability while preserving human authority.
+Status: **PENDING VERIFIED REAL PILOT INPUTS**.
+
+After mapping validation, process sanitized/exported real project records through Scope → Test → Data → Evidence → Result → Finding → Punch → Retest → Acceptance traceability while preserving human authority.
+
+No real-data dry run can be certified before G34-E source verification.
 
 ### G34-G — Pilot Readiness Pack
 
-Planned final gate. Produce a client-facing readiness summary, known limitations, mapping coverage, data-quality statement, unresolved criteria and explicit no-OT-writeback boundary.
+Status: **FRAMEWORK IMPLEMENTED — FINAL REAL PACK PENDING G34-E/G34-F**.
+
+The deterministic framework is documented at:
+
+`docs/commissioning/G34_G_PILOT_READINESS_PACK_FRAMEWORK.md`
+
+Implementation:
+
+- `src/pvmetrics-standalone/commissioning/pilot/pilotReadinessPack.ts`
+- `src/pvmetrics-standalone/commissioning/pilot/pilotReadinessPack.test.ts`
+
+The pack exposes only:
+
+- `PENDING_SOURCE_DATA` when no verified real project package exists;
+- `BLOCKED` when real intake/mapping/cross-profile consistency is incomplete;
+- `READY_FOR_OFFLINE_DRY_RUN` when verified real inputs are sufficient for an offline dry run only.
+
+The framework records artifact coverage, mapping coverage, blockers, warnings, limitations, dry-run state and explicit safety boundaries. It cannot produce a real readiness claim while `sourceReality = NO_REAL_PACKAGE`, even if synthetic/unit-test fixtures satisfy the structural validators.
+
+Final G34-G certification remains pending until a real authorized package has completed G34-E source verification and the G34-F offline real-data dry run.
 
 ## Safety invariants inherited from G32/G33
 
@@ -176,8 +206,8 @@ Planned final gate. Produce a client-facing readiness summary, known limitations
 - G34-B — Pilot Intake Contract: PASS.
 - G34-C — Offline Pilot Readiness Validator + focused tests: PASS.
 - G34-D — Controlled Manual Intake UI + CI + human visual smoke: PASS.
-- G34-E — Project Mapping Profile: SOURCE GATE OPEN / PENDING VERIFIED REAL PILOT INPUTS.
-- G34-F — Offline Real-Data Dry Run: PENDING.
-- G34-G — Pilot Readiness Pack: PENDING.
+- G34-E — Project Mapping Profile: FRAMEWORK IMPLEMENTED / PROJECT-SPECIFIC SOURCE VERIFICATION PENDING.
+- G34-F — Offline Real-Data Dry Run: PENDING VERIFIED REAL PILOT INPUTS.
+- G34-G — Pilot Readiness Pack: FRAMEWORK IMPLEMENTED / FINAL REAL PACK PENDING G34-E/G34-F.
 
 No G34 result is operational authorization for a real BESS plant.
