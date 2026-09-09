@@ -45,6 +45,14 @@ test('renders all required and optional pilot artifact classes', () => {
   }
 });
 
+test('offers a header-only CSV template download for every artifact class', () => {
+  assert.equal((html.match(/Descargar plantilla CSV/g) ?? []).length, 11);
+  assert.match(source, /renderPilotCsvTemplate/);
+  assert.match(source, /URL\.createObjectURL/);
+  assert.match(source, /anchor\.download/);
+  assert.match(html, /sin datos sintéticos ni datos de proyecto/i);
+});
+
 test('hashes selected files locally with Web Crypto SHA-256', () => {
   assert.match(source, /crypto\.subtle\.digest\(['\"]SHA-256['\"]/);
   assert.match(html, /no los sube a un servidor/i);

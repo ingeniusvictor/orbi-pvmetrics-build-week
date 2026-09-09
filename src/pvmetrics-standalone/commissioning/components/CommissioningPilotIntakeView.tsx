@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { FileCheck2, FolderOpen, RotateCcw, ShieldAlert } from 'lucide-react';
+import { Download, FileCheck2, FolderOpen, RotateCcw, ShieldAlert } from 'lucide-react';
 import {
   assessPilotReadiness,
   PILOT_OPTIONAL_ARTIFACT_KINDS,
@@ -8,6 +8,7 @@ import {
   type PilotArtifactKind,
   type PilotReadinessResult,
 } from '../pilot/pilotReadiness';
+import { getPilotCsvTemplate, renderPilotCsvTemplate } from '../pilot/dataExchangeTemplates';
 
 const ARTIFACT_LABELS: Record<PilotArtifactKind, string> = {
   PROJECT_IDENTITY: 'Identidad del proyecto',
@@ -41,6 +42,20 @@ const createEmptyArtifacts = (): PilotArtifact[] =>
     kind,
     status: 'MISSING',
   }));
+
+const downloadCsvTemplate = (kind: PilotArtifactKind) => {
+  const item = getPilotCsvTemplate(kind);
+  const blob = new Blob([renderPilotCsvTemplate(kind)], { type: 'text/csv;charset=utf-8' });
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = objectUrl;
+  anchor.download = item.fileName;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(objectUrl);
+};
 
 export const CommissioningPilotIntakeView: React.FC = () => {
   const [projectId, setProjectId] = useState('');
@@ -131,7 +146,7 @@ export const CommissioningPilotIntakeView: React.FC = () => {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
           <div>
             <p className="text-xs font-bold text-white">Privacidad y trazabilidad local</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. Las plantillas CSV descargables contienen únicamente encabezados genéricos, sin datos sintéticos ni datos de proyecto. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
           </div>
         </div>
       </section>
@@ -153,7 +168,7 @@ export const CommissioningPilotIntakeView: React.FC = () => {
           const meta = fileMeta[artifact.artifactId];
           const busy = busyArtifactId === artifact.artifactId;
           return (
-            <article key={artifact.artifactId} className="grid grid-cols-1 gap-3 rounded-xl border border-gray-800 bg-gray-950 p-4 lg:grid-cols-[1fr_auto] lg:items-center">
+            <article key={artifact.artifactId} className="grid grid-cols-1 gap-3 rounded-xl border border-gray-800 bg-gray-950 p-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-xs font-bold text-white">{ARTIFACT_LABELS[artifact.kind]}</p>
@@ -162,6 +177,10 @@ export const CommissioningPilotIntakeView: React.FC = () => {
                 </div>
                 {meta ? <p className="mt-2 break-all text-[10px] text-gray-500">{meta.name} · {meta.size.toLocaleString()} bytes{artifact.sha256 ? ` · SHA-256 ${artifact.sha256.slice(0, 16)}…` : ''}</p> : <p className="mt-2 text-[10px] text-gray-600">No local file selected.</p>}
               </div>
+              <button type="button" onClick={() => downloadCsvTemplate(artifact.kind)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-900 px-4 text-xs font-bold text-gray-300 hover:bg-gray-800 hover:text-white" aria-label={`Descargar plantilla CSV para ${ARTIFACT_LABELS[artifact.kind]}`}>
+                <Download className="h-4 w-4" />
+                Descargar plantilla CSV
+              </button>
               <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-4 text-xs font-bold text-cyan-200 hover:bg-cyan-500/15">
                 <FolderOpen className="h-4 w-4" />
                 Seleccionar archivo local
