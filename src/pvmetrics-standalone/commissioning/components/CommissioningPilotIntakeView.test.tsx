@@ -46,7 +46,7 @@ test('renders all required and optional pilot artifact classes', () => {
 });
 
 test('offers a header-only CSV template download for every artifact class', () => {
-  assert.equal((html.match(/Descargar plantilla CSV/g) ?? []).length, 11);
+  assert.equal((html.match(/aria-label="Descargar plantilla CSV para/g) ?? []).length, 11);
   assert.match(source, /renderPilotCsvTemplate/);
   assert.match(source, /URL\.createObjectURL/);
   assert.match(source, /anchor\.download/);
