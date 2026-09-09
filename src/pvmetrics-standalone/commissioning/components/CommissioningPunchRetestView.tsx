@@ -204,6 +204,8 @@ export const CommissioningPunchRetestView: React.FC<{ state: CommissioningWorksp
               .map((executionId) => executionById.get(executionId))
               .filter((execution): execution is TestExecution => Boolean(execution));
             const closure = getClosureAssessment(punch, snapshot.testExecutions);
+            const missingAssignee = punch.status === 'CLOSED' ? 'NOT RECORDED' : 'UNASSIGNED';
+            const missingTargetDate = punch.status === 'CLOSED' ? 'NOT RECORDED' : 'NOT SET';
 
             return (
               <article key={punch.punchItemId} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
@@ -226,9 +228,9 @@ export const CommissioningPunchRetestView: React.FC<{ state: CommissioningWorksp
                 <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-8 text-[10px]">
                   <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Asset</p><p className="mt-1 font-semibold text-gray-300">{asset?.name ?? punch.assetId}</p></div>
                   <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Finding</p><p className="mt-1 break-all font-mono text-gray-400">{finding?.findingId ?? punch.findingId}</p></div>
-                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Responsible</p><p className="mt-1 font-semibold text-gray-300">{punch.responsibleParty ?? 'UNASSIGNED'}</p></div>
-                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Assigned to</p><p className="mt-1 font-semibold text-gray-300">{punch.assignedTo ?? 'UNASSIGNED'}</p></div>
-                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Target date</p><p className="mt-1 font-semibold text-gray-300">{punch.targetDate ?? 'NOT SET'}</p></div>
+                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Responsible</p><p className="mt-1 font-semibold text-gray-300">{punch.responsibleParty ?? missingAssignee}</p></div>
+                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Assigned to</p><p className="mt-1 font-semibold text-gray-300">{punch.assignedTo ?? missingAssignee}</p></div>
+                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Target date</p><p className="mt-1 font-semibold text-gray-300">{punch.targetDate ?? missingTargetDate}</p></div>
                   <div className="rounded-lg border border-violet-500/15 bg-violet-500/5 p-3"><p className="text-violet-300">Linked retests</p><p className="mt-1 text-lg font-bold text-white">{punch.retestExecutionIds.length}</p></div>
                   <div className="rounded-lg border border-cyan-500/15 bg-cyan-500/5 p-3"><p className="text-cyan-300">Closure evidence</p><p className="mt-1 text-lg font-bold text-white">{punch.closureEvidenceIds.length}</p></div>
                   <div className="rounded-lg border border-gray-800 bg-gray-900 p-3"><p className="text-gray-600">Closed by</p><p className="mt-1 font-semibold text-gray-300">{punch.closedBy ?? 'OPEN'}</p></div>
