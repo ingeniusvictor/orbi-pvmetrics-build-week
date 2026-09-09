@@ -8,7 +8,11 @@ import {
   type PilotArtifactKind,
   type PilotReadinessResult,
 } from '../pilot/pilotReadiness';
-import { getPilotCsvTemplate, renderPilotCsvTemplate } from '../pilot/dataExchangeTemplates';
+import {
+  assessPilotCsvHeader,
+  getPilotCsvTemplate,
+  renderPilotCsvTemplate,
+} from '../pilot/dataExchangeTemplates';
 
 const ARTIFACT_LABELS: Record<PilotArtifactKind, string> = {
   PROJECT_IDENTITY: 'Identidad del proyecto',
@@ -28,6 +32,8 @@ const ALL_ARTIFACT_KINDS: readonly PilotArtifactKind[] = [
   ...PILOT_REQUIRED_ARTIFACT_KINDS,
   ...PILOT_OPTIONAL_ARTIFACT_KINDS,
 ];
+
+const CSV_HEADER_READ_LIMIT_BYTES = 64 * 1024;
 
 const hashFileSha256 = async (file: File): Promise<string> => {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 is unavailable in this browser context.');
@@ -55,6 +61,40 @@ const downloadCsvTemplate = (kind: PilotArtifactKind) => {
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(objectUrl);
+};
+
+const assessSelectedCsv = async (
+  artifact: PilotArtifact,
+  file: File,
+): Promise<{ status: PilotArtifact['status']; notes: string[] }> => {
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    return {
+      status: 'PROVIDED',
+      notes: ['Non-CSV file selected. File identity and SHA-256 are recorded locally; content/structure still requires authorized manual validation.'],
+    };
+  }
+
+  const headerSample = await file.slice(0, CSV_HEADER_READ_LIMIT_BYTES).text();
+  const assessment = assessPilotCsvHeader(artifact.kind, headerSample);
+  const notes: string[] = [];
+
+  if (assessment.missingRequiredColumns.length > 0) {
+    notes.push(`CSV HEADER BLOCKED — missing required columns: ${assessment.missingRequiredColumns.join(', ')}`);
+  }
+  if (assessment.duplicateColumns.length > 0) {
+    notes.push(`CSV HEADER BLOCKED — duplicate columns: ${assessment.duplicateColumns.join(', ')}`);
+  }
+  if (assessment.unexpectedColumns.length > 0) {
+    notes.push(`Additional source columns retained for review: ${assessment.unexpectedColumns.join(', ')}`);
+  }
+  notes.push(...assessment.warnings);
+
+  if (assessment.status === 'READY_FOR_REVIEW') {
+    notes.unshift('CSV header admission PASS — required template columns are present and non-duplicated. Row content and source authority remain subject to later validation.');
+    return { status: 'PROVIDED', notes };
+  }
+
+  return { status: 'PENDING_VALIDATION', notes };
 };
 
 export const CommissioningPilotIntakeView: React.FC = () => {
@@ -86,14 +126,20 @@ export const CommissioningPilotIntakeView: React.FC = () => {
     setBusyArtifactId(artifact.artifactId);
     setResult(null);
     try {
-      const sha256 = await hashFileSha256(file);
+      const [sha256, csvAdmission] = await Promise.all([
+        hashFileSha256(file),
+        assessSelectedCsv(artifact, file),
+      ]);
       replaceArtifact(artifact.artifactId, {
         artifactId: artifact.artifactId,
         kind: artifact.kind,
-        status: 'PROVIDED',
+        status: csvAdmission.status,
         reference: file.name,
         sha256,
-        notes: ['Selected locally in browser memory; not uploaded or persisted by Pilot Intake.'],
+        notes: [
+          'Selected locally in browser memory; not uploaded or persisted by Pilot Intake.',
+          ...csvAdmission.notes,
+        ],
       });
       setFileMeta((current) => ({ ...current, [artifact.artifactId]: { name: file.name, size: file.size } }));
     } catch (error) {
@@ -146,7 +192,7 @@ export const CommissioningPilotIntakeView: React.FC = () => {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
           <div>
             <p className="text-xs font-bold text-white">Privacidad y trazabilidad local</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. Las plantillas CSV descargables contienen únicamente encabezados genéricos, sin datos sintéticos ni datos de proyecto. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. Las plantillas CSV descargables contienen únicamente encabezados genéricos, sin datos sintéticos ni datos de proyecto. Cuando se selecciona un CSV, sus encabezados se validan localmente antes de admitirlo como PROVIDED. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
           </div>
         </div>
       </section>
@@ -173,9 +219,14 @@ export const CommissioningPilotIntakeView: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-xs font-bold text-white">{ARTIFACT_LABELS[artifact.kind]}</p>
                   <span className={`rounded border px-2 py-0.5 text-[8px] font-black uppercase ${required ? 'border-amber-500/25 bg-amber-500/10 text-amber-300' : 'border-gray-700 bg-gray-900 text-gray-400'}`}>{required ? 'Required' : 'Optional'}</span>
-                  <span className={`rounded border px-2 py-0.5 text-[8px] font-black uppercase ${artifact.status === 'PROVIDED' ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300' : artifact.status === 'PENDING_VALIDATION' ? 'border-amber-500/25 bg-amber-500/10 text-amber-300' : 'border-gray-700 bg-gray-900 text-gray-500'}`}>{busy ? 'HASHING' : artifact.status.replaceAll('_', ' ')}</span>
+                  <span className={`rounded border px-2 py-0.5 text-[8px] font-black uppercase ${artifact.status === 'PROVIDED' ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300' : artifact.status === 'PENDING_VALIDATION' ? 'border-amber-500/25 bg-amber-500/10 text-amber-300' : 'border-gray-700 bg-gray-900 text-gray-500'}`}>{busy ? 'HASHING / VALIDATING' : artifact.status.replaceAll('_', ' ')}</span>
                 </div>
                 {meta ? <p className="mt-2 break-all text-[10px] text-gray-500">{meta.name} · {meta.size.toLocaleString()} bytes{artifact.sha256 ? ` · SHA-256 ${artifact.sha256.slice(0, 16)}…` : ''}</p> : <p className="mt-2 text-[10px] text-gray-600">No local file selected.</p>}
+                {artifact.notes?.length ? (
+                  <div className="mt-2 space-y-1 text-[9px] leading-relaxed text-gray-500">
+                    {artifact.notes.map((note) => <p key={note}>• {note}</p>)}
+                  </div>
+                ) : null}
               </div>
               <button type="button" onClick={() => downloadCsvTemplate(artifact.kind)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-900 px-4 text-xs font-bold text-gray-300 hover:bg-gray-800 hover:text-white" aria-label={`Descargar plantilla CSV para ${ARTIFACT_LABELS[artifact.kind]}`}>
                 <Download className="h-4 w-4" />
