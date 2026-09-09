@@ -116,7 +116,19 @@ Certification: **PASS** on `8d05f75...`. Focused tests were added to the reposit
 
 ### G34-D — Controlled Manual Intake UI
 
-Next active gate. The user should be able to select local exported files and review admission results before anything is persisted. No automatic network discovery.
+Implementation: **IMPLEMENTED, pending current CI and human visual smoke**.
+
+The Commissioning workspace now includes a `Pilot Intake` section that remains available even when no Commissioning dataset is loaded. It provides:
+
+- explicit Project ID and Scope Revision fields;
+- local file selectors for each required/optional G34 artifact class;
+- client-side SHA-256 calculation with Web Crypto;
+- deterministic preflight using `assessPilotReadiness`;
+- visible blockers and warnings;
+- reset/clear controls;
+- explicit `OFFLINE ONLY · NO OT WRITEBACK · NO ENERGIZATION AUTHORITY` boundary.
+
+The selected files remain in browser memory for the current interaction. This G34-D surface does not upload files, does not discover network sources, does not write them to localStorage and does not persist an ingest package. It is a preflight/admission UI only; actual controlled ingest remains a later gated action.
 
 ### G34-E — Project Mapping Profile
 
@@ -147,7 +159,7 @@ Planned final gate. Produce a client-facing readiness summary, known limitations
 - G34-A — RC baseline + prior CI: PASS.
 - G34-B — Pilot Intake Contract: PASS.
 - G34-C — Offline Pilot Readiness Validator + focused tests: PASS.
-- G34-D — Controlled Manual Intake UI: ACTIVE / NEXT.
+- G34-D — Controlled Manual Intake UI: IMPLEMENTED, pending current CI + visual smoke.
 - G34-E — Project Mapping Profile: PENDING REAL PILOT INPUTS.
 - G34-F — Offline Real-Data Dry Run: PENDING.
 - G34-G — Pilot Readiness Pack: PENDING.

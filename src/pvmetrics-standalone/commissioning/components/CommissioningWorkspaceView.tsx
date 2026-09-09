@@ -4,6 +4,7 @@ import { CommissioningService } from '../application/commissioningService';
 import { COMMISSIONING_FEATURE_FLAGS } from '../config/commissioningFeatureFlags';
 import { BrowserLocalStorageDriver, CommissioningRepository } from '../persistence';
 import { CommissioningOverview } from './CommissioningOverview';
+import { CommissioningPilotIntakeView } from './CommissioningPilotIntakeView';
 import { CommissioningScopeView } from './CommissioningScopeView';
 import { CommissioningCampaignsView } from './CommissioningCampaignsView';
 import { CommissioningTestsView } from './CommissioningTestsView';
@@ -16,6 +17,7 @@ import { CommissioningHandoverView } from './CommissioningHandoverView';
 
 type WorkspaceSection =
   | 'overview'
+  | 'pilot-intake'
   | 'scope'
   | 'campaigns'
   | 'tests'
@@ -28,6 +30,7 @@ type WorkspaceSection =
 
 const sections: Array<{ id: WorkspaceSection; label: string }> = [
   { id: 'overview', label: 'Overview' },
+  { id: 'pilot-intake', label: 'Pilot Intake' },
   { id: 'scope', label: 'Scope' },
   { id: 'campaigns', label: 'Campaigns' },
   { id: 'tests', label: 'Tests' },
@@ -54,6 +57,7 @@ const CommissioningWorkspaceView: React.FC = () => {
 
   const renderActiveSection = () => {
     if (activeSection === 'overview') return <CommissioningOverview state={state} />;
+    if (activeSection === 'pilot-intake') return <CommissioningPilotIntakeView />;
     if (activeSection === 'scope') return <CommissioningScopeView state={state} />;
     if (activeSection === 'campaigns') return <CommissioningCampaignsView state={state} />;
     if (activeSection === 'tests') return <CommissioningTestsView state={state} />;
@@ -108,7 +112,9 @@ const CommissioningWorkspaceView: React.FC = () => {
       </nav>
 
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
-        {state.loadStatus === 'EMPTY' ? (
+        {activeSection === 'pilot-intake' ? (
+          <CommissioningPilotIntakeView />
+        ) : state.loadStatus === 'EMPTY' ? (
           <div className="space-y-5 py-8 text-center">
             <div>
               <p className="text-sm font-semibold text-white">Commissioning workspace sin dataset cargado</p>
