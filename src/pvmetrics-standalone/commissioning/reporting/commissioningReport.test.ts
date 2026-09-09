@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createCommissioningCertificationFixture } from '../fixtures/createCommissioningCertificationFixture';
 import { createCommissioningLabFixture } from '../fixtures/createCommissioningLabFixture';
 import { buildCommissioningReport, renderCommissioningReportText } from './commissioningReport';
 
@@ -24,6 +25,34 @@ test('commissioning report preserves scope exclusion and does not count external
   assert.equal(report.project.projectId, 'DAS-BESS-LAB');
   assert.equal(report.scope.scopeId, 'SCOPE-LAB-001');
   assert.equal(report.campaigns.length, 1);
+});
+
+test('processed E2E report preserves complete traceability without promoting excluded asset into acceptance scope', () => {
+  const snapshot = createCommissioningCertificationFixture();
+  const report = buildCommissioningReport({
+    snapshot,
+    projectId: 'DAS-BESS-LAB',
+    scopeId: 'SCOPE-LAB-001',
+    generatedAt: GENERATED_AT,
+    generatedBy: GENERATED_BY,
+  });
+
+  assert.equal(
+    snapshot.scopeAssets.find((item) => item.assetId === 'SB-LAB-004-EXTERNAL')?.status,
+    'EXCLUDED',
+  );
+  assert.equal(report.summary.assetsInScope, 54);
+  assert.equal(report.summary.anomalies.total, 9);
+  assert.equal(report.summary.anomalies.active, 9);
+  assert.equal(report.summary.findings.total, 5);
+  assert.equal(report.summary.punchItems.total, 3);
+  assert.equal(report.summary.evidenceRecords, 6);
+  assert.equal(report.traceability.anomalyIds.length, 9);
+  assert.equal(report.traceability.findingIds.length, 5);
+  assert.equal(report.traceability.punchItemIds.length, 3);
+  assert.equal(report.traceability.evidenceIds.length, 6);
+  assert.equal(report.traceability.humanAcceptanceDecisionIds.length, 4);
+  assert.match(report.limitations.join(' '), /EXCLUDED assets/i);
 });
 
 test('basic UI lab truthfully reports absent processed commissioning records', () => {
