@@ -62,6 +62,16 @@ test('validates selected CSV headers locally before marking an artifact provided
   assert.match(html, /encabezados se validan localmente/i);
 });
 
+test('requires deterministic telemetry row-content admission before PROVIDED', () => {
+  assert.match(source, /assessTelemetryCsvContent/);
+  assert.match(source, /TELEMETRY CONTENT BLOCKED/);
+  assert.match(source, /Telemetry content admission PASS/);
+  assert.match(source, /10 \* 1024 \* 1024/);
+  assert.match(source, /no partial sample is accepted as full validation/i);
+  assert.match(html, /telemetría CSV además pasa una validación determinística de contenido/i);
+  assert.match(html, /no corrige filas, unidades ni valores automáticamente/i);
+});
+
 test('hashes selected files locally with Web Crypto SHA-256', () => {
   assert.match(source, /crypto\.subtle\.digest\(['\"]SHA-256['\"]/);
   assert.match(html, /no los sube a un servidor/i);
