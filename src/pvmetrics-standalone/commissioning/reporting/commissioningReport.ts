@@ -96,13 +96,23 @@ export const buildCommissioningReport = ({
     quality[execution.dataQuality] += 1;
   });
 
-  const scopeAssetIds = new Set(snapshot.scopeAssets.filter((item) => item.scopeId === scopeId && item.status !== 'EXCLUDED').map((item) => item.assetId));
+  // Acceptance scope and traceability scope are intentionally different concepts.
+  // EXCLUDED assets never count as assets in acceptance scope, but observations tied
+  // to an explicitly registered excluded comparison asset must remain auditable.
+  const scopeAssetRecords = snapshot.scopeAssets.filter((item) => item.scopeId === scopeId);
+  const scopeAssetIds = new Set(
+    scopeAssetRecords
+      .filter((item) => item.status !== 'EXCLUDED')
+      .map((item) => item.assetId),
+  );
+  const traceableScopeAssetIds = new Set(scopeAssetRecords.map((item) => item.assetId));
+
   const anomalies = snapshot.anomalies.filter((item) =>
-    scopeAssetIds.has(item.assetId) &&
+    traceableScopeAssetIds.has(item.assetId) &&
     (item.executionId === undefined || executionIds.has(item.executionId)) &&
     (item.campaignId === undefined || campaignIds.has(item.campaignId)),
   );
-  const findings = snapshot.findings.filter((item) => item.projectId === projectId && scopeAssetIds.has(item.assetId));
+  const findings = snapshot.findings.filter((item) => item.projectId === projectId && traceableScopeAssetIds.has(item.assetId));
   const findingIds = new Set(findings.map((item) => item.findingId));
   const punches = snapshot.punchItems.filter((item) => findingIds.has(item.findingId));
   const baselines = snapshot.baselines.filter((item) => item.projectId === projectId && item.scopeId === scopeId);
@@ -112,7 +122,7 @@ export const buildCommissioningReport = ({
   const evidenceIds = new Set<string>();
   snapshot.evidence.forEach((item) => {
     if (item.projectId !== projectId) return;
-    if (item.assetId && !scopeAssetIds.has(item.assetId)) return;
+    if (item.assetId && !traceableScopeAssetIds.has(item.assetId)) return;
     if (item.executionId && !executionIds.has(item.executionId)) return;
     evidenceIds.add(item.evidenceId);
   });
@@ -201,6 +211,7 @@ export const buildCommissioningReport = ({
       'This report is generated from the stored Commissioning snapshot and does not issue OT commands or modify plant systems.',
       'ORBI analytical assessment is distinct from human acceptance and contractual acceptance.',
       'Missing thresholds, documents, evidence or mappings remain missing and must not be inferred.',
+      'Traceability preserves observations linked to explicitly registered EXCLUDED assets; this does not include those assets in acceptance scope.',
       'A READY or APPROVED handover state does not authorize energization or operation.',
     ],
   };
