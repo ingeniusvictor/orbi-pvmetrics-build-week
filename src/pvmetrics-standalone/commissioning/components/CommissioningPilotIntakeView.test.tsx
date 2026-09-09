@@ -53,6 +53,15 @@ test('offers a header-only CSV template download for every artifact class', () =
   assert.match(html, /sin datos sintéticos ni datos de proyecto/i);
 });
 
+test('validates selected CSV headers locally before marking an artifact provided', () => {
+  assert.match(source, /assessPilotCsvHeader/);
+  assert.match(source, /file\.slice\(0, CSV_HEADER_READ_LIMIT_BYTES\)\.text\(\)/);
+  assert.match(source, /CSV HEADER BLOCKED/);
+  assert.match(source, /CSV header admission PASS/);
+  assert.match(source, /PENDING_VALIDATION/);
+  assert.match(html, /encabezados se validan localmente/i);
+});
+
 test('hashes selected files locally with Web Crypto SHA-256', () => {
   assert.match(source, /crypto\.subtle\.digest\(['\"]SHA-256['\"]/);
   assert.match(html, /no los sube a un servidor/i);
