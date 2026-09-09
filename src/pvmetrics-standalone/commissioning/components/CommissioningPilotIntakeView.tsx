@@ -13,6 +13,7 @@ import {
   getPilotCsvTemplate,
   renderPilotCsvTemplate,
 } from '../pilot/dataExchangeTemplates';
+import { assessTelemetryCsvContent } from '../pilot/telemetryContentValidation';
 
 const ARTIFACT_LABELS: Record<PilotArtifactKind, string> = {
   PROJECT_IDENTITY: 'Identidad del proyecto',
@@ -34,6 +35,7 @@ const ALL_ARTIFACT_KINDS: readonly PilotArtifactKind[] = [
 ];
 
 const CSV_HEADER_READ_LIMIT_BYTES = 64 * 1024;
+const TELEMETRY_CONTENT_READ_LIMIT_BYTES = 10 * 1024 * 1024;
 
 const hashFileSha256 = async (file: File): Promise<string> => {
   if (!globalThis.crypto?.subtle) throw new Error('Web Crypto SHA-256 is unavailable in this browser context.');
@@ -68,6 +70,12 @@ const assessSelectedCsv = async (
   file: File,
 ): Promise<{ status: PilotArtifact['status']; notes: string[] }> => {
   if (!file.name.toLowerCase().endsWith('.csv')) {
+    if (artifact.kind === 'TELEMETRY_EXPORT') {
+      return {
+        status: 'PENDING_VALIDATION',
+        notes: ['TELEMETRY CONTENT BLOCKED — the current normalized telemetry preflight requires CSV. Non-CSV telemetry must use a later authorized offline parser; no format conversion is inferred.'],
+      };
+    }
     return {
       status: 'PROVIDED',
       notes: ['Non-CSV file selected. File identity and SHA-256 are recorded locally; content/structure still requires authorized manual validation.'],
@@ -89,12 +97,39 @@ const assessSelectedCsv = async (
   }
   notes.push(...assessment.warnings);
 
-  if (assessment.status === 'READY_FOR_REVIEW') {
-    notes.unshift('CSV header admission PASS — required template columns are present and non-duplicated. Row content and source authority remain subject to later validation.');
+  if (assessment.status !== 'READY_FOR_REVIEW') {
+    return { status: 'PENDING_VALIDATION', notes };
+  }
+
+  notes.unshift('CSV header admission PASS — required template columns are present and non-duplicated.');
+
+  if (artifact.kind !== 'TELEMETRY_EXPORT') {
+    notes.push('Row content and source authority remain subject to later validation.');
     return { status: 'PROVIDED', notes };
   }
 
-  return { status: 'PENDING_VALIDATION', notes };
+  if (file.size > TELEMETRY_CONTENT_READ_LIMIT_BYTES) {
+    notes.push(`TELEMETRY CONTENT PENDING — file exceeds the ${TELEMETRY_CONTENT_READ_LIMIT_BYTES / (1024 * 1024)} MB browser preflight limit. It must be processed by the controlled offline ingest path; no partial sample is accepted as full validation.`);
+    return { status: 'PENDING_VALIDATION', notes };
+  }
+
+  const telemetryAssessment = assessTelemetryCsvContent(await file.text());
+  const issueCount = Object.values(telemetryAssessment.issueCounts)
+    .reduce((total, count) => total + (count ?? 0), 0);
+
+  if (telemetryAssessment.status === 'BLOCKED') {
+    notes.push(`TELEMETRY CONTENT BLOCKED — ${telemetryAssessment.dataRowCount} data row(s), ${issueCount} deterministic issue(s). No corrections were applied automatically.`);
+    for (const issue of telemetryAssessment.issues.slice(0, 8)) {
+      notes.push(`${issue.code}${issue.rowNumber ? ` · row ${issue.rowNumber}` : ''} — ${issue.message}`);
+    }
+    notes.push(...telemetryAssessment.warnings);
+    return { status: 'PENDING_VALIDATION', notes };
+  }
+
+  notes.push(`Telemetry content admission PASS — ${telemetryAssessment.dataRowCount} data row(s) passed deterministic preflight checks for timestamp, asset/signal identity, numeric value, unit, source system, quality, duplicate/conflict and unit consistency.`);
+  notes.push(...telemetryAssessment.warnings);
+  notes.push('Content admission does not validate contractual criteria, source authority or operational acceptance.');
+  return { status: 'PROVIDED', notes };
 };
 
 export const CommissioningPilotIntakeView: React.FC = () => {
@@ -192,7 +227,7 @@ export const CommissioningPilotIntakeView: React.FC = () => {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
           <div>
             <p className="text-xs font-bold text-white">Privacidad y trazabilidad local</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. Las plantillas CSV descargables contienen únicamente encabezados genéricos, sin datos sintéticos ni datos de proyecto. Cuando se selecciona un CSV, sus encabezados se validan localmente antes de admitirlo como PROVIDED. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-gray-400">Los archivos seleccionados se leen en memoria del navegador para calcular SHA-256. Esta interfaz no los sube a un servidor, no usa red y no los guarda en localStorage. Las plantillas CSV descargables contienen únicamente encabezados genéricos, sin datos sintéticos ni datos de proyecto. Cuando se selecciona un CSV, sus encabezados se validan localmente; la telemetría CSV además pasa una validación determinística de contenido antes de admitirse como PROVIDED. El sistema no corrige filas, unidades ni valores automáticamente. El hash registrado por esta vista no sustituye una verificación independiente de evidencia.</p>
           </div>
         </div>
       </section>
