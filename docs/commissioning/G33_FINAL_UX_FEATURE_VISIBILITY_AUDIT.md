@@ -1,7 +1,8 @@
 # G33 — Final UX Polish + Feature Visibility Audit
 
-Status: IN PROGRESS
+Status: PASS
 Branch: `feature/bess-commissioning-workspace`
+Release candidate status: COMMISSIONING MVP RELEASE CANDIDATE
 Scope: final product-facing cleanup after G32 Human Visual E2E certification.
 
 ## Purpose
@@ -53,13 +54,13 @@ Reduce certification/demo-only chrome from the client-facing Commissioning works
 | Quality Rules | VISIBLE | Keep. |
 | Reports | VISIBLE | Keep. |
 | Settings | VISIBLE | Keep. |
-| Climate Recovery competition presentation layer | INTERNAL | Preserve source and historical competition freeze; remove competition-only chrome from Commissioning pilot-facing navigation in the final enforcement pass. |
-| Incident Copilot Build Week surface | LEGACY | Preserve source/history; not part of Commissioning pilot-facing navigation in the final enforcement pass. |
+| Climate Recovery competition presentation layer | INTERNAL | Preserved in source and historical competition freeze; hidden from ordinary Commissioning pilot-facing navigation. |
+| Incident Copilot Build Week surface | LEGACY | Preserved in source/history; hidden from ordinary Commissioning pilot-facing navigation. |
 
 ## G32 findings carried into G33 polish
 
-1. Findings summary label `Punch required` is semantically ambiguous because its value counts only unresolved workflow items. Target wording: `Open punch required` or equivalent.
-2. Closed synthetic Punch records may display `UNASSIGNED` / `Target date NOT SET`. These values are truthful snapshot data but can look like open administrative debt. Target wording should make clear that these are historical snapshot fields and not a current closure blocker.
+1. Findings summary label `Punch required` was semantically ambiguous because its value counts only unresolved workflow items. Resolved with clearer open-workflow wording.
+2. Closed synthetic Punch records could display `UNASSIGNED` / `Target date NOT SET`, which looked like open administrative debt. Resolved by presenting missing historical fields as `NOT RECORDED` for closed records.
 3. Processed report traceability bug discovered during G32 was fixed before G33: acceptance scope remains 54 assets while full traceability preserves 9 anomalies / 5 Findings / 3 Punch / 6 evidence records.
 
 ## Safety invariants preserved
@@ -74,10 +75,25 @@ Reduce certification/demo-only chrome from the client-facing Commissioning works
 
 ## G33 execution gates
 
-- G33-A — Visibility policy defined: PASS when this document and feature flags are committed.
-- G33-B — Internal Commissioning certification chrome hidden by default: PASS after CI.
-- G33-C — Minor Findings/Punch copy polish: PENDING.
-- G33-D — Global navigation enforcement for INTERNAL/LEGACY competition surfaces: PENDING.
-- G33-E — Final CI + visual smoke: PENDING.
+- G33-A — Visibility policy defined: PASS.
+- G33-B — Internal Commissioning certification chrome hidden by default: PASS.
+- G33-C — Minor Findings/Punch copy polish: PASS.
+- G33-D — Global navigation enforcement for INTERNAL/LEGACY competition surfaces: PASS.
+- G33-E — Final CI + visual smoke: PASS.
 
-No G33 gate may be interpreted as operational acceptance of a real BESS project.
+## Final visual smoke evidence
+
+The final desktop smoke confirms the intended product-facing state:
+
+- `Commissioning` remains visible in the global navigation.
+- Climate Recovery is hidden from ordinary navigation.
+- Incident Copilot / Build Week is hidden from ordinary navigation.
+- `Core E2E · G19 PASS` internal badge is not rendered.
+- The processed E2E certification scenario is not rendered in the ordinary empty state.
+- The controlled `Abrir laboratorio sintético` surface remains available.
+- Commissioning still exposes Overview, Scope, Campaigns, Tests, Anomaly Radar, Findings, Punch List, Evidence, Baseline and Handover.
+- Shadow Mode / No OT Writeback safety chrome remains visible.
+
+## Final verdict
+
+G33 PASS. The branch is accepted as the ORBI PVMetrics BESS Commissioning MVP Release Candidate for subsequent integration/release planning. This certification does not merge the branch, does not authorize production deployment, and does not represent operational acceptance of a real BESS project.
