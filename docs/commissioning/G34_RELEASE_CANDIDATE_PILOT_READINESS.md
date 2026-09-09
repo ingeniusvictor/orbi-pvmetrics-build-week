@@ -138,55 +138,59 @@ The selected files remain in browser memory for the current interaction. This G3
 
 ### G34-E — Project Mapping Profile
 
-Status: **FRAMEWORK IMPLEMENTED — SOURCE GATE OPEN / PENDING VERIFIED REAL PILOT INPUTS**.
+Status: **FRAMEWORK READY — PENDING VERIFIED REAL PILOT INPUTS**.
 
 A formal source-data request/checklist is prepared at:
 
 `docs/commissioning/G34_E_PROJECT_MAPPING_DATA_REQUEST.md`
 
-A deterministic generic framework now exists at:
+The generic source-verified mapping framework is implemented in:
 
-- `src/pvmetrics-standalone/commissioning/pilot/projectMappingProfile.ts`
-- `src/pvmetrics-standalone/commissioning/pilot/projectMappingProfile.test.ts`
+`src/pvmetrics-standalone/commissioning/pilot/projectMappingProfile.ts`
 
-The framework distinguishes `UNVERIFIED` from `SOURCE_CONFIRMED`, blocks confirmed mappings that rely on unverified sources, and prevents incomplete units from being silently converted.
+It distinguishes `UNVERIFIED` from `SOURCE_CONFIRMED`, blocks confirmed mappings backed by unverified sources, and prevents silent completion of missing asset IDs, tag mappings or unit metadata.
 
-The first project-specific mapping profile must still be built only from verified as-built/project sources. It must not infer missing topology, device hierarchy, tag names, units, scaling, sign convention, firmware, thresholds or OEM criteria.
+The first real mapping profile must be built only from verified as-built/project sources. It must not infer missing topology, device hierarchy, tag names, units, scaling, sign convention, firmware, thresholds or OEM criteria.
 
 Recommended strategy: begin with one narrow, well-documented commissioning test slice with authoritative procedure + criteria + telemetry + evidence + human witness/reviewer information, rather than attempting the full BESS project in the first real-data dry run.
 
-Until the real source package is supplied and validated, G34-E remains `PENDING_SOURCE_VERIFICATION` at the project-specific level and no real project mapping claims are certified.
+Until the real source package is supplied and validated, no project-specific mapping claims are certified.
 
 ### G34-F — Offline Real-Data Dry Run
 
-Status: **PENDING VERIFIED REAL PILOT INPUTS**.
+Status: **FRAMEWORK PATH READY — PENDING REAL DATA**.
 
-After mapping validation, process sanitized/exported real project records through Scope → Test → Data → Evidence → Result → Finding → Punch → Retest → Acceptance traceability while preserving human authority.
+The certified Commissioning pipeline is already capable of preserving the traceability chain:
 
-No real-data dry run can be certified before G34-E source verification.
+`Scope → Test → Data → Evidence → Result → Finding → Punch → Retest → Acceptance`
+
+A real-data dry run remains blocked until the real source package and project mapping pass validation. No synthetic fixture may be relabeled as real pilot evidence.
 
 ### G34-G — Pilot Readiness Pack
 
-Status: **FRAMEWORK IMPLEMENTED — FINAL REAL PACK PENDING G34-E/G34-F**.
+Status: **FRAMEWORK READY — REAL PACK PENDING REAL PILOT DATA**.
 
-The deterministic framework is documented at:
+The generic Pilot Readiness Pack framework is prepared so that the future real pilot can only resolve to a real readiness state after verified source data is explicitly present. Until then it remains source-pending and retains explicit `NO` values for operational authorization, energization authorization and OT writeback.
+
+Reference:
 
 `docs/commissioning/G34_G_PILOT_READINESS_PACK_FRAMEWORK.md`
 
-Implementation:
+### Cross-cutting G34 asset — Generic Data Exchange Templates
 
-- `src/pvmetrics-standalone/commissioning/pilot/pilotReadinessPack.ts`
-- `src/pvmetrics-standalone/commissioning/pilot/pilotReadinessPack.test.ts`
+Status: **IMPLEMENTED**.
 
-The pack exposes only:
+A project-agnostic CSV exchange contract and header validator are now prepared so that incoming project information can be normalized without inventing values. Templates are header-only and intentionally contain no synthetic project records.
 
-- `PENDING_SOURCE_DATA` when no verified real project package exists;
-- `BLOCKED` when real intake/mapping/cross-profile consistency is incomplete;
-- `READY_FOR_OFFLINE_DRY_RUN` when verified real inputs are sufficient for an offline dry run only.
+Code:
 
-The framework records artifact coverage, mapping coverage, blockers, warnings, limitations, dry-run state and explicit safety boundaries. It cannot produce a real readiness claim while `sourceReality = NO_REAL_PACKAGE`, even if synthetic/unit-test fixtures satisfy the structural validators.
+`src/pvmetrics-standalone/commissioning/pilot/dataExchangeTemplates.ts`
 
-Final G34-G certification remains pending until a real authorized package has completed G34-E source verification and the G34-F offline real-data dry run.
+Templates:
+
+`docs/commissioning/templates/`
+
+The template set covers Project Identity, Scope Register, Asset Register, Test Matrix, Criteria Sources, Signal Dictionary, Signal Mapping, normalized Telemetry, Event Export, Evidence Index and Authority Register. Additional vendor/source columns may be retained for review but are never interpreted silently. Missing mandatory columns or duplicate headers block deterministic header admission.
 
 ## Safety invariants inherited from G32/G33
 
@@ -206,8 +210,9 @@ Final G34-G certification remains pending until a real authorized package has co
 - G34-B — Pilot Intake Contract: PASS.
 - G34-C — Offline Pilot Readiness Validator + focused tests: PASS.
 - G34-D — Controlled Manual Intake UI + CI + human visual smoke: PASS.
-- G34-E — Project Mapping Profile: FRAMEWORK IMPLEMENTED / PROJECT-SPECIFIC SOURCE VERIFICATION PENDING.
-- G34-F — Offline Real-Data Dry Run: PENDING VERIFIED REAL PILOT INPUTS.
-- G34-G — Pilot Readiness Pack: FRAMEWORK IMPLEMENTED / FINAL REAL PACK PENDING G34-E/G34-F.
+- G34-E — Project Mapping Profile: FRAMEWORK READY / PENDING VERIFIED REAL PILOT INPUTS.
+- G34-F — Offline Real-Data Dry Run: FRAMEWORK PATH READY / PENDING REAL DATA.
+- G34-G — Pilot Readiness Pack: FRAMEWORK READY / REAL PACK PENDING REAL DATA.
+- Generic CSV Data Exchange Templates: IMPLEMENTED / pending current CI certification.
 
 No G34 result is operational authorization for a real BESS plant.
