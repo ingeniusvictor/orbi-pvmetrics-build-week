@@ -3,6 +3,7 @@
 Status: IN PROGRESS
 Branch: `feature/bess-commissioning-workspace`
 Baseline entering G34: `9c9ac24d904a673a7b1e1864870bef679bd08b11` (G33 PASS / Commissioning MVP Release Candidate)
+Certified G34 foundation commit: `8d05f75b9bfb4b0168e9cc105f6b2c86e59cbff4`
 
 ## Purpose
 
@@ -86,13 +87,15 @@ If required artifacts are missing or pending validation, or if a live connector/
 
 Target: preserve the G33 PASS baseline and verify CI before pilot-readiness work.
 
-Current evidence: G33 commit `9c9ac24...` completed Commissioning CI successfully, including Test, TypeScript lint and Production build.
+Certification: **PASS**. G33 commit `9c9ac24...` completed Commissioning CI successfully, including Test, TypeScript lint and Production build.
 
 ### G34-B — Pilot Intake Contract
 
 Target: define the artifact classes, required/optional inputs, traceability expectations and safety boundary.
 
 Implementation: `src/pvmetrics-standalone/commissioning/pilot/pilotReadiness.ts`.
+
+Certification: **PASS** on `8d05f75...`.
 
 ### G34-C — Offline Pilot Readiness Validator
 
@@ -109,9 +112,11 @@ Mandatory rules:
 - any claim that pilot readiness equals operational/energization authority blocks admission;
 - optional missing event/signal-dictionary files create warnings, not fabricated data.
 
+Certification: **PASS** on `8d05f75...`. Focused tests were added to the repository test suite. Commissioning CI run 108 completed Test, TypeScript lint and Production build successfully.
+
 ### G34-D — Controlled Manual Intake UI
 
-Planned after G34-C certification. The user should be able to select local exported files and review admission results before anything is persisted. No automatic network discovery.
+Next active gate. The user should be able to select local exported files and review admission results before anything is persisted. No automatic network discovery.
 
 ### G34-E — Project Mapping Profile
 
@@ -137,12 +142,12 @@ Planned final gate. Produce a client-facing readiness summary, known limitations
 - EXCLUDED / THIRD_PARTY scope items are never silently promoted into acceptance scope.
 - Traceability may retain observations from excluded assets without changing acceptance scope.
 
-## Initial G34 gates
+## Current G34 gates
 
 - G34-A — RC baseline + prior CI: PASS.
-- G34-B — Pilot Intake Contract: IMPLEMENTED, pending current CI.
-- G34-C — Offline Pilot Readiness Validator + focused tests: IMPLEMENTED, pending current CI.
-- G34-D — Controlled Manual Intake UI: PENDING.
+- G34-B — Pilot Intake Contract: PASS.
+- G34-C — Offline Pilot Readiness Validator + focused tests: PASS.
+- G34-D — Controlled Manual Intake UI: ACTIVE / NEXT.
 - G34-E — Project Mapping Profile: PENDING REAL PILOT INPUTS.
 - G34-F — Offline Real-Data Dry Run: PENDING.
 - G34-G — Pilot Readiness Pack: PENDING.
