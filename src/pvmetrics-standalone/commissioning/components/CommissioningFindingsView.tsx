@@ -76,7 +76,7 @@ export const CommissioningFindingsView: React.FC<{ state: CommissioningWorkspace
   }
 
   const openCount = findings.filter((item) => item.status !== 'CLOSED' && item.status !== 'DISMISSED').length;
-  const punchRequired = findings.filter((item) => item.requiresPunch && item.status !== 'CLOSED' && item.status !== 'DISMISSED').length;
+  const openPunchRequired = findings.filter((item) => item.requiresPunch && item.status !== 'CLOSED' && item.status !== 'DISMISSED').length;
   const unknownRootCause = findings.filter((item) => item.rootCauseState === 'UNKNOWN').length;
   const confirmedRootCause = findings.filter((item) => item.rootCauseState === 'CONFIRMED').length;
 
@@ -94,7 +94,7 @@ export const CommissioningFindingsView: React.FC<{ state: CommissioningWorkspace
         <article className="rounded-xl border border-amber-500/15 bg-gray-950 p-4"><p className="text-[9px] font-black uppercase text-gray-500">Warning</p><p className="mt-2 text-2xl font-black text-amber-300">{countSeverity(findings, 'WARNING')}</p></article>
         <article className="rounded-xl border border-orange-500/15 bg-gray-950 p-4"><p className="text-[9px] font-black uppercase text-gray-500">Major</p><p className="mt-2 text-2xl font-black text-orange-300">{countSeverity(findings, 'MAJOR')}</p></article>
         <article className="rounded-xl border border-rose-500/15 bg-gray-950 p-4"><p className="text-[9px] font-black uppercase text-gray-500">Critical</p><p className="mt-2 text-2xl font-black text-rose-300">{countSeverity(findings, 'CRITICAL')}</p></article>
-        <article className="rounded-xl border border-amber-500/15 bg-amber-500/5 p-4"><p className="text-[9px] font-black uppercase text-amber-300">Punch required</p><p className="mt-2 text-2xl font-black text-white">{punchRequired}</p></article>
+        <article className="rounded-xl border border-amber-500/15 bg-amber-500/5 p-4"><p className="text-[9px] font-black uppercase text-amber-300">Open punch required</p><p className="mt-2 text-2xl font-black text-white">{openPunchRequired}</p></article>
         <article className="rounded-xl border border-gray-800 bg-gray-950 p-4"><p className="text-[9px] font-black uppercase text-gray-500">Root cause unknown</p><p className="mt-2 text-2xl font-black text-gray-200">{unknownRootCause}</p></article>
       </section>
 
