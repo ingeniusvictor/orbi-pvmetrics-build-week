@@ -4,6 +4,7 @@ Status: IN PROGRESS
 Branch: `feature/bess-commissioning-workspace`
 Baseline entering G34: `9c9ac24d904a673a7b1e1864870bef679bd08b11` (G33 PASS / Commissioning MVP Release Candidate)
 Certified G34 foundation commit: `8d05f75b9bfb4b0168e9cc105f6b2c86e59cbff4`
+Certified G34-D implementation commit: `9f296533a63f3b46206de068fb07b90765844f73`
 
 ## Purpose
 
@@ -116,23 +117,38 @@ Certification: **PASS** on `8d05f75...`. Focused tests were added to the reposit
 
 ### G34-D — Controlled Manual Intake UI
 
-Implementation: **IMPLEMENTED, pending current CI and human visual smoke**.
+Certification: **PASS**.
 
-The Commissioning workspace now includes a `Pilot Intake` section that remains available even when no Commissioning dataset is loaded. It provides:
+Implementation commit: `9f296533a63f3b46206de068fb07b90765844f73`.
 
-- explicit Project ID and Scope Revision fields;
-- local file selectors for each required/optional G34 artifact class;
-- client-side SHA-256 calculation with Web Crypto;
-- deterministic preflight using `assessPilotReadiness`;
-- visible blockers and warnings;
-- reset/clear controls;
-- explicit `OFFLINE ONLY · NO OT WRITEBACK · NO ENERGIZATION AUTHORITY` boundary.
+CI evidence: Commissioning CI run 110 completed successfully with Test, TypeScript lint and Production build all PASS.
+
+Human visual smoke evidence confirms the final desktop surface renders correctly inside the native Commissioning workspace:
+
+- `Pilot Intake` is visible as a Commissioning section;
+- the workspace header retains `SHADOW MODE` and `NO OT WRITEBACK`;
+- the Pilot Intake header explicitly states offline preparation;
+- `OFFLINE ONLY · NO OT WRITEBACK · NO ENERGIZATION AUTHORITY` is visible;
+- the privacy/traceability notice states that selected files stay in browser memory and are not uploaded or stored in localStorage;
+- Project ID and Scope Revision fields render correctly;
+- required artifact rows and local file selectors render without overlap or clipping;
+- no live connector, OT writeback, energization or operational command control is exposed.
 
 The selected files remain in browser memory for the current interaction. This G34-D surface does not upload files, does not discover network sources, does not write them to localStorage and does not persist an ingest package. It is a preflight/admission UI only; actual controlled ingest remains a later gated action.
 
 ### G34-E — Project Mapping Profile
 
-Planned after a real pilot package is available. Build a project-specific mapping profile from verified as-built information. Do not infer missing topology, tag names, thresholds or OEM criteria.
+Status: **SOURCE GATE OPEN — PENDING VERIFIED REAL PILOT INPUTS**.
+
+A formal source-data request/checklist is prepared at:
+
+`docs/commissioning/G34_E_PROJECT_MAPPING_DATA_REQUEST.md`
+
+The first mapping profile must be built only from verified as-built/project sources. It must not infer missing topology, device hierarchy, tag names, units, scaling, sign convention, firmware, thresholds or OEM criteria.
+
+Recommended strategy: begin with one narrow, well-documented commissioning test slice with authoritative procedure + criteria + telemetry + evidence + human witness/reviewer information, rather than attempting the full BESS project in the first real-data dry run.
+
+Until the real source package is supplied and validated, G34-E remains `PENDING_SOURCE_VERIFICATION` and no project-specific mapping claims are certified.
 
 ### G34-F — Offline Real-Data Dry Run
 
@@ -159,8 +175,8 @@ Planned final gate. Produce a client-facing readiness summary, known limitations
 - G34-A — RC baseline + prior CI: PASS.
 - G34-B — Pilot Intake Contract: PASS.
 - G34-C — Offline Pilot Readiness Validator + focused tests: PASS.
-- G34-D — Controlled Manual Intake UI: IMPLEMENTED, pending current CI + visual smoke.
-- G34-E — Project Mapping Profile: PENDING REAL PILOT INPUTS.
+- G34-D — Controlled Manual Intake UI + CI + human visual smoke: PASS.
+- G34-E — Project Mapping Profile: SOURCE GATE OPEN / PENDING VERIFIED REAL PILOT INPUTS.
 - G34-F — Offline Real-Data Dry Run: PENDING.
 - G34-G — Pilot Readiness Pack: PENDING.
 
