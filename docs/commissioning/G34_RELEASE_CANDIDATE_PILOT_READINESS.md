@@ -178,9 +178,9 @@ Reference:
 
 ### Cross-cutting G34 asset — Generic Data Exchange Templates
 
-Status: **IMPLEMENTED**.
+Status: **PASS — IMPLEMENTED AND CI CERTIFIED**.
 
-A project-agnostic CSV exchange contract and header validator are now prepared so that incoming project information can be normalized without inventing values. Templates are header-only and intentionally contain no synthetic project records.
+A project-agnostic CSV exchange contract and header validator are prepared so that incoming project information can be normalized without inventing values. Templates are header-only and intentionally contain no synthetic project records.
 
 Code:
 
@@ -191,6 +191,16 @@ Templates:
 `docs/commissioning/templates/`
 
 The template set covers Project Identity, Scope Register, Asset Register, Test Matrix, Criteria Sources, Signal Dictionary, Signal Mapping, normalized Telemetry, Event Export, Evidence Index and Authority Register. Additional vendor/source columns may be retained for review but are never interpreted silently. Missing mandatory columns or duplicate headers block deterministic header admission.
+
+The `Pilot Intake` UI now exposes a local `Descargar plantilla CSV` action for all 11 artifact classes. Each download is generated from the same in-code contract using an in-browser Blob/Object URL; it does not call a server, use network transport, write browser storage or insert project-specific values.
+
+Certification commits:
+
+- `0213fde99f04bd36c18a784c3c53d6bfcf640370` — generic CSV contracts, templates and deterministic header tests.
+- `1ef4bab26635a2954a820674ef97e1725c777c21` — Pilot Intake template download UI.
+- `beade81e935222d715abbc877c422a95ff37fb61` — UI regression lock for all 11 template download actions.
+
+Commissioning CI run 123 completed Test, TypeScript lint and Production build successfully on `beade81e...`.
 
 ## Safety invariants inherited from G32/G33
 
@@ -213,6 +223,6 @@ The template set covers Project Identity, Scope Register, Asset Register, Test M
 - G34-E — Project Mapping Profile: FRAMEWORK READY / PENDING VERIFIED REAL PILOT INPUTS.
 - G34-F — Offline Real-Data Dry Run: FRAMEWORK PATH READY / PENDING REAL DATA.
 - G34-G — Pilot Readiness Pack: FRAMEWORK READY / REAL PACK PENDING REAL DATA.
-- Generic CSV Data Exchange Templates: IMPLEMENTED / pending current CI certification.
+- Generic CSV Data Exchange Templates + Pilot Intake downloads: PASS.
 
 No G34 result is operational authorization for a real BESS plant.
