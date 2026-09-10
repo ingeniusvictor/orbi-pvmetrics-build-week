@@ -226,3 +226,41 @@ Commissioning CI run 123 completed Test, TypeScript lint and Production build su
 - Generic CSV Data Exchange Templates + Pilot Intake downloads: PASS.
 
 No G34 result is operational authorization for a real BESS plant.
+
+## G34-H / G34-I reconciliation and G34-J freeze input
+
+The following records close the G34 framework reconciliation. They preserve the
+existing G34 history and do not upgrade framework readiness into real-project
+commissioning, acceptance, energization, operation or dispatch authority.
+
+### G34-H — Offline Telemetry Content Validation
+
+Status: **PASS — IMPLEMENTED, CI CERTIFIED AND HUMAN NEGATIVE-SMOKE CERTIFIED**.
+
+The controlled offline telemetry-content gate is certified as documented in:
+
+`docs/commissioning/G34_H_OFFLINE_TELEMETRY_CONTENT_VALIDATION.md`
+
+This certification applies to deterministic local validation behavior only. It
+does not verify a project's source authority, acceptance criteria, human
+acceptance, energization or operational authority.
+
+### G34-I — SMA/e-STORAGE baseline coverage audit
+
+Status: **PASS — STRUCTURAL COVERAGE AUDITED**.
+
+The audited baseline records:
+
+- `IMPLEMENTED`: 10/15;
+- `FRAMEWORK_READY`: 5/15;
+- Cliente/OEM dependencies still require verifiable real sources.
+
+No project criterion, threshold, setpoint, procedure, mapping or topology may
+be inferred from the structural audit. The evidence and classifications remain
+authoritative in:
+
+`docs/commissioning/G34_I_SMA_BASELINE_COVERAGE_AUDIT.md`
+
+G34-J formally freezes this generic framework at:
+
+`docs/commissioning/G34_J_FINAL_FRAMEWORK_CERTIFICATION_AND_FREEZE.md`
