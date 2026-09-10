@@ -38,6 +38,10 @@ import { PVMetricsSignalMappingView } from '../components/signal-mapping/PVMetri
 import { PVMetricsSignalQualityRulesView } from '../components/signal-quality/PVMetricsSignalQualityRulesView';
 import { PVMetricsPlantProfileManagerView } from '../components/plant-profile/PVMetricsPlantProfileManagerView';
 import { COMMISSIONING_FEATURE_FLAGS } from '../commissioning/config/commissioningFeatureFlags';
+import {
+  DEFAULT_COMMISSIONING_LOCALE,
+  type CommissioningLocale,
+} from '../commissioning/localization/commissioningLocale';
 
 const IncidentCopilotView = lazy(
   () => import('../../build-week/incident-copilot/IncidentCopilotView'),
@@ -57,7 +61,6 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
     activeCompanyId,
     activePlantId,
     activeCompany,
-    activePlant,
     setActiveCompanyId,
     setActivePlantId
   } = useAppState();
@@ -65,13 +68,19 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
   const [activeView, setActiveView] = useState<MainViewType>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [climateRecoveryLocale, setClimateRecoveryLocale] = useState<'es' | 'en'>('es');
+  const [commissioningLocale, setCommissioningLocale] = useState<CommissioningLocale>(DEFAULT_COMMISSIONING_LOCALE);
   const [climateRecoveryMode, setClimateRecoveryMode] = useState<'free' | 'guided' | 'presentation'>('free');
-  const shellEnglish = activeView === 'climate-recovery' && climateRecoveryLocale === 'en';
+  const shellLocale = activeView === 'climate-recovery'
+    ? climateRecoveryLocale
+    : activeView === 'commissioning'
+      ? commissioningLocale
+      : 'es';
+  const shellEnglish = shellLocale === 'en';
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     ...(COMMISSIONING_FEATURE_FLAGS.workspaceEnabled
-      ? [{ id: 'commissioning', label: 'Commissioning', icon: ClipboardCheck, badge: 'BESS' }]
+      ? [{ id: 'commissioning', label: shellEnglish ? 'Commissioning' : 'Puesta en Servicio', icon: ClipboardCheck, badge: 'BESS' }]
       : []),
     ...(isProductNavVisible(PRODUCT_FEATURE_VISIBILITY.climateRecovery)
       ? [{ id: 'climate-recovery', label: shellEnglish ? 'Climate Recovery' : 'Recuperación Climática', icon: Leaf, badge: 'CR-06.1' }]
@@ -131,11 +140,14 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           <Suspense
             fallback={
               <div className="rounded-xl border border-emerald-500/20 bg-gray-900 p-8 text-center text-xs text-emerald-300">
-                Loading BESS Commissioning Workspace…
+                {commissioningLocale === 'es' ? 'Cargando espacio de Puesta en Servicio BESS…' : 'Loading BESS Commissioning Workspace…'}
               </div>
             }
           >
-            <CommissioningWorkspaceView />
+            <CommissioningWorkspaceView
+              locale={commissioningLocale}
+              onLocaleChange={setCommissioningLocale}
+            />
           </Suspense>
         );
       case 'live':
@@ -179,7 +191,7 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
   };
 
   return (
-    <div className="cr-shell min-h-screen bg-[#0a0f1d] text-[#f9fafb] flex flex-col font-sans antialiased custom-scrollbar selection:bg-amber-500 selection:text-slate-900" data-cr-mode={activeView === 'climate-recovery' ? climateRecoveryMode : 'free'}>
+    <div className="cr-shell min-h-screen bg-[#0a0f1d] text-[#f9fafb] flex flex-col font-sans antialiased custom-scrollbar selection:bg-amber-500 selection:text-slate-900" data-cr-mode={activeView === 'climate-recovery' ? climateRecoveryMode : 'free'} lang={shellLocale}>
       <div className="cr-technical-chrome no-print bg-slate-950 border-b border-gray-800 text-[10px] text-gray-400 px-4 py-2 flex flex-wrap gap-x-6 gap-y-1.5 items-center justify-between">
         <div className="flex items-center gap-1.5 font-semibold text-amber-400">
           <AlertOctagon className="w-3.5 h-3.5" />
@@ -187,10 +199,10 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'LOCAL SIMULATION' : 'SIMULACIÓN LOCAL'}</span>
-          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">READ-ONLY</span>
-          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">NO REAL DISPATCH</span>
-          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">CONFIGURABLE</span>
-          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">SCADA READY</span>
+          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'READ-ONLY' : 'SOLO LECTURA'}</span>
+          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'NO REAL DISPATCH' : 'SIN DESPACHO REAL'}</span>
+          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'CONFIGURABLE' : 'CONFIGURABLE'}</span>
+          <span className="bg-gray-900 px-2 py-0.5 rounded text-gray-300 border border-gray-800 font-bold uppercase text-[8px]">{shellEnglish ? 'SCADA READY' : 'PREPARADO PARA SCADA'}</span>
         </div>
         <div className="text-gray-500 hidden md:block">
           {shellEnglish ? 'No active real SCADA connection' : 'Sin conexión SCADA real activa'}
@@ -253,7 +265,9 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-label={mobileMenuOpen
+                  ? (shellEnglish ? 'Close navigation menu' : 'Cerrar menú de navegación')
+                  : (shellEnglish ? 'Open navigation menu' : 'Abrir menú de navegación')}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="primary-navigation"
                 className="rounded p-1 text-gray-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
@@ -317,9 +331,9 @@ const OrbiPVMetricsStandaloneInner: React.FC = () => {
           <div className="cr-operational-banner no-print p-3 bg-gray-900/50 border border-gray-850 rounded-xl flex items-start gap-3">
             <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-[10px] text-gray-400 leading-relaxed">
-              <strong>{shellEnglish ? 'Operational boundary:' : 'Exclusividad de Operación:'}</strong> {shellEnglish
+              <strong>{shellEnglish ? 'Operational boundary:' : 'Límite operacional:'}</strong> {shellEnglish
                 ? 'ORBI PVMetrics IA does not operate BESS, send commands to EMS/BMS, or execute energy sales. This software is read-only in a local demonstration simulation. Commercial windows are non-binding technical evaluation suggestions.'
-                : 'ORBI PVMetrics IA no opera BESS, no envía comandos al EMS/BMS y no ejecuta ventas de energía. Este software opera de manera read-only en simulación local demostrativa. Las ventanas comerciales son sugerencias de evaluación técnica no vinculantes.'}
+                : 'ORBI PVMetrics IA no opera BESS, no envía comandos al EMS/BMS y no ejecuta ventas de energía. Este software funciona en modo de solo lectura dentro de una simulación local demostrativa. Las ventanas comerciales son sugerencias de evaluación técnica no vinculantes.'}
             </div>
           </div>
 
