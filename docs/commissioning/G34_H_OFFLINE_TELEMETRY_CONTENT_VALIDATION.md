@@ -1,9 +1,10 @@
 # G34-H — Offline Telemetry Content Validation
 
-Status: PASS — IMPLEMENTED AND CI CERTIFIED
+Status: PASS — IMPLEMENTED, CI CERTIFIED AND HUMAN NEGATIVE-SMOKE CERTIFIED
 Branch: `feature/bess-commissioning-workspace`
 Certified implementation head: `5e375f6ded27dc685525f147f230b829bdd1ec7f`
 CI evidence: Commissioning CI run 131 — Test PASS, TypeScript lint PASS, Production build PASS.
+Human smoke evidence: 2026-09-09 — the downloaded header-only `telemetry_normalized.csv` was re-selected in Pilot Intake and correctly resolved to `PENDING VALIDATION`, with `CSV header admission PASS`, `TELEMETRY CONTENT BLOCKED`, and `EMPTY_DATASET` surfaced to the user.
 
 ## Purpose
 
