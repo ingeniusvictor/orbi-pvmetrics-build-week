@@ -38,7 +38,9 @@ test('G32-A main navigation routes Commissioning through the feature flag', () =
   const source = read(APP_PATH);
   assert.match(source, /COMMISSIONING_FEATURE_FLAGS\.workspaceEnabled/);
   assert.match(source, /id:\s*'commissioning'/);
-  assert.match(source, /<CommissioningWorkspaceView\s*\/>/);
+  assert.match(source, /<CommissioningWorkspaceView\b/);
+  assert.match(source, /locale=\{commissioningLocale\}/);
+  assert.match(source, /onLocaleChange=\{setCommissioningLocale\}/);
 });
 
 test('G32-A workspace exposes every approved commissioning section without placeholders', () => {
@@ -64,9 +66,9 @@ test('G32-A workspace exposes every approved commissioning section without place
 test('G32-A global Reports preserves legacy reports and adds Commissioning as a separate domain', () => {
   const app = read(APP_PATH);
   const unified = read(UNIFIED_REPORTS_PATH);
-  assert.match(app, /<UnifiedReportsView\s*\/>/);
+  assert.match(app, /<UnifiedReportsView\b/);
   assert.match(unified, /<ReportsView\s*\/>/);
-  assert.match(unified, /<CommissioningReportsPanel\s*\/>/);
+  assert.match(unified, /<CommissioningReportsPanel\b/);
   assert.match(unified, /PV \+ BESS Reports/);
   assert.match(unified, /BESS Commissioning Report/);
 });
