@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.5",
-  "status": "two-project-skills-materialized",
+  "profile": "orbi-ecc-pvmetrics-v0.6",
+  "status": "agent-harness-contract-defined",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -77,6 +77,18 @@
         "after final branch change",
         "product-evolution handoff"
       ],
+      "authoritative": false,
+      "runtimeDependency": false
+    },
+    {
+      "name": "pvmetrics-agent-harness",
+      "path": ".agents/skills/pvmetrics-agent-harness/SKILL.md",
+      "version": "0.1.0",
+      "origin": "ORBI",
+      "upstreamInspiration": [
+        "ECC agent-harness-construction"
+      ],
+      "activation": "agent-or-tool-contract-design",
       "authoritative": false,
       "runtimeDependency": false
     }
@@ -216,7 +228,8 @@
     "defaultLoad": false,
     "conditionalSkills": [
       "pvmetrics-operational-data-review",
-      "pvmetrics-verification-loop"
+      "pvmetrics-verification-loop",
+      "pvmetrics-agent-harness"
     ],
     "rationale": "Preserve context budget; load domain skill only for matching operational-data/evidence work.",
     "routingRules": [
@@ -229,5 +242,15 @@
         "when": "completion, READY/GREEN, merge or handoff"
       }
     ]
+  },
+  "agentHarness": {
+    "contractDefined": true,
+    "runtimeEnabled": false,
+    "schema": ".orbi/pvmetrics-agent-observation-v1.schema.json",
+    "validator": "scripts/validate-pvmetrics-agent-observation.mjs",
+    "test": "tests/pvmetricsAgentHarnessContract.test.mjs",
+    "observationSchemaVersion": "pvm.agent.observation.v1",
+    "autonomousLoop": false,
+    "authorizationEngine": false
   }
 }
