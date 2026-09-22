@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "profile": "orbi-ecc-pvmetrics-v0.1",
+  "status": "inventory-and-instruction-baseline",
+  "adoptionMode": "curated",
+  "scope": "orbi-pvmetrics-build-week",
+  "productEvolutionBase": "feature/pvmetrics-product-evolution",
+  "sourcePilot": {
+    "repository": "ingeniusvictor/orbi-creative-studio",
+    "profile": "orbi-ecc-creative-studio-v1.0",
+    "certificationCommit": "8b2b3a39fbfb9ee1b85049079dff7b8e74054299"
+  },
+  "upstream": {
+    "ecc": {
+      "repository": "affaan-m/ECC",
+      "version": "2.2.2",
+      "commit": "91ba9b4cf6c47c8130829004f8bb64762a76ccbb"
+    },
+    "agentShield": {
+      "repository": "affaan-m/agentshield",
+      "package": "ecc-agentshield",
+      "version": "1.6.0",
+      "commit": "b0891303bdcd6037376a94263d45cfd2ff3dfb98"
+    }
+  },
+  "repositoryEvidence": {
+    "snapshotCommit": "44c9ddb4ca6a4d05668a482ec7e564b6ebb61d89",
+    "totalFiles": 593,
+    "typescriptFiles": 338,
+    "tsxFiles": 190,
+    "tests": 33,
+    "workflows": 1,
+    "packageManager": "npm",
+    "nodeCiMajor": 22,
+    "framework": [
+      "React 19",
+      "Vite 6"
+    ]
+  },
+  "candidateDailyAgents": [
+    "planner",
+    "architect",
+    "code-reviewer",
+    "security-reviewer",
+    "tdd-guide",
+    "doc-updater",
+    "typescript-reviewer"
+  ],
+  "candidateDailySkills": [
+    "architecture-decision-records",
+    "coding-standards",
+    "contract-first",
+    "tdd-workflow",
+    "verification-loop",
+    "security-review",
+    "context-budget"
+  ],
+  "candidateLibrarySkills": [
+    "agent-sort",
+    "codebase-onboarding",
+    "agent-harness-construction",
+    "ai-regression-testing",
+    "eval-harness",
+    "benchmark",
+    "benchmark-methodology"
+  ],
+  "projectSkills": [],
+  "authority": {
+    "mayConnectLiveOT": false,
+    "mayIssuePlantCommands": false,
+    "mayAuthorizeEnergization": false,
+    "mayAuthorizeDispatch": false,
+    "mayRelabelSyntheticAsReal": false,
+    "mayInventOemOrProjectCriteria": false,
+    "mayTreatDataGovernanceAsOperationalAuthority": false,
+    "mayTreatAiOutputAsAcceptanceEvidence": false
+  },
+  "frozenBoundaries": {
+    "commissioning": "PILOT_FRAMEWORK_READY — VERIFIED REAL PILOT DATA PENDING",
+    "buildWeekIncidentCopilot": "competition-bound legacy",
+    "climateRecovery": "competition-bound frozen"
+  },
+  "hooks": {
+    "enabled": false
+  },
+  "mcp": {
+    "enabled": false
+  },
+  "continuousLearning": {
+    "enabled": false
+  },
+  "unifiedMemory": {
+    "enabled": false,
+    "authoritative": false
+  },
+  "autonomousLoops": {
+    "enabled": false
+  },
+  "agentShield": {
+    "mode": "not-enabled-yet",
+    "phase": "PVM-ECC-P2"
+  },
+  "ci": {
+    "productEvolutionWorkflow": ".github/workflows/pvmetrics-product-evolution-ci.yml",
+    "requiredCommands": [
+      "npm ci",
+      "npm test",
+      "npm run lint",
+      "npm run build"
+    ]
+  }
+}
