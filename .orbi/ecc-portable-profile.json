@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "profile": "orbi-ecc-pvmetrics-portable-v0.1",
+  "status": "selective-reuse-ready",
+  "sourcePilot": {
+    "repository": "ingeniusvictor/orbi-pvmetrics-build-week",
+    "canonicalBranch": "feature/pvmetrics-product-evolution",
+    "certifiedThroughPhase": "P6",
+    "certifiedBaseline": "96087b124dd7a450cb5fdf2d80d81c296a34cf85"
+  },
+  "upstream": {
+    "ecc": {
+      "repository": "affaan-m/ECC",
+      "version": "2.2.2",
+      "commit": "91ba9b4cf6c47c8130829004f8bb64762a76ccbb"
+    },
+    "agentShield": {
+      "repository": "affaan-m/agentshield",
+      "package": "ecc-agentshield",
+      "version": "1.6.0",
+      "commit": "b0891303bdcd6037376a94263d45cfd2ff3dfb98"
+    }
+  },
+  "adoptionPolicy": {
+    "fullInstall": false,
+    "copyAllAgents": false,
+    "copyAllSkills": false,
+    "oneVariableAtATime": true,
+    "gitTestsAndGovernedDocsRemainCanonical": true,
+    "noOperationalAuthorityFromAgentOutput": true
+  },
+  "portableComponents": [
+    {
+      "name": "root-agent-instructions-pattern",
+      "source": "AGENTS.md",
+      "reuse": "adapt-required",
+      "reason": "Current branch, commands, frozen boundaries and domain authority differ by repository."
+    },
+    {
+      "name": "verification-vs-operational-acceptance-model",
+      "source": ".agents/skills/pvmetrics-verification-loop/SKILL.md",
+      "reuse": "portable-with-domain-review",
+      "reason": "The evidence model is portable; exact gates and operational semantics must be adapted."
+    },
+    {
+      "name": "structured-agent-observation-contract",
+      "source": ".orbi/pvmetrics-agent-observation-v1.schema.json",
+      "reuse": "portable-with-authority-review",
+      "reason": "Status/evidence/recovery structure is reusable; authorityImpact fields must match the target."
+    },
+    {
+      "name": "agent-harness-validator-pattern",
+      "source": "scripts/validate-pvmetrics-agent-observation.mjs",
+      "reuse": "portable-with-schema-review",
+      "reason": "Fail-closed shape validation and unknown-field rejection are reusable."
+    },
+    {
+      "name": "conditional-project-skill-routing",
+      "source": ".orbi/ecc-profile.json",
+      "reuse": "portable-with-skill-review",
+      "reason": "On-demand domain skills preserve context budget; skill names/triggers are project-specific."
+    },
+    {
+      "name": "agentshield-report-only-pattern",
+      "source": ".github/workflows/pvmetrics-ecc-agentshield-report.yml",
+      "reuse": "adapt-required",
+      "reason": "Pinning/report-only posture is reusable; paths and accepted baselines are repository-specific."
+    }
+  ],
+  "pvmetricsSpecificComponents": [
+    "pvmetrics-operational-data-review",
+    "operational-data provenance taxonomy",
+    "SOURCE_VERIFIED hierarchy",
+    "BESS commissioning frozen-state semantics",
+    "live-OT/dispatch/energization authority boundaries",
+    "PVMetrics AgentShield npm-integrity false-positive baseline"
+  ],
+  "projectSkills": [
+    {
+      "name": "pvmetrics-operational-data-review",
+      "reuse": "pvmetrics-specific"
+    },
+    {
+      "name": "pvmetrics-verification-loop",
+      "reuse": "adaptable-pattern"
+    },
+    {
+      "name": "pvmetrics-agent-harness",
+      "reuse": "adaptable-pattern"
+    }
+  ],
+  "validationEvidence": {
+    "finalPreCertificationCiRun": 35680202032,
+    "repositoryTests": {
+      "passed": 672,
+      "failed": 0
+    },
+    "typescript": "pass",
+    "build": "pass",
+    "finalPreCertificationAgentShieldRun": 35680201871,
+    "agentShieldUniqueFindingClasses": 1,
+    "agentShieldAcceptedFinding": "ACCEPTED_FALSE_POSITIVE — NPM_INTEGRITY_SHA512",
+    "newSecurityFindingClass": false
+  },
+  "authority": {
+    "mayConnectLiveOT": false,
+    "mayIssuePlantCommands": false,
+    "mayAuthorizeEnergization": false,
+    "mayAuthorizeDispatch": false,
+    "mayAuthorizeCommissioningAcceptance": false,
+    "mayPromoteVerifiedRealPilot": false,
+    "mayRelabelSyntheticAsReal": false,
+    "mayInventOemOrProjectCriteria": false,
+    "mayTreatAiOutputAsAcceptanceEvidence": false
+  },
+  "commissioningState": "PILOT_FRAMEWORK_READY — VERIFIED REAL PILOT DATA PENDING",
+  "deferred": {
+    "hooks": false,
+    "mcp": false,
+    "continuousLearningV2": false,
+    "unifiedMemory": false,
+    "autonomousLoops": false,
+    "agentRuntime": false,
+    "multiAgentRoles": false
+  },
+  "promotionCriteria": {
+    "reportOnlySecurityGreen": true,
+    "repositoryGateGreen": true,
+    "noNewUnreviewedSecurityFindingClass": true,
+    "projectSkillsNonRuntime": true,
+    "authoritySeparationExplicit": true,
+    "rollbackAvailable": true
+  }
+}
