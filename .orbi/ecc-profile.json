@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.4",
-  "status": "first-project-skill-materialized",
+  "profile": "orbi-ecc-pvmetrics-v0.5",
+  "status": "two-project-skills-materialized",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -57,6 +57,25 @@
         "real-data admission",
         "commissioning evidence",
         "AI consuming operational data"
+      ],
+      "authoritative": false,
+      "runtimeDependency": false
+    },
+    {
+      "name": "pvmetrics-verification-loop",
+      "path": ".agents/skills/pvmetrics-verification-loop/SKILL.md",
+      "version": "0.1.0",
+      "origin": "ORBI",
+      "upstreamInspiration": [
+        "ECC verification-loop",
+        "ECC delivery-gate"
+      ],
+      "activation": "completion-gate",
+      "triggers": [
+        "before READY/GREEN claim",
+        "before phase PR merge",
+        "after final branch change",
+        "product-evolution handoff"
       ],
       "authoritative": false,
       "runtimeDependency": false
@@ -162,7 +181,7 @@
     "coding-standards",
     "contract-first",
     "tdd-workflow",
-    "verification-loop",
+    "pvmetrics-verification-loop",
     "security-review",
     "context-budget",
     "delivery-gate",
@@ -196,8 +215,19 @@
   "projectSkillRouting": {
     "defaultLoad": false,
     "conditionalSkills": [
-      "pvmetrics-operational-data-review"
+      "pvmetrics-operational-data-review",
+      "pvmetrics-verification-loop"
     ],
-    "rationale": "Preserve context budget; load domain skill only for matching operational-data/evidence work."
+    "rationale": "Preserve context budget; load domain skill only for matching operational-data/evidence work.",
+    "routingRules": [
+      {
+        "skill": "pvmetrics-operational-data-review",
+        "when": "operational-data, provenance, evidence, real/synthetic, commissioning evidence"
+      },
+      {
+        "skill": "pvmetrics-verification-loop",
+        "when": "completion, READY/GREEN, merge or handoff"
+      }
+    ]
   }
 }
