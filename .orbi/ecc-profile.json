@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.2",
-  "status": "agentshield-baseline-classified",
+  "profile": "orbi-ecc-pvmetrics-v0.3",
+  "status": "agent-sort-classified",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -37,33 +37,6 @@
       "Vite 6"
     ]
   },
-  "candidateDailyAgents": [
-    "planner",
-    "architect",
-    "code-reviewer",
-    "security-reviewer",
-    "tdd-guide",
-    "doc-updater",
-    "typescript-reviewer"
-  ],
-  "candidateDailySkills": [
-    "architecture-decision-records",
-    "coding-standards",
-    "contract-first",
-    "tdd-workflow",
-    "verification-loop",
-    "security-review",
-    "context-budget"
-  ],
-  "candidateLibrarySkills": [
-    "agent-sort",
-    "codebase-onboarding",
-    "agent-harness-construction",
-    "ai-regression-testing",
-    "eval-harness",
-    "benchmark",
-    "benchmark-methodology"
-  ],
   "projectSkills": [],
   "authority": {
     "mayConnectLiveOT": false,
@@ -137,5 +110,63 @@
       "npm run lint",
       "npm run build"
     ]
+  },
+  "dailyAgents": [
+    "planner",
+    "architect",
+    "code-reviewer",
+    "security-reviewer",
+    "tdd-guide",
+    "doc-updater",
+    "typescript-reviewer"
+  ],
+  "libraryAgents": [
+    "react-reviewer",
+    "react-build-resolver",
+    "build-error-resolver",
+    "e2e-runner",
+    "performance-optimizer",
+    "refactor-cleaner",
+    "silent-failure-hunter",
+    "mle-reviewer",
+    "rag-pipeline-reviewer",
+    "harness-optimizer",
+    "loop-operator"
+  ],
+  "dailySkills": [
+    "architecture-decision-records",
+    "coding-standards",
+    "contract-first",
+    "tdd-workflow",
+    "verification-loop",
+    "security-review",
+    "context-budget",
+    "delivery-gate",
+    "git-workflow"
+  ],
+  "librarySkills": [
+    "agent-sort",
+    "codebase-onboarding",
+    "agent-harness-construction",
+    "ai-regression-testing",
+    "eval-harness",
+    "benchmark",
+    "benchmark-methodology",
+    "browser-qa",
+    "e2e-testing",
+    "frontend-patterns",
+    "react-patterns",
+    "react-testing",
+    "react-performance",
+    "vite-patterns",
+    "error-handling"
+  ],
+  "agentSort": {
+    "phase": "PVM-ECC-P3",
+    "methodology": "ECC agent-sort",
+    "evidenceBacked": true,
+    "runtimeExecuted": false,
+    "p2CanonicalAtStart": "390efd095aa1b66c4ce78171a9efa8a7af376640",
+    "nextRecommendedSkill": "pvmetrics-operational-data-review"
   }
 }
