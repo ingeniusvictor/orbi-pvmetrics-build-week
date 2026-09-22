@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.1",
-  "status": "inventory-and-instruction-baseline",
+  "profile": "orbi-ecc-pvmetrics-v0.2",
+  "status": "agentshield-report-baseline",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -97,8 +97,18 @@
     "enabled": false
   },
   "agentShield": {
-    "mode": "not-enabled-yet",
-    "phase": "PVM-ECC-P2"
+    "mode": "report-only",
+    "package": "ecc-agentshield",
+    "version": "1.6.0",
+    "repository": "affaan-m/agentshield",
+    "commit": "b0891303bdcd6037376a94263d45cfd2ff3dfb98",
+    "autoFix": false,
+    "ciEnforced": false,
+    "failOnFindings": false,
+    "onlineSupplyChainLookup": false,
+    "evidenceRetentionDays": 14,
+    "baselineClassification": "pending-first-run-review",
+    "inheritedAcceptedFindings": false
   },
   "ci": {
     "productEvolutionWorkflow": ".github/workflows/pvmetrics-product-evolution-ci.yml",
