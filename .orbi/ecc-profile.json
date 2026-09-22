@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.3",
-  "status": "agent-sort-classified",
+  "profile": "orbi-ecc-pvmetrics-v0.4",
+  "status": "first-project-skill-materialized",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -37,7 +37,31 @@
       "Vite 6"
     ]
   },
-  "projectSkills": [],
+  "projectSkills": [
+    {
+      "name": "pvmetrics-operational-data-review",
+      "path": ".agents/skills/pvmetrics-operational-data-review/SKILL.md",
+      "version": "0.1.0",
+      "origin": "ORBI",
+      "upstreamInspiration": [
+        "ECC contract-first",
+        "ECC security-review",
+        "ECC verification-loop"
+      ],
+      "activation": "conditional",
+      "triggers": [
+        "operational-data contracts",
+        "operational adapters/imports",
+        "provenance/evidence",
+        "synthetic vs real data",
+        "real-data admission",
+        "commissioning evidence",
+        "AI consuming operational data"
+      ],
+      "authoritative": false,
+      "runtimeDependency": false
+    }
+  ],
   "authority": {
     "mayConnectLiveOT": false,
     "mayIssuePlantCommands": false,
@@ -168,5 +192,12 @@
     "runtimeExecuted": false,
     "p2CanonicalAtStart": "390efd095aa1b66c4ce78171a9efa8a7af376640",
     "nextRecommendedSkill": "pvmetrics-operational-data-review"
+  },
+  "projectSkillRouting": {
+    "defaultLoad": false,
+    "conditionalSkills": [
+      "pvmetrics-operational-data-review"
+    ],
+    "rationale": "Preserve context budget; load domain skill only for matching operational-data/evidence work."
   }
 }
