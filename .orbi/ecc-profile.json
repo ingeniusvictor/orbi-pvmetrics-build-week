@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "profile": "orbi-ecc-pvmetrics-v0.6",
-  "status": "agent-harness-contract-defined",
+  "profile": "orbi-ecc-pvmetrics-v1.0",
+  "status": "selective-adoption-certified",
   "adoptionMode": "curated",
   "scope": "orbi-pvmetrics-build-week",
   "productEvolutionBase": "feature/pvmetrics-product-evolution",
@@ -252,5 +252,20 @@
     "observationSchemaVersion": "pvm.agent.observation.v1",
     "autonomousLoop": false,
     "authorizationEngine": false
+  },
+  "certification": {
+    "phase": "PVM-ECC-P7",
+    "certifiedThrough": "PVM-ECC-P6",
+    "preCertificationCanonical": "96087b124dd7a450cb5fdf2d80d81c296a34cf85",
+    "productEvolutionCiRun": 35680202032,
+    "tests": {
+      "passed": 672,
+      "failed": 0
+    },
+    "typescript": "pass",
+    "build": "pass",
+    "agentShieldRun": 35680201871,
+    "agentShieldNewFindingClass": false,
+    "portableProfile": ".orbi/ecc-portable-profile.json"
   }
 }
